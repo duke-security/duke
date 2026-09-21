@@ -16,11 +16,13 @@ composed, rather than experiencing it as a single opaque tool.
 
 ## Current implementation
 
-Only two components are implemented today:
+Two components are implemented today:
 
-- **`core`** — currently limited to package metadata; the shared
-  domain models, interfaces, configuration, and registry described
-  below are planned.
+- **`core`** — the vendor-neutral domain model (`Entity`,
+  `SecurityEvent`, `Evidence`, `Finding`, `Incident`,
+  `ResponseAction`, `Scenario`) described in
+  [domain-model.md](domain-model.md). Interfaces, configuration, and a
+  scenario/component registry are still planned.
 - **`cli`** — a Typer-based command-line interface providing
   `duke --help` and `duke version`, built on top of Rich for output
   formatting.
@@ -59,12 +61,14 @@ adapters. This means:
 See [ADR 0001](../decisions/0001-vendor-agnostic-core.md) for the
 rationale.
 
-## Domain model direction
+## Domain model
 
-The initial domain model will eventually include: `SecurityEvent`,
-`Entity`, `Evidence`, `Finding`, `Incident`, `ResponseAction`, and
-`Scenario`. These are introduced incrementally, only with a clear
-purpose, tests, and documentation — not speculatively.
+The core domain model — `SecurityEvent`, `Entity`, `Evidence`,
+`Finding`, `Incident`, `ResponseAction`, and `Scenario` — is
+implemented; see [domain-model.md](domain-model.md) for each model's
+purpose, relationships, and key validation decisions. Further models
+are introduced incrementally, only with a clear purpose, tests, and
+documentation — not speculatively.
 
 ## Scenario design
 

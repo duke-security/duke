@@ -39,6 +39,8 @@ for the current milestone.
 
 ### Complete
 
+- Vendor-neutral Pydantic v2 core domain models with strict validation
+- Core domain-model unit tests and architecture documentation
 - Installable Python package (`duke-security`)
 - Typer/Rich command-line interface
 - `duke --help`
@@ -48,13 +50,14 @@ for the current milestone.
 - Documentation foundation (this roadmap, README, CONTRIBUTING,
   architecture overview, development guides, and initial ADRs)
 
-### Planned
+### Component roadmap
 
-All components below are planned and not yet implemented.
+The core domain models and CLI foundation are implemented. The table
+below distinguishes that foundation from the capabilities still planned.
 
 | Component | Purpose |
 |---|---|
-| `core` | Shared domain models, interfaces, configuration, and registry |
+| `core` | Domain models implemented; shared interfaces, configuration, and scenario registry planned |
 | `cli` | Typer-based command-line interface (foundation in place; commands to grow with each capability) |
 | `learning` | Python lessons, exercises, and challenges |
 | `simulation` | Safe behaviour and scenario simulation |
@@ -71,9 +74,10 @@ SIEM, EDR, or other security vendor. Provider-specific data is
 translated into Duke's normalized models through adapters — see
 [ADR 0001](docs/decisions/0001-vendor-agnostic-core.md).
 
-Planned domain models (introduced only with clear purpose, tests, and
-documentation): `SecurityEvent`, `Entity`, `Evidence`, `Finding`,
-`Incident`, `ResponseAction`, `Scenario`.
+Implemented domain models: `SecurityEvent`, `Entity`, `Evidence`,
+`Finding`, `Incident`, `ResponseAction`, and `Scenario`. See
+[domain-model.md](docs/architecture/domain-model.md). Further models
+will be introduced only with clear purpose, tests, and documentation.
 
 ## Beyond the first milestone
 

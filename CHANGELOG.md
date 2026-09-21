@@ -9,6 +9,16 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Vendor-neutral Pydantic v2 domain models for `SecurityEvent`,
+  `Entity`, `Evidence`, `Finding`, `Incident`, `ResponseAction`, and
+  `Scenario`.
+- Strict validation for UUID relationships, timezone-aware timestamps,
+  enum-controlled states, evidence provenance, incident composition,
+  unknown fields, and response rollback requirements.
+- Forty-nine focused core-model unit tests covering construction,
+  validation, serialization, reconstruction, and relationships.
+- Core domain-model architecture documentation with a normalized
+  `SecurityEvent` example.
 - Documentation foundation: README, ROADMAP, CONTRIBUTING, and
   architecture/development documentation describing Duke's current
   capabilities and planned components.

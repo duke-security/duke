@@ -29,6 +29,8 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
 ### Implemented today
 
 - An installable Python package (`duke-security`)
+- Vendor-neutral Pydantic v2 domain models for security events,
+  entities, evidence, findings, incidents, response actions, and scenarios
 - A [Typer](https://typer.tiangolo.com/)/[Rich](https://rich.readthedocs.io/)
   command-line interface
 - `duke --help`
@@ -38,9 +40,11 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
 
 ### Planned
 
-Everything else described in this repository — scenario simulation,
-telemetry generation, detection, investigation, response, reporting,
-labs, and vendor adapters — is **planned** and not yet implemented.
+The core domain model is implemented and documented in
+[docs/architecture/domain-model.md](docs/architecture/domain-model.md).
+Scenario simulation, telemetry generation, detection logic,
+investigation workflows, response execution, reporting, labs, and
+vendor adapters remain **planned** and are not yet implemented.
 See [docs/architecture/overview.md](docs/architecture/overview.md)
 and [ROADMAP.md](ROADMAP.md) for details.
 
