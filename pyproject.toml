@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "duke-security"
+version = "0.1.0"
+description = "A vendor-agnostic cybersecurity education and security-engineering platform."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "networkx>=3.2",
+    "pydantic>=2.6",
+    "pyyaml>=6.0",
+    "rich>=13.7",
+    "typer>=0.12",
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.8",
+    "pre-commit>=3.6",
+    "pytest>=8.0",
+    "pytest-cov>=4.1",
+    "ruff>=0.3",
+]
+
+[project.scripts]
+duke = "duke.cli.app:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["duke"]
+
+[[tool.mypy.overrides]]
+module = ["yaml.*"]
+ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["duke"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

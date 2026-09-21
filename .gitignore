@@ -1,0 +1,40 @@
+# Virtual environments
+.venv/
+venv/
+
+# Python-generated files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Test and coverage output
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Type-checker and linter caches
+.mypy_cache/
+.ruff_cache/
+
+# Build output
+build/
+dist/
+*.egg-info/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Duke-generated runtime data
+data/events/*.json
+reports/
