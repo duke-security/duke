@@ -12,6 +12,7 @@ from duke.core import Finding, FindingStatus, Severity
 def _build_finding(created_at: datetime, **overrides: object) -> Finding:
     defaults: dict[str, object] = {
         "created_at": created_at,
+        "confidence": 85,
         "title": "Impossible travel login",
         "description": "A user authenticated from two distant locations quickly.",
         "detection_name": "impossible-travel",
@@ -26,6 +27,7 @@ def _build_finding(created_at: datetime, **overrides: object) -> Finding:
 def test_valid_finding_construction(aware_now: datetime) -> None:
     finding = _build_finding(aware_now)
 
+    assert finding.confidence == 85
     assert finding.severity is Severity.HIGH
     assert finding.status is FindingStatus.NEW
     assert finding.event_ids == []
@@ -74,3 +76,10 @@ def test_supporting_evidence_and_event_relationships(aware_now: datetime) -> Non
     assert finding.event_ids == [event_id]
     assert finding.evidence_ids == [evidence_id]
     assert finding.entity_ids == [entity_id]
+@pytest.mark.parametrize("confidence", [-1, 101])
+def test_confidence_outside_valid_range_rejected(
+    aware_now: datetime,
+    confidence: int,
+) -> None:
+    with pytest.raises(ValidationError):
+        _build_finding(aware_now, confidence=confidence)

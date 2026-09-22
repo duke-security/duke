@@ -52,6 +52,11 @@ for the current milestone.
 - `duke version`
 - CLI unit tests
 - Quality gates: Ruff, mypy (strict), pytest
+- `duke detect T1078`
+- Deterministic, behaviour-based T1078 detection using an explainable
+  weighted confidence score (`Finding.confidence`) over normalized events
+- Detection input loading and validation with clear error handling, plus
+  comprehensive detection and CLI tests
 - Documentation foundation (this roadmap, README, CONTRIBUTING,
   architecture overview, development guides, and initial ADRs)
 
@@ -67,7 +72,7 @@ below distinguishes that foundation from the capabilities still planned.
 | `learning` | Python lessons, exercises, and challenges |
 | `simulation` | T1078 safe deterministic simulation implemented; additional scenarios and mutation remain planned |
 | `telemetry` | T1078 normalized event generation and JSON export implemented; ingestion and source health remain planned |
-| `detection` | Detection rules, correlation, and quality testing |
+| `detection` | Deterministic T1078 detection implemented with explainable weighted confidence and automated tests; mutation testing, precision/recall measurement, lifecycle tuning, and additional rules remain planned |
 | `investigation` | Evidence, timelines, hypotheses, and graphs |
 | `response` | Safe response plans, approvals, dry runs, and rollback |
 | `reporting` | Incident reports, summaries, and lessons learned |

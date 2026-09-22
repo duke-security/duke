@@ -40,14 +40,18 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
   command-line interface
 - `duke --help`
 - `duke version`
+- `duke detect T1078`
+- Behaviour-based detection for the T1078 scenario, using an explainable
+  weighted confidence score to emit vendor-neutral findings
 - CLI unit tests
 - Quality gates: [Ruff](https://docs.astral.sh/ruff/), mypy (strict), pytest
 
 ### Planned
 
 The core domain model and the T1078 scenario’s metadata, simulation,
-normalized telemetry, JSON export, and CLI command are implemented.
-Detection logic, evidence-led investigation, safe response, validation,
+normalized telemetry, JSON export, CLI commands, and behaviour-based
+detection are implemented.
+Evidence-led investigation, safe response, detection validation,
 incident reporting, learning exercises, additional scenarios, and
 vendor adapters remain **planned**.
 
@@ -72,6 +76,7 @@ For local development, install it in editable mode instead — see
 duke --help
 duke version
 duke simulate T1078
+duke detect T1078 --input data/events/t1078-session-001.json
 ```
 
 ## Documentation

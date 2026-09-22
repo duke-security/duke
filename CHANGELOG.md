@@ -40,6 +40,27 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
 - `duke --help` and `duke version` commands.
 - CLI unit tests.
 - Ruff, mypy (strict), and pytest quality gates.
+- `Finding.confidence`: an integer `0`–`100` scoring how strongly a
+  detection asserts a finding, with boundary validation and unit tests.
+- Deterministic, behaviour-based detection for T1078 Valid Accounts.
+  An explainable weighted score requires a known-good baseline login
+  and a later login from a new network and unfamiliar device, then
+  correlates distinct follow-on behaviours within 15 minutes to emit a
+  `Finding` (new-context login 25 points; repository enumeration 10,
+  restricted file access 15, privileged-access request 15, archive
+  creation 10, and network egress 15). Findings are produced only at a
+  confidence of 60 or more, and confidence derives severity (medium or
+  high, never critical).
+- `duke detect T1078`, which loads and validates a normalized telemetry
+  JSON artefact (`--input`) and reports findings; it never silently
+  regenerates the simulation.
+- Detection input loading with clear, non-zero error handling for
+  missing files, directories, malformed JSON, unsupported schema
+  versions, and invalid `SecurityEvent` records, plus automated tests.
+- Detection unit tests covering true positives, benign activity,
+  insufficient score, correlation-window expiry, missing baseline,
+  wrong actor, duplicate behaviours, deterministic output, confidence
+  range, and event/entity relationships.
 
 
 ### Changed

@@ -118,7 +118,10 @@ identifier — the events, evidence, and entities that support it.
 `severity` and `status` (`FindingStatus`) track the finding's own
 lifecycle independently of any incident it may later be correlated
 into. `technique_id` optionally records an associated MITRE ATT&CK
-technique.
+technique. `confidence` is an integer `0`–`100` expressing how strongly
+the detection logic asserts the finding; detection rules use it to
+report an explainable, weighted score and to derive `severity` rather
+than hardcoding it.
 
 ### `Incident`
 

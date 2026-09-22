@@ -27,11 +27,15 @@ The following foundations are implemented:
 - **`simulation`** — a deterministic and safe T1078 event generator.
 - **`telemetry`** — normalized synthetic events and structured JSON
   export with overwrite protection.
+- **`detection`** — deterministic, behaviour-based T1078 detection that
+  scores an actor's event sequence with an explainable weighted
+  confidence value and emits vendor-neutral `Finding` objects; input
+  loading validates exported normalized events.
 - **`labs`** — documentation for the implemented T1078 simulation
-  stage.
+  and detection stages.
 
-The T1078 detection, investigation, response, validation, reporting,
-and learning stages remain planned.
+The T1078 investigation, response, validation, reporting, and learning
+stages remain planned.
 
 ## Component status
 
@@ -42,7 +46,7 @@ and learning stages remain planned.
 | `learning` | Planned Python lessons, exercises, and challenges |
 | `simulation` | T1078 deterministic simulation implemented; additional scenarios and mutation planned |
 | `telemetry` | T1078 event generation and JSON export implemented; ingestion and source-health monitoring planned |
-| `detection` | Planned detection rules, correlation, testing, and tuning |
+| `detection` | Deterministic T1078 detection implemented with explainable weighted confidence and automated tests; mutation testing, precision/recall, tuning, and additional rules planned |
 | `investigation` | Planned evidence, timelines, hypotheses, and graphs |
 | `response` | Planned safe response actions, approvals, dry runs, verification, and rollback |
 | `reporting` | Planned incident reports, summaries, and lessons learned |
@@ -90,9 +94,13 @@ The implemented T1078 scenario contains:
 - automated model, loader, simulation, export, and CLI tests;
 - scenario documentation.
 
+The implemented scenario now also includes:
+
+- behaviour-based detection logic with explainable weighted confidence
+  and automated tests.
+
 The following scenario components remain planned:
 
-- detection logic and quality tests;
 - investigation and evidence guidance;
 - safe response actions;
 - validation and mutation testing;

@@ -46,3 +46,8 @@ class Finding(DukeModel):
         default_factory=list,
         description="Identifiers of Entity objects implicated by this finding.",
     )
+    confidence: int = Field(
+        ge=0,
+        le=100,
+        description="Detection confidence expressed as an integer from 0 to 100.",
+    )
