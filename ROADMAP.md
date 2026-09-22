@@ -39,6 +39,11 @@ for the current milestone.
 
 ### Complete
 
+- Packaged YAML scenario loading and validation
+- T1078 deterministic simulation with eight entities and eight events
+- Normalized JSON telemetry export with overwrite protection
+- `duke simulate T1078`
+- T1078 simulation documentation and automated tests
 - Vendor-neutral Pydantic v2 core domain models with strict validation
 - Core domain-model unit tests and architecture documentation
 - Installable Python package (`duke-security`)
@@ -58,15 +63,15 @@ below distinguishes that foundation from the capabilities still planned.
 | Component | Purpose |
 |---|---|
 | `core` | Domain models implemented; shared interfaces, configuration, and scenario registry planned |
-| `cli` | Typer-based command-line interface (foundation in place; commands to grow with each capability) |
+| `cli` | Typer-based CLI implemented with `version` and T1078 `simulate`; commands will grow with each capability |
 | `learning` | Python lessons, exercises, and challenges |
-| `simulation` | Safe behaviour and scenario simulation |
-| `telemetry` | Normalized security-event generation and ingestion |
+| `simulation` | T1078 safe deterministic simulation implemented; additional scenarios and mutation remain planned |
+| `telemetry` | T1078 normalized event generation and JSON export implemented; ingestion and source health remain planned |
 | `detection` | Detection rules, correlation, and quality testing |
 | `investigation` | Evidence, timelines, hypotheses, and graphs |
 | `response` | Safe response plans, approvals, dry runs, and rollback |
 | `reporting` | Incident reports, summaries, and lessons learned |
-| `labs` | Guided end-to-end learning experiences |
+| `labs` | T1078 simulation documentation implemented; detection through reporting stages remain planned |
 | `adapters` | Optional vendor or platform integrations |
 
 The core will not depend directly on AWS, Azure, GCP, a particular

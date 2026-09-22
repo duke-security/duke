@@ -23,8 +23,12 @@ class Scenario(DukeModel):
     attack_technique_id: str = Field(
         description="MITRE ATT&CK technique identifier, e.g. 'T1078'.",
     )
-    attack_tactic: str = Field(
-        description="MITRE ATT&CK tactic name, e.g. 'Initial Access'.",
+    attack_tactics: list[str] = Field(
+        min_length=1,
+        description=(
+            "MITRE ATT&CK tactic names associated with the technique, "
+            "e.g. 'Initial Access' or 'Defense Evasion'."
+        ),
     )
     learning_objectives: list[str] = Field(
         min_length=1,

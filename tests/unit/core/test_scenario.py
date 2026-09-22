@@ -13,7 +13,7 @@ def _build_scenario(**overrides: object) -> Scenario:
         "name": "Valid Accounts: Anomalous Authentication",
         "description": "Detect and investigate use of compromised valid credentials.",
         "attack_technique_id": "T1078",
-        "attack_tactic": "Initial Access",
+        "attack_tactics": ["Initial Access"],
         "learning_objectives": ["Recognize impossible-travel authentication patterns."],
         "python_concepts": ["dataclasses", "datetime arithmetic"],
         "telemetry_requirements": ["Normalized authentication events."],
@@ -60,3 +60,24 @@ def test_requires_at_least_one_learning_objective() -> None:
 def test_requires_at_least_one_safety_note() -> None:
     with pytest.raises(ValidationError):
         _build_scenario(safety_notes=[])
+def test_supports_multiple_attack_tactics() -> None:
+    scenario = _build_scenario(
+        attack_tactics=[
+            "Initial Access",
+            "Persistence",
+            "Privilege Escalation",
+            "Defense Evasion",
+        ],
+    )
+
+    assert scenario.attack_tactics == [
+        "Initial Access",
+        "Persistence",
+        "Privilege Escalation",
+        "Defense Evasion",
+    ]
+
+
+def test_requires_at_least_one_attack_tactic() -> None:
+    with pytest.raises(ValidationError):
+        _build_scenario(attack_tactics=[])

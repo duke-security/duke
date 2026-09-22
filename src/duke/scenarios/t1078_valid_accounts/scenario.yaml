@@ -1,0 +1,47 @@
+id: "10780000-0000-4000-8000-000000000001"
+name: "Valid Accounts: Compromised Identity"
+description: >-
+  A synthetic user identity authenticates from an unfamiliar context and
+  performs a sequence of unusual actions involving repository discovery,
+  sensitive data access, privilege use, archive creation, and outbound
+  network activity.
+
+attack_technique_id: "T1078"
+attack_tactics:
+  - "Initial Access"
+  - "Persistence"
+  - "Privilege Escalation"
+  - "Defense Evasion"
+
+learning_objectives:
+  - "Explain why valid-account activity can be malicious without a failed login."
+  - "Distinguish normal identity activity from a suspicious behaviour sequence."
+  - "Correlate authentication, repository, file, privilege, and network telemetry."
+  - "Preserve evidence before proposing containment actions."
+
+python_concepts:
+  - "Lists and dictionaries"
+  - "Functions and modules"
+  - "Typed data models"
+  - "Datetime arithmetic"
+  - "JSON and YAML serialization"
+  - "Deterministic test data"
+
+telemetry_requirements:
+  - "Authentication activity"
+  - "Device and network context"
+  - "Repository enumeration"
+  - "Sensitive file access"
+  - "Privilege activity"
+  - "Archive creation"
+  - "Outbound network connections"
+
+safety_notes:
+  - "Uses only synthetic identities, devices, resources, and network addresses."
+  - "Does not authenticate to a real identity provider."
+  - "Does not access real repositories or sensitive files."
+  - "Does not create real archives or transmit data."
+  - "Does not modify accounts, permissions, sessions, or security controls."
+
+version: "0.1.0"
+last_reviewed: "2026-09-22"

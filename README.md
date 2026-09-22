@@ -29,6 +29,11 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
 ### Implemented today
 
 - An installable Python package (`duke-security`)
+- Packaged and validated YAML scenario definitions
+- A deterministic, safe T1078 Valid Accounts simulation containing
+  eight synthetic entities and eight normalized events
+- Structured JSON artefact export with overwrite protection
+- `duke simulate T1078`
 - Vendor-neutral Pydantic v2 domain models for security events,
   entities, evidence, findings, incidents, response actions, and scenarios
 - A [Typer](https://typer.tiangolo.com/)/[Rich](https://rich.readthedocs.io/)
@@ -40,13 +45,15 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
 
 ### Planned
 
-The core domain model is implemented and documented in
-[docs/architecture/domain-model.md](docs/architecture/domain-model.md).
-Scenario simulation, telemetry generation, detection logic,
-investigation workflows, response execution, reporting, labs, and
-vendor adapters remain **planned** and are not yet implemented.
-See [docs/architecture/overview.md](docs/architecture/overview.md)
-and [ROADMAP.md](ROADMAP.md) for details.
+The core domain model and the T1078 scenario’s metadata, simulation,
+normalized telemetry, JSON export, and CLI command are implemented.
+Detection logic, evidence-led investigation, safe response, validation,
+incident reporting, learning exercises, additional scenarios, and
+vendor adapters remain **planned**.
+
+See [the T1078 lab documentation](docs/labs/T1078/overview.md),
+[the architecture overview](docs/architecture/overview.md), and
+[ROADMAP.md](ROADMAP.md) for details.
 
 ## Installation
 
@@ -64,6 +71,7 @@ For local development, install it in editable mode instead — see
 ```bash
 duke --help
 duke version
+duke simulate T1078
 ```
 
 ## Documentation

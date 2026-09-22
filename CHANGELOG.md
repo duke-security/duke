@@ -9,6 +9,16 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Packaged YAML loading and validation for built-in Duke scenarios.
+- Safe deterministic simulation for MITRE ATT&CK T1078 Valid Accounts,
+  producing eight synthetic entities and eight normalized events.
+- Structured JSON simulation artefacts with schema versioning,
+  configurable output paths, and explicit overwrite protection.
+- `duke simulate T1078` CLI command.
+- T1078 lab documentation covering the scenario timeline, Python
+  concepts, safety boundaries, artefact structure, and limitations.
+- Automated tests for scenario loading, deterministic simulation,
+  entity relationships, JSON export, file safety, and CLI behaviour.
 - Vendor-neutral Pydantic v2 domain models for `SecurityEvent`,
   `Entity`, `Evidence`, `Finding`, `Incident`, `ResponseAction`, and
   `Scenario`.
@@ -30,3 +40,9 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
 - `duke --help` and `duke version` commands.
 - CLI unit tests.
 - Ruff, mypy (strict), and pytest quality gates.
+
+
+### Changed
+
+- `Scenario.attack_tactic` was replaced by `attack_tactics` so one
+  ATT&CK technique can map accurately to multiple tactics.

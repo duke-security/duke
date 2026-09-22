@@ -16,34 +16,38 @@ composed, rather than experiencing it as a single opaque tool.
 
 ## Current implementation
 
-Two components are implemented today:
+The following foundations are implemented:
 
-- **`core`** — the vendor-neutral domain model (`Entity`,
-  `SecurityEvent`, `Evidence`, `Finding`, `Incident`,
-  `ResponseAction`, `Scenario`) described in
-  [domain-model.md](domain-model.md). Interfaces, configuration, and a
-  scenario/component registry are still planned.
-- **`cli`** — a Typer-based command-line interface providing
-  `duke --help` and `duke version`, built on top of Rich for output
-  formatting.
+- **`core`** — vendor-neutral models for entities, security events,
+  evidence, findings, incidents, response actions, and scenarios.
+- **`cli`** — Typer/Rich commands for help, version information, and
+  running the T1078 simulation.
+- **`scenarios`** — packaged YAML definitions loaded and validated as
+  typed `Scenario` models.
+- **`simulation`** — a deterministic and safe T1078 event generator.
+- **`telemetry`** — normalized synthetic events and structured JSON
+  export with overwrite protection.
+- **`labs`** — documentation for the implemented T1078 simulation
+  stage.
 
-Everything else in this document describes planned architecture.
+The T1078 detection, investigation, response, validation, reporting,
+and learning stages remain planned.
 
-## Planned components
+## Component status
 
-| Component | Responsibility |
+| Component | Current status and responsibility |
 |---|---|
-| `core` | Shared domain models, interfaces, configuration, and a scenario/component registry |
-| `cli` | Typer-based command-line interface; the primary interface until an API, TUI, or web UI is justified |
-| `learning` | Python lessons, exercises, and challenges |
-| `simulation` | Safe behaviour and scenario simulation |
-| `telemetry` | Normalized security-event generation and ingestion |
-| `detection` | Detection rules, correlation, and quality testing |
-| `investigation` | Evidence, timelines, hypotheses, and graphs |
-| `response` | Safe response plans, approvals, dry runs, and rollback |
-| `reporting` | Incident reports, summaries, and lessons learned |
-| `labs` | Guided end-to-end learning experiences that compose the components above into a full lifecycle |
-| `adapters` | Optional vendor or platform integrations |
+| `core` | Domain models implemented; shared interfaces, configuration, and registry remain planned |
+| `cli` | Foundation, `version`, and T1078 `simulate` implemented |
+| `learning` | Planned Python lessons, exercises, and challenges |
+| `simulation` | T1078 deterministic simulation implemented; additional scenarios and mutation planned |
+| `telemetry` | T1078 event generation and JSON export implemented; ingestion and source-health monitoring planned |
+| `detection` | Planned detection rules, correlation, testing, and tuning |
+| `investigation` | Planned evidence, timelines, hypotheses, and graphs |
+| `response` | Planned safe response actions, approvals, dry runs, verification, and rollback |
+| `reporting` | Planned incident reports, summaries, and lessons learned |
+| `labs` | T1078 simulation documentation implemented; remaining lifecycle stages planned |
+| `adapters` | Planned optional vendor and platform integrations |
 
 ## Vendor-agnostic core
 
@@ -70,25 +74,35 @@ purpose, relationships, and key validation decisions. Further models
 are introduced incrementally, only with a clear purpose, tests, and
 documentation — not speculatively.
 
+
 ## Scenario design
 
-Scenarios are intended to be metadata-driven rather than hardcoded
-into the CLI. A scenario may eventually be composed of:
+Scenarios are metadata-driven rather than hardcoded into the CLI.
 
-- `scenario.yaml` metadata (identifier, name, description, ATT&CK
-  technique/tactic, learning objectives, Python concepts, telemetry
-  requirements, safety classification, references, version, and
-  last-reviewed date)
-- safe simulation logic
-- detection logic
-- investigation guidance
-- response guidance
-- validation tests
-- scenario documentation
+The implemented T1078 scenario contains:
 
-The first scenario, based on MITRE ATT&CK T1078 (Valid Accounts), is
-the initial vertical slice used to validate this design end to end —
-see [ROADMAP.md](../../ROADMAP.md).
+- packaged `scenario.yaml` metadata;
+- a typed YAML loader with Pydantic validation;
+- ATT&CK technique and multiple-tactic mappings;
+- learning objectives and Python concepts;
+- telemetry requirements and explicit safety notes;
+- deterministic safe simulation logic;
+- automated model, loader, simulation, export, and CLI tests;
+- scenario documentation.
+
+The following scenario components remain planned:
+
+- detection logic and quality tests;
+- investigation and evidence guidance;
+- safe response actions;
+- validation and mutation testing;
+- incident reporting;
+- guided learning exercises.
+
+T1078 Valid Accounts is Duke's first vertical slice, not its only
+planned scenario. See [ROADMAP.md](../../ROADMAP.md) and the
+[T1078 lab documentation](../labs/T1078/overview.md).
+
 
 ## CLI-first interface
 
