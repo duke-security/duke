@@ -29,13 +29,20 @@ The following foundations are implemented:
   export with overwrite protection.
 - **`detection`** — deterministic, behaviour-based T1078 detection that
   scores an actor's event sequence with an explainable weighted
-  confidence value and emits vendor-neutral `Finding` objects; input
-  loading validates exported normalized events.
-- **`labs`** — documentation for the implemented T1078 simulation
-  and detection stages.
+  confidence value and emits vendor-neutral `Finding` objects. Artefact
+  loading and validation live in `telemetry` and are re-exported here for
+  compatibility.
+- **`telemetry`** — normalized artefact ingestion: loads validated
+  `Entity` and `SecurityEvent` collections from exported JSON.
+- **`investigation`** — evidence-led T1078 investigation that consumes an
+  existing `Finding` and produces a chronological timeline, per-event
+  evidence, involved entities, confirmed facts, analyst assessments, and
+  unresolved questions.
+- **`labs`** — documentation for the implemented T1078 simulation,
+  detection, and investigation stages.
 
-The T1078 investigation, response, validation, reporting, and learning
-stages remain planned.
+The T1078 response, validation, reporting, and learning stages remain
+planned.
 
 ## Component status
 
@@ -45,9 +52,9 @@ stages remain planned.
 | `cli` | Foundation, `version`, and T1078 `simulate` implemented |
 | `learning` | Planned Python lessons, exercises, and challenges |
 | `simulation` | T1078 deterministic simulation implemented; additional scenarios and mutation planned |
-| `telemetry` | T1078 event generation and JSON export implemented; ingestion and source-health monitoring planned |
+| `telemetry` | Normalized event generation, JSON export, and artefact ingestion implemented; source-health monitoring and broader ingestion planned |
 | `detection` | Deterministic T1078 detection implemented with explainable weighted confidence and automated tests; mutation testing, precision/recall, tuning, and additional rules planned |
-| `investigation` | Planned evidence, timelines, hypotheses, and graphs |
+| `investigation` | Evidence-led T1078 investigation implemented (`duke investigate`); hypothesising and graphs remain planned |
 | `response` | Planned safe response actions, approvals, dry runs, verification, and rollback |
 | `reporting` | Planned incident reports, summaries, and lessons learned |
 | `labs` | T1078 simulation documentation implemented; remaining lifecycle stages planned |
@@ -97,11 +104,13 @@ The implemented T1078 scenario contains:
 The implemented scenario now also includes:
 
 - behaviour-based detection logic with explainable weighted confidence
-  and automated tests.
+  and automated tests;
+- evidence-led investigation guidance that consumes an existing finding
+  and produces evidence, a timeline, involved entities, facts,
+  assessments, and open questions.
 
 The following scenario components remain planned:
 
-- investigation and evidence guidance;
 - safe response actions;
 - validation and mutation testing;
 - incident reporting;

@@ -179,3 +179,73 @@ def test_detect_invalid_event_record(tmp_path: Path) -> None:
 
     assert invocation.exit_code == 1
     assert "Invalid SecurityEvent at index 0" in invocation.stdout
+
+
+def test_investigate_t1078_reads_input_artifact(tmp_path: Path) -> None:
+    result = generate_t1078_simulation()
+    input_path = export_simulation(result, tmp_path / "t1078.json")
+
+    invocation = runner.invoke(
+        app,
+        ["investigate", "T1078", "--input", str(input_path)],
+    )
+
+    assert invocation.exit_code == 0
+    assert "Investigation complete" in invocation.stdout
+    assert "Compromised identity used from unfamiliar device" in invocation.stdout
+    assert "Confirmed facts:" in invocation.stdout
+    assert "Analyst assessments:" in invocation.stdout
+    assert "Unresolved questions:" in invocation.stdout
+
+
+def test_investigate_no_findings_is_benign(tmp_path: Path) -> None:
+    # A benign artefact: only the known-good baseline and routine access.
+    result = generate_t1078_simulation()
+    payload = simulation_payload(result)
+    payload["events"] = payload["events"][:2]
+    input_path = tmp_path / "benign.json"
+    input_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    invocation = runner.invoke(
+        app,
+        ["investigate", "T1078", "--input", str(input_path)],
+    )
+
+    assert invocation.exit_code == 0
+    assert "No findings to investigate" in invocation.stdout
+    assert "Investigation complete" not in invocation.stdout
+
+
+def test_investigate_rejects_unsupported_technique(tmp_path: Path) -> None:
+    invocation = runner.invoke(
+        app,
+        ["investigate", "T9999", "--input", str(tmp_path / "x.json")],
+    )
+
+    assert invocation.exit_code == 2
+    assert "Unsupported technique" in invocation.stdout
+
+
+def test_investigate_missing_input_file(tmp_path: Path) -> None:
+    missing = tmp_path / "missing.json"
+
+    invocation = runner.invoke(
+        app,
+        ["investigate", "T1078", "--input", str(missing)],
+    )
+
+    assert invocation.exit_code == 1
+    assert "Input file not found or not a regular file" in invocation.stdout
+
+
+def test_investigate_invalid_artefact_exits_one(tmp_path: Path) -> None:
+    bad = tmp_path / "bad.json"
+    bad.write_text("{ not json", encoding="utf-8")
+
+    invocation = runner.invoke(
+        app,
+        ["investigate", "T1078", "--input", str(bad)],
+    )
+
+    assert invocation.exit_code == 1
+    assert "Malformed JSON" in invocation.stdout

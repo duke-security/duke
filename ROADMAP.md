@@ -57,6 +57,14 @@ for the current milestone.
   weighted confidence score (`Finding.confidence`) over normalized events
 - Detection input loading and validation with clear error handling, plus
   comprehensive detection and CLI tests
+- Telemetry artefact ingestion through `duke.telemetry` (entities + events),
+  re-exported by `duke.detection` for backwards compatibility
+- `duke investigate T1078`
+- Evidence-led T1078 investigation that consumes an existing finding and
+  produces a chronological timeline, per-event evidence (with the known-good
+  baseline as context), involved entities, confirmed facts, analyst
+  assessments, and unresolved questions — plus benign no-finding handling
+  and comprehensive investigation, loader, and CLI tests
 - Documentation foundation (this roadmap, README, CONTRIBUTING,
   architecture overview, development guides, and initial ADRs)
 
@@ -71,9 +79,9 @@ below distinguishes that foundation from the capabilities still planned.
 | `cli` | Typer-based CLI implemented with `version` and T1078 `simulate`; commands will grow with each capability |
 | `learning` | Python lessons, exercises, and challenges |
 | `simulation` | T1078 safe deterministic simulation implemented; additional scenarios and mutation remain planned |
-| `telemetry` | T1078 normalized event generation and JSON export implemented; ingestion and source health remain planned |
+| `telemetry` | Normalized event generation, JSON export, and artefact ingestion implemented; source health and broader ingestion remain planned |
 | `detection` | Deterministic T1078 detection implemented with explainable weighted confidence and automated tests; mutation testing, precision/recall measurement, lifecycle tuning, and additional rules remain planned |
-| `investigation` | Evidence, timelines, hypotheses, and graphs |
+| `investigation` | Evidence-led T1078 investigation implemented (`duke investigate`), producing timelines, evidence, involved entities, facts, assessments, and open questions; hypothesising and graphs remain planned |
 | `response` | Safe response plans, approvals, dry runs, and rollback |
 | `reporting` | Incident reports, summaries, and lessons learned |
 | `labs` | T1078 simulation documentation implemented; detection through reporting stages remain planned |

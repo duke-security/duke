@@ -10,7 +10,9 @@ import typer
 from rich.console import Console
 
 from duke.detection import EventLoadError, detect_t1078, load_events
+from duke.investigation import InvestigationResult, investigate_t1078
 from duke.simulation import export_simulation, generate_t1078_simulation
+from duke.telemetry import load_telemetry_artefact
 
 app = typer.Typer(
     name="duke",
@@ -146,6 +148,78 @@ def detect(
         console.print(f"    Confidence: {finding.confidence}/100")
         console.print(f"    Supporting events: {len(finding.event_ids)}")
         console.print(f"    {finding.detection_details}")
+
+
+def _print_investigation(result: InvestigationResult) -> None:
+    """Print an evidence-led investigation summary."""
+    console.print("[green]Investigation complete[/green]")
+    console.print(f"Finding: {result.finding.title}")
+    console.print(f"Technique: {result.finding.technique_id}")
+    console.print(f"Severity: {result.finding.severity}")
+    console.print(f"Confidence: {result.finding.confidence}/100")
+    console.print(f"Involved entities: {len(result.involved_entities)}")
+    console.print(f"Evidence items: {len(result.evidence)}")
+    for evidence in result.evidence:
+        console.print(f"  - {evidence.relationship}: {evidence.description}")
+    console.print("Timeline:")
+    for entry in result.timeline:
+        console.print(
+            f"  {entry.occurred_at.isoformat()}  {entry.summary}"
+        )
+    console.print("Confirmed facts:")
+    for fact in result.confirmed_facts:
+        console.print(f"  - {fact}")
+    console.print("Analyst assessments:")
+    for assessment in result.analyst_assessments:
+        console.print(f"  - {assessment}")
+    console.print("Unresolved questions:")
+    for question in result.unresolved_questions:
+        console.print(f"  - {question}")
+
+
+@app.command()
+def investigate(
+    technique: Annotated[
+        str,
+        typer.Argument(
+            help="MITRE ATT&CK technique to investigate, for example T1078.",
+        ),
+    ],
+    read_path: Annotated[
+        Path,
+        typer.Option(
+            "--input",
+            "-i",
+            help="Path to the normalized telemetry JSON artefact to investigate.",
+        ),
+    ] = Path("data/events/t1078-session-001.json"),
+) -> None:
+    """Investigate an existing finding against normalized telemetry."""
+    normalized_technique = technique.upper()
+
+    if normalized_technique != "T1078":
+        console.print(
+            f"[red]Unsupported technique:[/red] {technique}. "
+            "Currently available: T1078",
+        )
+        raise typer.Exit(code=2)
+
+    try:
+        artefact = load_telemetry_artefact(read_path)
+    except EventLoadError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=1) from exc
+
+    findings = detect_t1078(artefact.events)
+
+    if not findings:
+        console.print("[yellow]No findings to investigate[/yellow]")
+        console.print(f"Events analysed: {len(artefact.events)}")
+        return
+
+    for finding in findings:
+        result = investigate_t1078(artefact, finding)
+        _print_investigation(result)
 
 if __name__ == "__main__":
     app()

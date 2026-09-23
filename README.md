@@ -43,17 +43,21 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
 - `duke detect T1078`
 - Behaviour-based detection for the T1078 scenario, using an explainable
   weighted confidence score to emit vendor-neutral findings
+- `duke investigate T1078`
+- Evidence-led investigation of an existing finding, producing a
+  chronological timeline, per-event evidence, involved entities, confirmed
+  facts, analyst assessments, and unresolved questions
 - CLI unit tests
 - Quality gates: [Ruff](https://docs.astral.sh/ruff/), mypy (strict), pytest
 
 ### Planned
 
 The core domain model and the T1078 scenario’s metadata, simulation,
-normalized telemetry, JSON export, CLI commands, and behaviour-based
-detection are implemented.
-Evidence-led investigation, safe response, detection validation,
-incident reporting, learning exercises, additional scenarios, and
-vendor adapters remain **planned**.
+normalized telemetry, JSON export, CLI commands, behaviour-based
+detection, and evidence-led investigation are implemented.
+Safe response, detection validation, incident reporting, learning
+exercises, additional scenarios, and vendor adapters remain
+**planned**.
 
 See [the T1078 lab documentation](docs/labs/T1078/overview.md),
 [the architecture overview](docs/architecture/overview.md), and
@@ -77,6 +81,7 @@ duke --help
 duke version
 duke simulate T1078
 duke detect T1078 --input data/events/t1078-session-001.json
+duke investigate T1078 --input data/events/t1078-session-001.json
 ```
 
 ## Documentation

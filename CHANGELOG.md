@@ -61,6 +61,25 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
   insufficient score, correlation-window expiry, missing baseline,
   wrong actor, duplicate behaviours, deterministic output, confidence
   range, and event/entity relationships.
+- Telemetry artefact ingestion in `duke.telemetry` (`load_telemetry_artefact`
+  and `load_events`), loading normalized `Entity` and `SecurityEvent`
+  collections from exported JSON with clear error handling. `duke.detection`
+  re-exports `load_events`/`EventLoadError` for backwards compatibility.
+- `InvestigationResult` and `TimelineEntry` typed models, plus the
+  `duke.investigation` package.
+- Evidence-led T1078 investigation (`investigate_t1078`) that consumes an
+  existing `Finding` and builds a chronological timeline, one `Evidence`
+  per referenced event (known-good baseline as `PROVIDES_CONTEXT`,
+  new-context authentication and follow-ons as `SUPPORTS`), the involved
+  entities, and distinct confirmed facts, analyst assessments, and
+  unresolved questions.
+- `duke investigate T1078`: loads an exported artefact, runs detection,
+  and either reports no findings (exit 0) or prints the evidence-led
+  investigation for each finding. Invalid artefacts exit 1; unsupported
+  techniques exit 2.
+- Investigation, loader, and CLI tests covering evidence creation,
+  relationship classification, chronological timelines, entity resolution,
+  deterministic output, benign handling, and exit codes.
 
 
 ### Changed

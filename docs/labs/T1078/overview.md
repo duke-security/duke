@@ -2,8 +2,8 @@
 
 ## Status
 
-Simulation and detection implemented. Investigation, response,
-validation, and incident reporting remain planned.
+Simulation, detection, and evidence-led investigation implemented.
+Response, validation, and incident reporting remain planned.
 
 ## Purpose
 
@@ -87,7 +87,42 @@ exported artefact.
 ```bash
 duke simulate T1078 --output data/events/t1078-session-001.json
 duke detect T1078 --input data/events/t1078-session-001.json
+duke investigate T1078 --input data/events/t1078-session-001.json
 ```
+
+## Investigation
+
+Investigation does not run detection itself. `duke investigate T1078`
+loads the exported artefact, runs `detect_t1078`, and then passes the
+existing `Finding` into `investigate_t1078`, which builds an evidence-led
+result over the telemetry the finding references.
+
+For the shipped T1078 corpus the investigation reports:
+
+- **Involved entities** — Alex Morgan's account and the six implicated
+  objects (unfamiliar device, repository, restricted file, privileged
+  service, archive, external destination). The known-good baseline device
+  (`workstation-017`) is treated as context and excluded.
+- **Evidence** — one item per referenced event. The known-good baseline
+  authentication is recorded as `PROVIDES_CONTEXT`; the new-context login
+  and each follow-on behaviour are `SUPPORTS`.
+- **Timeline** — the referenced events listed in ascending chronological
+  order.
+- **Confirmed facts** — evidence-grounded statements, e.g. that the
+  account authenticated from a new network and unfamiliar device and that
+  a restricted file was accessed.
+- **Analyst assessments** — analytic interpretation, e.g. that the
+  sequence is consistent with possible valid-account misuse (T1078) but
+  does not confirm compromise.
+- **Unresolved questions** — what remains open, e.g. whether the owner
+  performed the activity and whether data was exfiltrated.
+
+Investigation output is fully deterministic for a given artefact and
+finding. When detection produces no finding, `duke investigate T1078`
+reports "No findings to investigate" and exits 0.
+
+See [the investigation documentation](../../investigations/T1078-compromised-identity.md)
+for the full workflow.
 
 ## Detection methodology
 
