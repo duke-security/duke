@@ -52,6 +52,11 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
   preliminary incident and proposes approval-gated actions grouped into
   containment, evidence preservation, investigation follow-up, and
   recovery — never modifying a real system
+- `duke validate T1078`
+- Deterministic detection validation that reruns the detection →
+  investigation → response pipeline against controlled in-memory
+  mutations of the artefact (which is never modified), reporting pass/fail
+  per case
 - CLI unit tests
 - Quality gates: [Ruff](https://docs.astral.sh/ruff/), mypy (strict), pytest
 
@@ -59,9 +64,9 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
 
 The core domain model and the T1078 scenario’s metadata, simulation,
 normalized telemetry, JSON export, CLI commands, behaviour-based
-detection, evidence-led investigation, and safe dry-run response are
-implemented. Detection validation, incident reporting, learning
-exercises, additional scenarios, and vendor adapters remain
+detection, evidence-led investigation, safe dry-run response, and
+deterministic detection validation are implemented. Incident reporting,
+learning exercises, additional scenarios, and vendor adapters remain
 **planned**.
 
 See [the T1078 lab documentation](docs/labs/T1078/overview.md),
@@ -88,6 +93,7 @@ duke simulate T1078
 duke detect T1078 --input data/events/t1078-session-001.json
 duke investigate T1078 --input data/events/t1078-session-001.json
 duke respond T1078 --input data/events/t1078-session-001.json
+duke validate T1078 --input data/events/t1078-session-001.json
 ```
 
 ## Documentation

@@ -42,11 +42,13 @@ The following foundations are implemented:
   finding into a deterministic preliminary incident and proposes
   approval-gated actions grouped into containment, evidence preservation,
   investigation follow-up, and recovery.
+- **`validation`** — deterministic validation of the T1078 detection →
+  investigation → response pipeline that reruns the workflow against
+  controlled in-memory mutations of an artefact, never modifying it.
 - **`labs`** — documentation for the implemented T1078 simulation,
-  detection, investigation, and response stages.
+  detection, investigation, response, and validation stages.
 
-The T1078 validation, reporting, and learning stages remain
-planned.
+The T1078 reporting and learning stages remain planned.
 
 ## Component status
 
@@ -57,9 +59,10 @@ planned.
 | `learning` | Planned Python lessons, exercises, and challenges |
 | `simulation` | T1078 deterministic simulation implemented; additional scenarios and mutation planned |
 | `telemetry` | Normalized event generation, JSON export, and artefact ingestion implemented; source-health monitoring and broader ingestion planned |
-| `detection` | Deterministic T1078 detection implemented with explainable weighted confidence and automated tests; mutation testing, precision/recall, tuning, and additional rules planned |
+| `detection` | Deterministic T1078 detection implemented with explainable weighted confidence; detection validation implemented (`duke validate`); precision/recall, tuning, and additional rules planned |
 | `investigation` | Evidence-led T1078 investigation implemented (`duke investigate`); hypothesising and graphs remain planned |
 | `response` | Dry-run-only T1078 response planning implemented (`duke respond`); execution, approvals, and rollback application remain planned |
+| `validation` | Deterministic validation implemented (`duke validate`), rerunning the pipeline against in-memory mutations of an artefact |
 | `reporting` | Planned incident reports, summaries, and lessons learned |
 | `labs` | T1078 simulation documentation implemented; remaining lifecycle stages planned |
 | `adapters` | Planned optional vendor and platform integrations |
@@ -113,11 +116,12 @@ The implemented scenario now also includes:
   and produces evidence, a timeline, involved entities, facts,
   assessments, and open questions;
 - safe dry-run response planning that proposes approval-gated actions
-  grouped by category, without ever executing them.
+  grouped by category, without ever executing them;
+- deterministic detection validation that reruns the pipeline against
+  controlled in-memory mutations, without modifying the source artefact.
 
 The following scenario components remain planned:
 
-- validation and mutation testing;
 - incident reporting;
 - guided learning exercises.
 

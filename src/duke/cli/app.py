@@ -14,6 +14,7 @@ from duke.investigation import InvestigationResult, investigate_t1078
 from duke.response import ResponsePlan, plan_t1078_response
 from duke.simulation import export_simulation, generate_t1078_simulation
 from duke.telemetry import load_telemetry_artefact
+from duke.validation import ValidationStatus, ValidationSuiteResult, validate_t1078
 
 app = typer.Typer(
     name="duke",
@@ -304,6 +305,72 @@ def respond(
         result = investigate_t1078(artefact, finding)
         plan = plan_t1078_response(artefact, result)
         _print_response_plan(plan)
+
+
+def _print_validation(suite: ValidationSuiteResult) -> None:
+    """Print a detection-validation suite and its per-case results."""
+    for case in suite.cases:
+        mark = (
+            "[green]PASS[/green]"
+            if case.status is ValidationStatus.PASS
+            else "[red]FAIL[/red]"
+        )
+        console.print(f"{mark} {case.name} — {case.actual}")
+        console.print(f"      Expected: {case.expected}")
+        console.print(f"      {case.explanation}")
+
+    count = len(suite.cases)
+    passed = sum(
+        1 for case in suite.cases if case.status is ValidationStatus.PASS
+    )
+    if suite.all_passed:
+        console.print(
+            f"[green]Validation complete: {passed}/{count} cases passed[/green]"
+        )
+    else:
+        console.print(
+            f"[red]Validation failed: {passed}/{count} cases passed[/red]"
+        )
+
+
+@app.command()
+def validate(
+    technique: Annotated[
+        str,
+        typer.Argument(
+            help="MITRE ATT&CK technique to validate, for example T1078.",
+        ),
+    ],
+    read_path: Annotated[
+        Path,
+        typer.Option(
+            "--input",
+            "-i",
+            help="Path to the normalized telemetry JSON artefact to validate.",
+        ),
+    ] = Path("data/events/t1078-session-001.json"),
+) -> None:
+    """Validate a technique's detection pipeline over a telemetry artefact."""
+    normalized_technique = technique.upper()
+
+    if normalized_technique != "T1078":
+        console.print(
+            f"[red]Unsupported technique:[/red] {technique}. "
+            "Currently available: T1078",
+        )
+        raise typer.Exit(code=2)
+
+    try:
+        artefact = load_telemetry_artefact(read_path)
+    except EventLoadError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=1) from exc
+
+    suite = validate_t1078(artefact)
+    _print_validation(suite)
+
+    if not suite.all_passed:
+        raise typer.Exit(code=1)
 
 if __name__ == "__main__":
     app()

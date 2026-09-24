@@ -103,6 +103,28 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
   side-effect freedom, benign handling, and exit codes.
 - Response documentation under `docs/responses/` and updated lab,
   investigation, README, roadmap, architecture, and changelog entries.
+- The `duke.validation` package: `ValidationStatus`, `ValidationCase`, and
+  `ValidationSuiteResult` typed models for detection validation, with a
+  read-only derived `all_passed` flag.
+- Controlled, in-memory mutation helpers (`duke.validation.mutations`) that
+  build new `TelemetryArtefact` values from immutable tuples and
+  `model_copy` — never modifying the source artefact, never writing files,
+  and cloning events with distinct deterministic IDs.
+- Deterministic T1078 detection validation (`validate_t1078`) that consumes
+  an existing `TelemetryArtefact`, reruns the detection → investigation →
+  response-planning workflow against mutations, and reports 16 explicit
+  cases (unmodified corpus, missing baseline, missing anchor, insufficient
+  confidence, window expiry, wrong actor, duplicate non-inflation, five
+  individual follow-on removals, benign activity, determinism, evidence
+  traceability, and response-action safety).
+- `duke validate T1078`: validates a supplied artefact and exits 0 when all
+  cases pass, 1 for an invalid artefact or a failed suite, and 2 for an
+  unsupported technique, without modifying the input file.
+- Validation, mutation, result-model, and CLI tests covering every case,
+  immutability of the source artefact and input-file bytes, determinism,
+  exit codes, and a side-effect-free package guard.
+- Validation documentation under `docs/validation/` and updated lab,
+  README, roadmap, architecture, and changelog entries.
 
 
 ### Changed

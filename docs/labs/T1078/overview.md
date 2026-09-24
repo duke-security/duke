@@ -2,9 +2,9 @@
 
 ## Status
 
-Simulation, detection, evidence-led investigation, and safe dry-run
-response implemented. Detection validation and incident reporting remain
-planned.
+Simulation, detection, evidence-led investigation, safe dry-run response,
+and deterministic detection validation implemented. Incident reporting
+remains planned.
 
 ## Purpose
 
@@ -91,6 +91,8 @@ exported artefact.
 duke simulate T1078 --output data/events/t1078-session-001.json
 duke detect T1078 --input data/events/t1078-session-001.json
 duke investigate T1078 --input data/events/t1078-session-001.json
+duke respond T1078 --input data/events/t1078-session-001.json
+duke validate T1078 --input data/events/t1078-session-001.json
 ```
 
 ## Investigation
@@ -162,6 +164,26 @@ compromise or exfiltration. When detection produces no finding,
 
 Response is proposal-only: it modifies no real account, session,
 permission, file, network, or security control.
+
+## Detection validation
+
+`duke validate T1078` proves the detection → investigation → response
+pipeline behaves correctly by rerunning it against controlled, in-memory
+mutations of the artefact. The source artefact is never modified (each
+mutation copies events via immutable tuples and `model_copy`, and cloned
+events get distinct deterministic IDs), no files are written, and no
+network is touched. Sixteen explicit validation cases cover the unmodified
+suspicious corpus, missing baseline, missing new-context login,
+insufficient confidence, correlation-window expiry, wrong actor,
+duplicate-behaviour non-inflation, the five individual follow-on removals,
+benign activity, deterministic repeatability, evidence/timeline
+traceability, and response-action dry-run safety. The suite's
+`all_passed` flag is read-only and derived from its cases. When the
+canonical corpus passes all 16 cases the command exits 0; an invalid
+artefact or a failed suite exits 1; an unsupported technique exits 2.
+
+See [the validation documentation](../../validation/T1078-detection-validation.md)
+for the full case list.
 
 ## Detection methodology
 

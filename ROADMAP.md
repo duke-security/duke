@@ -71,6 +71,12 @@ for the current milestone.
   proposes approval-gated actions grouped into containment, evidence
   preservation, investigation follow-up, and recovery — with conservative
   rollback semantics, verified via model, planner, and CLI tests
+- `duke validate T1078`
+- Deterministic T1078 detection validation (`validate_t1078`) that consumes
+  an artefact (never modifying it), reruns detection, investigation, and
+  response planning against controlled in-memory mutations, and reports a
+  read-only `all_passed` suite of explicit cases — with a side-effect-free
+  guard and comprehensive validation, mutation, and CLI tests
 - Documentation foundation (this roadmap, README, CONTRIBUTING,
   architecture overview, development guides, and initial ADRs)
 
@@ -86,7 +92,7 @@ below distinguishes that foundation from the capabilities still planned.
 | `learning` | Python lessons, exercises, and challenges |
 | `simulation` | T1078 safe deterministic simulation implemented; additional scenarios and mutation remain planned |
 | `telemetry` | Normalized event generation, JSON export, and artefact ingestion implemented; source health and broader ingestion remain planned |
-| `detection` | Deterministic T1078 detection implemented with explainable weighted confidence and automated tests; mutation testing, precision/recall measurement, lifecycle tuning, and additional rules remain planned |
+| `detection` | Deterministic T1078 detection implemented with explainable weighted confidence; deterministic detection validation implemented (`duke validate`) with controlled in-memory mutations and an explicit case suite; precision/recall measurement, lifecycle tuning, and additional rules remain planned |
 | `investigation` | Evidence-led T1078 investigation implemented (`duke investigate`), producing timelines, evidence, involved entities, facts, assessments, and open questions; hypothesising and graphs remain planned |
 | `response` | Dry-run-only T1078 response planning implemented (`duke respond`), producing preliminary-incident correlation and approval-gated actions grouped by category; real execution, approvals, and rollback application remain planned |
 | `reporting` | Incident reports, summaries, and lessons learned |
