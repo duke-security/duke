@@ -81,6 +81,35 @@ pytest
 See [docs/development/testing.md](docs/development/testing.md) for
 details on the test layout and how to run a subset of tests.
 
+## Registering a new scenario
+
+Scenarios are added in one place — the static built-in registry
+(`duke.scenarios.builtins`) — rather than by editing every CLI command.
+The CLI resolves scenarios and dispatches to capabilities exclusively
+through the registry.
+
+To add a scenario:
+
+1. Implement the scenario metadata (a `scenario.yaml` plus a loader
+   returning a typed `Scenario`) and whichever of the seven capabilities
+   the scenario supports (simulation, detection, investigation, response,
+   validation, reporting, learning), with matching typed callable
+   signatures.
+2. Add a `ScenarioRegistration` in `duke.scenarios.builtins` — a technique
+   ID, slug, name, aliases, the metadata loader, and a
+   `ScenarioCapabilities` object listing the supported capabilities.
+3. Register it in `builtin_registry()`. The registry enforces unique
+   technique IDs, slugs, and aliases, and rejects a registration that
+   duplicates its own ID or slug.
+4. No CLI changes are required. Commands that need a capability your
+   scenario does not provide fail clearly with exit code 2. The
+   `duke scenarios` command lists it automatically, in deterministic
+   technique-ID order.
+
+Because the registry is static and built-in (not a dynamic plugin or
+filesystem discovery), each scenario is a small, testable, documented
+vertical slice. Add registration, capability, and CLI tests alongside it.
+
 ## Submitting changes
 
 - Keep pull requests scoped to a single vertical slice of

@@ -1,22 +1,32 @@
 """Command-line interface for Duke."""
 
 
+from collections.abc import Callable
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as package_version
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
 from rich.console import Console
 
-from duke.detection import EventLoadError, detect_t1078, load_events
-from duke.investigation import InvestigationResult, investigate_t1078
-from duke.learning import T1078_LEARNING_PATH, render_path, render_step
-from duke.reporting import export_report, render_incident_report, report_t1078
-from duke.response import ResponsePlan, plan_t1078_response
-from duke.simulation import export_simulation, generate_t1078_simulation
+from duke.detection import EventLoadError, load_events
+from duke.investigation import InvestigationResult
+from duke.learning import render_path, render_step
+from duke.reporting import export_report, render_incident_report
+from duke.response import ResponsePlan
+from duke.scenarios import (
+    CapabilityMissingError,
+    ScenarioCapability,
+    ScenarioRegistration,
+    UnknownScenarioError,
+    has_capability,
+    required_capability,
+)
+from duke.scenarios.builtins import builtin_registry
+from duke.simulation import export_simulation
 from duke.telemetry import load_telemetry_artefact
-from duke.validation import ValidationStatus, ValidationSuiteResult, validate_t1078
+from duke.validation import ValidationStatus, ValidationSuiteResult
 
 app = typer.Typer(
     name="duke",
@@ -26,6 +36,8 @@ app = typer.Typer(
 
 console = Console()
 
+REGISTRY = builtin_registry()
+
 
 def get_version() -> str:
     """Return the installed Duke version."""
@@ -33,6 +45,27 @@ def get_version() -> str:
         return package_version("duke-security")
     except PackageNotFoundError:
         return "unknown"
+
+
+def _resolve(technique: str) -> ScenarioRegistration:
+    """Resolve a scenario through the registry, or exit 2 if unknown."""
+    try:
+        return REGISTRY.resolve(technique)
+    except UnknownScenarioError:
+        console.print(f"[red]Unsupported technique:[/red] {technique}")
+        raise typer.Exit(code=2) from None
+
+
+def _capability(
+    registration: ScenarioRegistration,
+    capability: ScenarioCapability,
+) -> Callable[..., Any]:
+    """Resolve one capability callable from a registration, or exit 2."""
+    try:
+        return required_capability(registration, capability)
+    except CapabilityMissingError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=2) from None
 
 
 @app.callback()
@@ -72,16 +105,10 @@ def simulate(
 ) -> None:
 
     """Generate safe synthetic telemetry for an ATT&CK scenario."""
-    normalized_technique = technique.upper()
+    registration = _resolve(technique)
+    generate = _capability(registration, ScenarioCapability.SIMULATION)
 
-    if normalized_technique != "T1078":
-        console.print(
-            f"[red]Unsupported technique:[/red] {technique}. "
-            "Currently available: T1078",
-        )
-        raise typer.Exit(code=2)
-
-    result = generate_t1078_simulation()
+    result = generate()
 
     try:
         saved_path = export_simulation(
@@ -119,14 +146,8 @@ def detect(
     ] = Path("data/events/t1078-session-001.json"),
 ) -> None:
     """Run behaviour-based detection over a normalized telemetry artefact."""
-    normalized_technique = technique.upper()
-
-    if normalized_technique != "T1078":
-        console.print(
-            f"[red]Unsupported technique:[/red] {technique}. "
-            "Currently available: T1078",
-        )
-        raise typer.Exit(code=2)
+    registration = _resolve(technique)
+    detect = _capability(registration, ScenarioCapability.DETECTION)
 
     try:
         events = load_events(read_path)
@@ -134,7 +155,7 @@ def detect(
         console.print(f"[red]{exc}[/red]")
         raise typer.Exit(code=1) from exc
 
-    findings = detect_t1078(events)
+    findings = detect(events)
 
     if not findings:
         console.print("[yellow]No findings[/yellow]")
@@ -199,14 +220,9 @@ def investigate(
     ] = Path("data/events/t1078-session-001.json"),
 ) -> None:
     """Investigate an existing finding against normalized telemetry."""
-    normalized_technique = technique.upper()
-
-    if normalized_technique != "T1078":
-        console.print(
-            f"[red]Unsupported technique:[/red] {technique}. "
-            "Currently available: T1078",
-        )
-        raise typer.Exit(code=2)
+    registration = _resolve(technique)
+    detect = _capability(registration, ScenarioCapability.DETECTION)
+    investigate = _capability(registration, ScenarioCapability.INVESTIGATION)
 
     try:
         artefact = load_telemetry_artefact(read_path)
@@ -214,7 +230,7 @@ def investigate(
         console.print(f"[red]{exc}[/red]")
         raise typer.Exit(code=1) from exc
 
-    findings = detect_t1078(artefact.events)
+    findings = detect(artefact.events)
 
     if not findings:
         console.print("[yellow]No findings to investigate[/yellow]")
@@ -222,7 +238,7 @@ def investigate(
         return
 
     for finding in findings:
-        result = investigate_t1078(artefact, finding)
+        result = investigate(artefact, finding)
         _print_investigation(result)
 
 
@@ -281,14 +297,10 @@ def respond(
     ] = Path("data/events/t1078-session-001.json"),
 ) -> None:
     """Propose a dry-run response plan from investigation of normalized telemetry."""
-    normalized_technique = technique.upper()
-
-    if normalized_technique != "T1078":
-        console.print(
-            f"[red]Unsupported technique:[/red] {technique}. "
-            "Currently available: T1078",
-        )
-        raise typer.Exit(code=2)
+    registration = _resolve(technique)
+    detect = _capability(registration, ScenarioCapability.DETECTION)
+    investigate = _capability(registration, ScenarioCapability.INVESTIGATION)
+    plan_response = _capability(registration, ScenarioCapability.RESPONSE)
 
     try:
         artefact = load_telemetry_artefact(read_path)
@@ -296,7 +308,7 @@ def respond(
         console.print(f"[red]{exc}[/red]")
         raise typer.Exit(code=1) from exc
 
-    findings = detect_t1078(artefact.events)
+    findings = detect(artefact.events)
 
     if not findings:
         console.print("[yellow]No findings to respond to[/yellow]")
@@ -304,8 +316,8 @@ def respond(
         return
 
     for finding in findings:
-        result = investigate_t1078(artefact, finding)
-        plan = plan_t1078_response(artefact, result)
+        result = investigate(artefact, finding)
+        plan = plan_response(artefact, result)
         _print_response_plan(plan)
 
 
@@ -353,14 +365,8 @@ def validate(
     ] = Path("data/events/t1078-session-001.json"),
 ) -> None:
     """Validate a technique's detection pipeline over a telemetry artefact."""
-    normalized_technique = technique.upper()
-
-    if normalized_technique != "T1078":
-        console.print(
-            f"[red]Unsupported technique:[/red] {technique}. "
-            "Currently available: T1078",
-        )
-        raise typer.Exit(code=2)
+    registration = _resolve(technique)
+    validate_artefact = _capability(registration, ScenarioCapability.VALIDATION)
 
     try:
         artefact = load_telemetry_artefact(read_path)
@@ -368,7 +374,7 @@ def validate(
         console.print(f"[red]{exc}[/red]")
         raise typer.Exit(code=1) from exc
 
-    suite = validate_t1078(artefact)
+    suite = validate_artefact(artefact)
     _print_validation(suite)
 
     if not suite.all_passed:
@@ -409,14 +415,12 @@ def report(
     ] = False,
 ) -> None:
     """Render a deterministic, advisory incident report from workflow data."""
-    normalized_technique = technique.upper()
-
-    if normalized_technique != "T1078":
-        console.print(
-            f"[red]Unsupported technique:[/red] {technique}. "
-            "Currently available: T1078",
-        )
-        raise typer.Exit(code=2)
+    registration = _resolve(technique)
+    detect = _capability(registration, ScenarioCapability.DETECTION)
+    validate_artefact = _capability(registration, ScenarioCapability.VALIDATION)
+    investigate = _capability(registration, ScenarioCapability.INVESTIGATION)
+    plan_response = _capability(registration, ScenarioCapability.RESPONSE)
+    report_artefact = _capability(registration, ScenarioCapability.REPORTING)
 
     try:
         artefact = load_telemetry_artefact(read_path)
@@ -424,7 +428,7 @@ def report(
         console.print(f"[red]{exc}[/red]")
         raise typer.Exit(code=1) from exc
 
-    findings = detect_t1078(artefact.events)
+    findings = detect(artefact.events)
 
     if not findings:
         console.print("[yellow]No findings to report[/yellow]")
@@ -432,7 +436,7 @@ def report(
         return  # exit 0; no output file is created
 
     # Run detection validation exactly once, before any report is built.
-    suite = validate_t1078(artefact)
+    suite = validate_artefact(artefact)
     if not suite.all_passed:
         console.print("[red]Validation failed[/red]")
         console.print("No report was generated.")
@@ -446,9 +450,9 @@ def report(
         raise typer.Exit(code=1)
 
     finding = findings[0]
-    result = investigate_t1078(artefact, finding)
-    plan = plan_t1078_response(artefact, result)
-    incident_report = report_t1078(artefact, finding, result, plan, suite)
+    result = investigate(artefact, finding)
+    plan = plan_response(artefact, result)
+    incident_report = report_artefact(artefact, finding, result, plan, suite)
     markdown = render_incident_report(incident_report)
 
     try:
@@ -489,11 +493,17 @@ def learn(
     never modifies or writes a learner's files, never grades, and never
     persists progress.
     """
-    if technique != "T1078":
+    try:
+        registration = REGISTRY.resolve(technique)
+        learning = required_capability(registration, ScenarioCapability.LEARNING)
+    except UnknownScenarioError:
         typer.echo(f"Unsupported technique: {technique}")
-        raise typer.Exit(code=2)
+        raise typer.Exit(code=2) from None
+    except CapabilityMissingError as exc:
+        typer.echo(str(exc))
+        raise typer.Exit(code=2) from None
 
-    path = T1078_LEARNING_PATH
+    path = learning()
 
     if step is None:
         typer.echo(render_path(path))
@@ -506,6 +516,29 @@ def learn(
         raise typer.Exit(code=2)
 
     typer.echo(render_step(lesson, path.technique_id))
+
+
+@app.command()
+def scenarios() -> None:
+    """List registered scenarios and the capabilities each provides.
+
+    Output is deterministic: scenarios are ordered by canonical technique
+    ID (then slug), and each scenario's capabilities are shown in lifecycle
+    order. Listing never loads scenario metadata and never runs a
+    capability.
+    """
+    console.print("[bold]Registered scenarios[/bold]")
+    for registration in REGISTRY.scenarios():
+        console.print(f"- {registration.technique_id} — {registration.name}")
+        console.print(f"    Slug: {registration.slug}")
+        caps = [
+            capability.value
+            for capability in ScenarioCapability
+            if has_capability(registration, capability)
+        ]
+        console.print(f"    Capabilities: {', '.join(caps)}")
+        if registration.aliases:
+            console.print(f"    Aliases: {', '.join(registration.aliases)}")
 
 
 if __name__ == "__main__":

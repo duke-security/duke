@@ -15,6 +15,25 @@ from duke.simulation import (
 runner = CliRunner()
 
 
+def _t1078_registry_with(**capability_overrides):
+    """Return a registry whose T1078 registration has capability overrides.
+
+    Used to exercise CLI dispatch against a scenario that differs from the
+    built-in T1078 registration (e.g. a replaced or missing capability).
+    """
+    import dataclasses
+
+    from duke.scenarios.builtins import t1078_registration
+    from duke.scenarios.registry import ScenarioRegistry
+
+    base = t1078_registration()
+    caps = dataclasses.replace(base.capabilities, **capability_overrides)
+    registration = dataclasses.replace(base, capabilities=caps)
+    registry = ScenarioRegistry()
+    registry.register(registration)
+    return registry
+
+
 def test_help_displays_project_description() -> None:
     """The help command should explain Duke's purpose."""
     result = runner.invoke(app, ["--help"])
@@ -577,7 +596,10 @@ def test_report_failed_validation_writes_nothing(tmp_path: Path, monkeypatch) ->
             ),
         )
 
-    monkeypatch.setattr("duke.cli.app.validate_t1078", failing)
+    monkeypatch.setattr(
+        "duke.cli.app.REGISTRY",
+        _t1078_registry_with(validation=failing),
+    )
     result = generate_t1078_simulation()
     input_path = export_simulation(result, tmp_path / "t1078.json")
     output_path = tmp_path / "incident.md"
@@ -607,7 +629,10 @@ def test_report_multiple_findings_write_nothing(tmp_path: Path, monkeypatch) -> 
         findings = real_detect(events)
         return (findings[0], findings[0])
 
-    monkeypatch.setattr("duke.cli.app.detect_t1078", two_findings)
+    monkeypatch.setattr(
+        "duke.cli.app.REGISTRY",
+        _t1078_registry_with(detection=two_findings),
+    )
 
     invocation = runner.invoke(
         app,
@@ -632,7 +657,10 @@ def test_report_runs_validation_exactly_once(tmp_path: Path, monkeypatch) -> Non
         calls["count"] += 1
         return real_validate(artefact)
 
-    monkeypatch.setattr("duke.cli.app.validate_t1078", counting)
+    monkeypatch.setattr(
+        "duke.cli.app.REGISTRY",
+        _t1078_registry_with(validation=counting),
+    )
     result = generate_t1078_simulation()
     input_path = export_simulation(result, tmp_path / "t1078.json")
     output_path = tmp_path / "incident.md"
@@ -756,3 +784,116 @@ def test_learn_output_is_literal_and_rich_safe() -> None:
     assert result.exit_code == 0
     assert "dict[str, int]" in result.stdout
     assert "counts.get(action, 0)" in result.stdout
+
+
+def test_scenarios_lists_registered_scenario() -> None:
+    result = runner.invoke(app, ["scenarios"])
+
+    assert result.exit_code == 0
+    assert "T1078" in result.stdout
+    assert "Valid Accounts: Compromised Identity" in result.stdout
+    assert "t1078_valid_accounts" in result.stdout
+    assert "valid-accounts" in result.stdout
+    for capability in (
+        "simulation",
+        "detection",
+        "investigation",
+        "response",
+        "validation",
+        "reporting",
+        "learning",
+    ):
+        assert capability in result.stdout
+
+
+def test_scenarios_shows_capabilities_in_lifecycle_order() -> None:
+    result = runner.invoke(app, ["scenarios"])
+    order = (
+        "simulation",
+        "detection",
+        "investigation",
+        "response",
+        "validation",
+        "reporting",
+        "learning",
+    )
+    positions = [result.stdout.index(cap) for cap in order]
+    assert positions == sorted(positions)
+
+
+def test_learn_resolves_case_insensitive_slug_and_alias() -> None:
+    for key in ("T1078", "t1078", "t1078_valid_accounts", "valid-accounts"):
+        result = runner.invoke(app, ["learn", key])
+        assert result.exit_code == 0
+        assert "T1078 Guided Learning Path" in result.stdout
+
+
+def test_detect_resolves_via_lowercase_and_slug(tmp_path: Path) -> None:
+    input_path = tmp_path / "events.json"
+    simulated = runner.invoke(
+        app, ["simulate", "T1078", "--output", str(input_path)]
+    )
+    assert simulated.exit_code == 0
+
+    for key in ("t1078", "t1078_valid_accounts", "valid-accounts"):
+        result = runner.invoke(app, ["detect", key, "--input", str(input_path)])
+        assert result.exit_code == 0
+        assert "Findings" in result.stdout
+
+
+def test_detect_missing_capability_exits_2_without_execution(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """A registered scenario lacking a capability fails clearly (revision 7)."""
+    registry = _t1078_registry_with(detection=None)
+    monkeypatch.setattr("duke.cli.app.REGISTRY", registry)
+
+    input_path = tmp_path / "no-events.json"
+    result = runner.invoke(
+        app, ["detect", "T1078", "--input", str(input_path)]
+    )
+
+    assert result.exit_code == 2
+    assert "does not provide capability" in result.stdout
+    # No capability ran and no artefact was read or produced.
+    assert not input_path.exists()
+
+
+def test_cli_has_no_hardcoded_t1078_dispatch() -> None:
+    """Dispatch must go through the registry, not a hardcoded technique check.
+
+    This is a narrow, structural check: the CLI must not import any
+    T1078-specific capability function and must not contain the old
+    ``technique.upper() != "T1078"`` style guard. It does not forbid the
+    literal text "T1078" (help examples and default filenames keep it).
+    """
+    import ast
+
+    source_path = Path(__file__).resolve().parents[2] / "src/duke/cli/app.py"
+    source = source_path.read_text(encoding="utf-8")
+    tree = ast.parse(source)
+
+    imported = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                imported.add(alias.asname or alias.name)
+
+    t1078_capabilities = {
+        "generate_t1078_simulation",
+        "detect_t1078",
+        "investigate_t1078",
+        "plan_t1078_response",
+        "validate_t1078",
+        "report_t1078",
+        "t1078_learning_path",
+    }
+    assert not (imported & t1078_capabilities)
+
+    # Dispatch is registry-driven: it must import the registry root and the
+    # capability-selection helper, and must not compare the technique string.
+    assert "builtin_registry" in imported
+    assert "required_capability" in imported
+    assert "technique.upper()" not in source
+    assert '== "T1078"' not in source
+    assert '!= "T1078"' not in source

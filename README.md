@@ -67,6 +67,12 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
   walk that teaches Python through Duke's defensive T1078 workflow. Each
   step reuses real CLI commands and public exports as metadata — it never
   executes a command, modifies learner files, grades, or persists progress
+- `duke scenarios`
+- A static, built-in scenario registry: scenarios are registered once with
+  their metadata and lifecycle capability callables (simulation, detection,
+  investigation, response, validation, reporting, learning), resolved
+  case-insensitively by technique/slug/alias, and dispatched by the CLI
+  through the registry rather than through hardcoded technique checks
 - CLI unit tests
 - Quality gates: [Ruff](https://docs.astral.sh/ruff/), mypy (strict), pytest
 
@@ -75,12 +81,13 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
 The core domain model and the T1078 scenario’s metadata, simulation,
 normalized telemetry, JSON export, CLI commands, behaviour-based
 detection, evidence-led investigation, safe dry-run response,
-deterministic detection validation, deterministic incident reporting, and
-a T1078 guided learning path are implemented. The full learning component
-(additional scenarios and their learning paths, a reusable scenario
-registry/orchestration, learner-progress tracking, broader improve →
-retest learning workflows, further lesson content), additional T1078
-scenarios, and vendor adapters remain **planned**.
+deterministic detection validation, deterministic incident reporting, a
+T1078 guided learning path, and a static scenario registry are
+implemented. The full learning component (additional scenarios and their
+learning paths, learner-progress tracking, broader improve → retest
+learning workflows, further lesson content), a dynamic/plugin scenario
+registry, additional ATT&CK scenarios, and vendor adapters remain
+**planned**.
 
 See [the T1078 guided learning guide](docs/learning/T1078-guided-learning.md),
 [the T1078 lab documentation](docs/labs/T1078/overview.md),
@@ -113,6 +120,7 @@ duke report T1078 \
   --output reports/t1078-incident-report.md
 duke learn T1078
 duke learn T1078 --step detection
+duke scenarios
 ```
 
 ## Documentation
@@ -121,6 +129,7 @@ duke learn T1078 --step detection
 - [CHANGELOG.md](CHANGELOG.md) — release history
 - [CONTRIBUTING.md](CONTRIBUTING.md) — how to contribute
 - [docs/architecture/overview.md](docs/architecture/overview.md) — component architecture
+- [docs/scenarios/scenario-registry.md](docs/scenarios/scenario-registry.md) — the scenario registry and how to add a scenario
 - [docs/learning/T1078-guided-learning.md](docs/learning/T1078-guided-learning.md) — the guided learning path
 - [docs/development/environment-setup.md](docs/development/environment-setup.md) — local setup
 - [docs/development/testing.md](docs/development/testing.md) — running the test suite

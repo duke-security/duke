@@ -174,9 +174,41 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
   Rich-safe output, and exit codes.
 - Guided-learning documentation under `docs/learning/` and updated README,
   roadmap, architecture, lab, testing, and changelog entries.
+- The `duke.scenarios` package: a static built-in scenario registry. A typed,
+  frozen `ScenarioRegistration` declares a technique ID, slug, name, aliases,
+  a lazy metadata loader, and seven typed optional capabilities
+  (`ScenarioCapabilities`) implemented as a `ScenarioCapability` StrEnum
+  selection. The registry enforces non-empty core fields, unique normalized
+  aliases, no alias matching the registration's own technique ID or slug, and
+  no cross-registration key collisions.
+- Case-insensitive resolution of scenarios by canonical technique ID, slug, or
+  alias, preserving canonical display values, with clear
+  `UnknownScenarioError` and `CapabilityMissingError` failures and a
+  deterministic, lifecycle-ordered listing.
+- The built-in registration (`duke.scenarios.builtins`) registering T1078 once
+  with its lazy metadata loader and all seven capabilities, plus fresh
+  `builtin_registry()` instances.
+- `duke scenarios`: lists registered scenarios in deterministic technique-ID
+  order with name, slug, capabilities (in lifecycle order), and aliases —
+  without invoking any metadata loader or capability.
+- CLI lifecycle commands (simulate, detect, investigate, respond, validate,
+  report, learn) now resolve scenarios and dispatch to capabilities through
+  the registry instead of hardcoding T1078 capability selection or technique
+  checks; unknown scenarios and missing capabilities exit 2 before any
+  capability executes.
+- Scenario-registry, built-in-registry, import-order, and CLI tests covering
+  registration validation, resolution, deterministic listing, lazy metadata,
+  capability dispatch and absence, and fresh-process circular-import safety,
+  plus the new CLI missing-capability exit-2 path.
+- Scenario-registry documentation under `docs/scenarios/` and updated README,
+  roadmap, architecture, testing, CONTRIBUTING, and changelog entries.
 
 
 ### Changed
 
 - `Scenario.attack_tactic` was replaced by `attack_tactics` so one
   ATT&CK technique can map accurately to multiple tactics.
+- CLI lifecycle commands no longer import or call T1078-specific capability
+  functions directly; they resolve scenarios and dispatch to capabilities
+  through the static built-in `duke.scenarios` registry (T1078 remains in help
+  examples and default filenames).

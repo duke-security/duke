@@ -20,10 +20,15 @@ The following foundations are implemented:
 
 - **`core`** — vendor-neutral models for entities, security events,
   evidence, findings, incidents, response actions, and scenarios.
-- **`cli`** — Typer/Rich commands for help, version information, and
-  running the T1078 simulation.
-- **`scenarios`** — packaged YAML definitions loaded and validated as
-  typed `Scenario` models.
+- **`cli`** — Typer/Rich commands for help, version information, the
+  `scenarios` listing, and all seven T1078 lifecycle commands. Commands
+  resolve scenarios and dispatch to capabilities through the static
+  built-in registry rather than hardcoding T1078.
+- **`scenarios`** — a static built-in scenario registry that registers
+  T1078 once (`ScenarioRegistration`) with a lazy metadata loader and
+  seven typed optional capabilities, plus packaged YAML definitions
+  loaded and validated as typed `Scenario` models. The CLI resolves
+  scenarios and dispatches to capabilities through this registry.
 - **`simulation`** — a deterministic and safe T1078 event generator.
 - **`telemetry`** — normalized synthetic events and structured JSON
   export with overwrite protection.
@@ -61,8 +66,9 @@ The following foundations are implemented:
 
 | Component | Current status and responsibility |
 |---|---|
-| `core` | Domain models implemented; shared interfaces, configuration, and registry remain planned |
-| `cli` | Foundation, `version`, and T1078 `simulate` implemented |
+| `core` | Domain models implemented; shared interfaces and configuration remain planned |
+| `scenarios` | Static built-in scenario registry implemented, registering T1078 once with typed capabilities and a lazy metadata loader; dynamic/plugin discovery and configuration-driven registries remain planned |
+| `cli` | Typer/Rich CLI implemented with `version`, `scenarios`, and all seven T1078 lifecycle commands; commands resolve scenarios and dispatch to capabilities through the `scenarios` registry |
 | `learning` | Planned Python lessons, exercises, and challenges |
 | `simulation` | T1078 deterministic simulation implemented; additional scenarios and mutation planned |
 | `telemetry` | Normalized event generation, JSON export, and artefact ingestion implemented; source-health monitoring and broader ingestion planned |
@@ -71,7 +77,7 @@ The following foundations are implemented:
 | `response` | Dry-run-only T1078 response planning implemented (`duke respond`); execution, approvals, and rollback application remain planned |
 | `validation` | Deterministic validation implemented (`duke validate`), rerunning the pipeline against in-memory mutations of an artefact |
 | `reporting` | Deterministic advisory incident reporting implemented (`duke report`), rendering an aggregate of finding, investigation, response plan, and validation suite to Markdown with overwrite-protected export |
-| `learning` | T1078 guided learning path implemented (`duke learn T1078`) with typed, metadata-only models and deterministic literal rendering; scenario registry/orchestration, learner-progress tracking, and further learning content remain planned |
+| `learning` | T1078 guided learning path implemented (`duke learn T1078`) with typed, metadata-only models and deterministic literal rendering; learner-progress tracking and further learning content remain planned |
 | `labs` | T1078 simulation through reporting documentation implemented (labs overview covers all lifecycle stages); guided lab delivery remains planned |
 | `adapters` | Planned optional vendor and platform integrations |
 
@@ -135,10 +141,20 @@ The implemented scenario now also includes:
   without executing them. See
   [the guided learning guide](../learning/T1078-guided-learning.md).
 
+Scenarios are registered in a **static built-in scenario registry**
+(`duke.scenarios`), not discovered from the filesystem. Each registration
+declares a technique ID, slug, name, aliases, a lazy metadata loader, and
+seven typed optional capabilities; the CLI resolves scenarios by ID, slug,
+or alias and dispatches each lifecycle command through the registry. This
+keeps scenario orchestration in one place: adding a scenario means adding a
+registration, not editing every CLI command. See
+[scenario-registry.md](../scenarios/scenario-registry.md). Dynamic/plugin
+discovery is deliberately deferred.
+
 The following scenario components remain planned:
 
 - additional ATT&CK scenarios and their learning paths;
-- a reusable scenario registry/orchestration;
+- dynamic/plugin scenario discovery;
 - learner-progress tracking;
 - broader improve → retest learning workflows.
 

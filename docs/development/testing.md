@@ -36,7 +36,8 @@ Typer's `CliRunner`. Response-planning and plan-model tests live under
 result-model tests live under `tests/unit/validation/`; incident-reporting
 report-model, renderer, export, and end-to-end tests live under
 `tests/unit/reporting/`; guided-learning model, catalogue, and rendering
-tests live under `tests/unit/learning/`.
+tests live under `tests/unit/learning/`; scenario-registry tests live
+under `tests/unit/scenarios/`.
 
 ```bash
 pytest tests/unit/test_cli.py
@@ -44,7 +45,18 @@ pytest tests/unit/response
 pytest tests/unit/validation
 pytest tests/unit/reporting
 pytest tests/unit/learning
+pytest tests/unit/scenarios
 ```
+
+The scenario-registry tests (`tests/unit/scenarios/`) cover the typed
+registry model — registration validation, case-insensitive resolution by
+technique ID, slug, and alias, duplicate/collision errors, deterministic
+listing in lifecycle capability order, capability presence and dispatch,
+and lazy metadata loading with no capability invocation. Separate
+import-order tests launch fresh Python subprocesses to verify that
+`duke.cli.app` and `duke.scenarios.builtins` import in either order without
+circular-import failures (bypassing any in-process import cache).
+
 
 ## Coverage
 

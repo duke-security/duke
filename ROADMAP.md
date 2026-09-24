@@ -88,6 +88,15 @@ for the current milestone.
   that teach Python through Duke's defensive T1078 workflow, using real CLI
   commands and public exports as metadata — never executing commands,
   modifying learner files, grading, or persisting progress
+- `duke scenarios`
+- A static built-in scenario registry (`duke.scenarios`) that registers T1078
+  once with a typed, frozen `ScenarioRegistration` — technique ID, slug, name,
+  aliases, a lazy metadata loader, and seven typed optional capabilities —
+  resolved case-insensitively. Every CLI lifecycle command now resolves
+  scenarios and dispatches to capabilities through the registry instead of
+  hardcoding T1078, so future scenarios are addable by registration rather
+  than edits across every command; missing capabilities and unknown scenarios
+  fail clearly with exit code 2
 - Documentation foundation (this roadmap, README, CONTRIBUTING,
   architecture overview, development guides, initial ADRs, and the guided
   learning guide under `docs/learning/`)
@@ -99,9 +108,10 @@ below distinguishes that foundation from the capabilities still planned.
 
 | Component | Purpose |
 |---|---|
-| `core` | Domain models implemented; shared interfaces, configuration, and scenario registry planned |
-| `cli` | Typer-based CLI implemented with `version`, T1078 `simulate`, and T1078 `learn`; commands will grow with each capability |
-| `learning` | T1078 guided learning path implemented (`duke learn T1078`) with typed, metadata-only learning models and deterministic rendering; reusable scenario registry/orchestration, learner-progress tracking, broader improve→retest learning workflows, and further lesson content remain planned |
+| `core` | Domain models implemented; shared interfaces and configuration planned |
+| `scenarios` | Static built-in scenario registry implemented (`duke.scenarios`), registering T1078 once with typed capabilities and metadata loader; all CLI commands resolve scenarios and dispatch to capabilities through the registry. Dynamic/plugin discovery and configuration-driven registries remain planned |
+| `cli` | Typer-based CLI implemented with `version`, `scenarios`, and all seven T1078 lifecycle commands; commands resolve scenarios and their capabilities through the static built-in scenario registry (`duke.scenarios`), so additional scenarios are addable by registration rather than CLI edits |
+| `learning` | T1078 guided learning path implemented (`duke learn T1078`) with typed, metadata-only learning models and deterministic rendering; learner-progress tracking, broader improve→retest learning workflows, and further lesson content remain planned |
 | `simulation` | T1078 safe deterministic simulation implemented; additional scenarios and mutation remain planned |
 | `telemetry` | Normalized event generation, JSON export, and artefact ingestion implemented; source health and broader ingestion remain planned |
 | `detection` | Deterministic T1078 detection implemented with explainable weighted confidence; deterministic detection validation implemented (`duke validate`) with controlled in-memory mutations and an explicit case suite; precision/recall measurement, lifecycle tuning, and additional rules remain planned |
