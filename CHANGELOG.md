@@ -80,6 +80,29 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
 - Investigation, loader, and CLI tests covering evidence creation,
   relationship classification, chronological timelines, entity resolution,
   deterministic output, benign handling, and exit codes.
+- The `duke.response` package: `ResponseCategory`, `ResponseActionGroup`,
+  and `ResponsePlan` typed models for dry-run-only response planning.
+- Dry-run T1078 response planning (`plan_t1078_response`) that consumes an
+  existing artefact and `InvestigationResult`, correlates the finding into
+  a deterministic preliminary `Incident` (recorded so each action can carry
+  an `incident_id`, without asserting compromise or exfiltration), and
+  proposes approval-gated actions grouped into containment, evidence
+  preservation, investigation follow-up, and recovery.
+- Conservative rollback semantics for the proposed actions: revoked
+  sessions and rotated credentials are not restorable, preserved evidence
+  is never deleted as rollback, review-only actions carry no rollback,
+  and MFA rollback never weakens baseline requirements.
+- `duke respond T1078`: proposes a dry-run plan from an exported artefact,
+  reporting no findings (exit 0) when detection finds nothing, invalid
+  artefacts (exit 1), and unsupported techniques (exit 2). No real
+  account, session, permission, file, network, or security control is
+  modified.
+- Response planner, plan-model, and CLI tests covering category ordering,
+  dry-run/approval/planned guarantees, rollback classifications,
+  conditional non-asserting wording, determinism, incident correlation,
+  side-effect freedom, benign handling, and exit codes.
+- Response documentation under `docs/responses/` and updated lab,
+  investigation, README, roadmap, architecture, and changelog entries.
 
 
 ### Changed

@@ -114,6 +114,13 @@ handling, and no remediation. All data is from the exported JSON artefact.
 - Only the events the finding references are surfaced; related but
   unreferenced telemetry is intentionally excluded.
 
+## Next: response
+
+Once an investigation result exists, `duke respond T1078` consumes the
+same artefact and evidence-led result to propose a dry-run-only,
+approval-gated response plan. See
+[the response documentation](../responses/T1078-safe-response.md).
+
 ## References
 
 - MITRE ATT&CK — T1078 Valid Accounts (https://attack.mitre.org/techniques/T1078/)

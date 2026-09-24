@@ -11,6 +11,7 @@ from rich.console import Console
 
 from duke.detection import EventLoadError, detect_t1078, load_events
 from duke.investigation import InvestigationResult, investigate_t1078
+from duke.response import ResponsePlan, plan_t1078_response
 from duke.simulation import export_simulation, generate_t1078_simulation
 from duke.telemetry import load_telemetry_artefact
 
@@ -220,6 +221,89 @@ def investigate(
     for finding in findings:
         result = investigate_t1078(artefact, finding)
         _print_investigation(result)
+
+
+def _print_response_plan(plan: ResponsePlan) -> None:
+    """Print a proposed, dry-run-only response plan."""
+    console.print("[green]Response plan complete (DRY RUN — nothing executed)[/green]")
+    console.print(
+        f"Incident: {plan.incident.title} (status: {plan.incident.status}, "
+        f"severity: {plan.incident.severity})"
+    )
+    console.print(f"Finding: {plan.finding.title}")
+    console.print(
+        f"Actions proposed: {len(plan.actions())} — all dry-run, all require approval"
+    )
+
+    for group in plan.groups:
+        console.print("")
+        console.print(f"[bold]{group.category.value.replace('_', ' ').title()}[/bold]")
+        for action in group.actions:
+            rollback = (
+                "no rollback (irreversible)"
+                if not action.supports_rollback
+                else "rollback supported"
+            )
+            console.print(
+                f"  - {action.name}  [risk: {action.risk}, approval: yes, "
+                f"{rollback}]"
+            )
+            console.print(f"      Purpose: {action.purpose}")
+            console.print(f"      Verify: {action.verification_guidance}")
+            if action.rollback_guidance is not None:
+                console.print(f"      Rollback: {action.rollback_guidance}")
+
+    console.print("")
+    console.print(
+        "[yellow]No real account, session, permission, file, network, or "
+        "security control was modified.[/yellow]"
+    )
+
+
+@app.command()
+def respond(
+    technique: Annotated[
+        str,
+        typer.Argument(
+            help="MITRE ATT&CK technique to respond to, for example T1078.",
+        ),
+    ],
+    read_path: Annotated[
+        Path,
+        typer.Option(
+            "--input",
+            "-i",
+            help="Path to the normalized telemetry JSON artefact to respond to.",
+        ),
+    ] = Path("data/events/t1078-session-001.json"),
+) -> None:
+    """Propose a dry-run response plan from investigation of normalized telemetry."""
+    normalized_technique = technique.upper()
+
+    if normalized_technique != "T1078":
+        console.print(
+            f"[red]Unsupported technique:[/red] {technique}. "
+            "Currently available: T1078",
+        )
+        raise typer.Exit(code=2)
+
+    try:
+        artefact = load_telemetry_artefact(read_path)
+    except EventLoadError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=1) from exc
+
+    findings = detect_t1078(artefact.events)
+
+    if not findings:
+        console.print("[yellow]No findings to respond to[/yellow]")
+        console.print(f"Events analysed: {len(artefact.events)}")
+        return
+
+    for finding in findings:
+        result = investigate_t1078(artefact, finding)
+        plan = plan_t1078_response(artefact, result)
+        _print_response_plan(plan)
 
 if __name__ == "__main__":
     app()

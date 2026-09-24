@@ -2,8 +2,9 @@
 
 ## Status
 
-Simulation, detection, and evidence-led investigation implemented.
-Response, validation, and incident reporting remain planned.
+Simulation, detection, evidence-led investigation, and safe dry-run
+response implemented. Detection validation and incident reporting remain
+planned.
 
 ## Purpose
 
@@ -28,6 +29,8 @@ After completing the lab, a learner should be able to:
 - correlate identity, device, application, file, privilege, and network
   telemetry;
 - preserve evidence before proposing containment;
+- propose dry-run-only, approval-gated response actions that can never
+  modify a real system;
 - use typed Python models to generate reproducible security telemetry.
 
 ## Python concepts
@@ -123,6 +126,42 @@ reports "No findings to investigate" and exits 0.
 
 See [the investigation documentation](../../investigations/T1078-compromised-identity.md)
 for the full workflow.
+
+## Dry-run response
+
+`duke respond T1078` consumes the same artefact, re-runs detection and
+investigation, and proposes a plan of dry-run-only response actions —
+never executing any of them. See
+[the response documentation](../../responses/T1078-safe-response.md) for
+the full workflow.
+
+```bash
+duke respond T1078 --input data/events/t1078-session-001.json
+```
+
+The plan correlates the finding into a *preliminary* incident record and
+groups proposed actions in a deliberate order:
+
+- **Containment** — `disable-account`, `revoke-active-sessions`,
+  `deny-unfamiliar-device`
+- **Evidence preservation** — `preserve-telemetry-artefact`
+- **Investigation follow-up** — `confirm-account-ownership`,
+  `review-privileged-access-grant`, `assess-exfiltration-risk`
+- **Recovery** — `require-mfa-reauthentication`,
+  `rotate-account-credentials`
+
+Every action is `dry_run=True`, `requires_approval=True`, and
+`status=PLANNED`, and carries a purpose, risk, verification guidance, and
+(where reversible) rollback guidance. Rollback is conservative: revoked
+sessions and rotated credentials are not restorable, preserved evidence is
+never deleted as rollback, and review-only actions have no rollback.
+Containment and recovery actions are conditional recommendations grounded
+in possible valid-account misuse — they never assert a confirmed
+compromise or exfiltration. When detection produces no finding,
+`duke respond T1078` reports "No findings to respond to" and exits 0.
+
+Response is proposal-only: it modifies no real account, session,
+permission, file, network, or security control.
 
 ## Detection methodology
 

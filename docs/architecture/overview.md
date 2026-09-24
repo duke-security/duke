@@ -38,10 +38,14 @@ The following foundations are implemented:
   existing `Finding` and produces a chronological timeline, per-event
   evidence, involved entities, confirmed facts, analyst assessments, and
   unresolved questions.
+- **`response`** — dry-run-only T1078 response planning that correlates a
+  finding into a deterministic preliminary incident and proposes
+  approval-gated actions grouped into containment, evidence preservation,
+  investigation follow-up, and recovery.
 - **`labs`** — documentation for the implemented T1078 simulation,
-  detection, and investigation stages.
+  detection, investigation, and response stages.
 
-The T1078 response, validation, reporting, and learning stages remain
+The T1078 validation, reporting, and learning stages remain
 planned.
 
 ## Component status
@@ -55,7 +59,7 @@ planned.
 | `telemetry` | Normalized event generation, JSON export, and artefact ingestion implemented; source-health monitoring and broader ingestion planned |
 | `detection` | Deterministic T1078 detection implemented with explainable weighted confidence and automated tests; mutation testing, precision/recall, tuning, and additional rules planned |
 | `investigation` | Evidence-led T1078 investigation implemented (`duke investigate`); hypothesising and graphs remain planned |
-| `response` | Planned safe response actions, approvals, dry runs, verification, and rollback |
+| `response` | Dry-run-only T1078 response planning implemented (`duke respond`); execution, approvals, and rollback application remain planned |
 | `reporting` | Planned incident reports, summaries, and lessons learned |
 | `labs` | T1078 simulation documentation implemented; remaining lifecycle stages planned |
 | `adapters` | Planned optional vendor and platform integrations |
@@ -107,11 +111,12 @@ The implemented scenario now also includes:
   and automated tests;
 - evidence-led investigation guidance that consumes an existing finding
   and produces evidence, a timeline, involved entities, facts,
-  assessments, and open questions.
+  assessments, and open questions;
+- safe dry-run response planning that proposes approval-gated actions
+  grouped by category, without ever executing them.
 
 The following scenario components remain planned:
 
-- safe response actions;
 - validation and mutation testing;
 - incident reporting;
 - guided learning exercises.

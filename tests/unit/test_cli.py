@@ -249,3 +249,97 @@ def test_investigate_invalid_artefact_exits_one(tmp_path: Path) -> None:
 
     assert invocation.exit_code == 1
     assert "Malformed JSON" in invocation.stdout
+
+
+def test_respond_t1078_reads_input_artifact(tmp_path: Path) -> None:
+    result = generate_t1078_simulation()
+    input_path = export_simulation(result, tmp_path / "t1078.json")
+
+    invocation = runner.invoke(
+        app,
+        ["respond", "T1078", "--input", str(input_path)],
+    )
+
+    assert invocation.exit_code == 0
+    assert "Response plan complete (DRY RUN" in invocation.stdout
+    assert "Actions proposed: 9" in invocation.stdout
+    assert "Containment" in invocation.stdout
+    assert "disable-account" in invocation.stdout
+    assert "nothing executed" in invocation.stdout
+    assert "No real account" in invocation.stdout
+    assert "modified" in invocation.stdout
+
+
+def test_respond_no_findings_is_benign(tmp_path: Path) -> None:
+    result = generate_t1078_simulation()
+    payload = simulation_payload(result)
+    payload["events"] = payload["events"][:2]
+    input_path = tmp_path / "benign.json"
+    input_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    invocation = runner.invoke(
+        app,
+        ["respond", "T1078", "--input", str(input_path)],
+    )
+
+    assert invocation.exit_code == 0
+    assert "No findings to respond to" in invocation.stdout
+    assert "Response plan complete" not in invocation.stdout
+
+
+def test_respond_rejects_unsupported_technique(tmp_path: Path) -> None:
+    invocation = runner.invoke(
+        app,
+        ["respond", "T9999", "--input", str(tmp_path / "x.json")],
+    )
+
+    assert invocation.exit_code == 2
+    assert "Unsupported technique" in invocation.stdout
+
+
+def test_respond_missing_input_file(tmp_path: Path) -> None:
+    missing = tmp_path / "missing.json"
+
+    invocation = runner.invoke(
+        app,
+        ["respond", "T1078", "--input", str(missing)],
+    )
+
+    assert invocation.exit_code == 1
+    assert "Input file not found or not a regular file" in invocation.stdout
+
+
+def test_respond_malformed_json(tmp_path: Path) -> None:
+    bad = tmp_path / "bad.json"
+    bad.write_text("{ not json", encoding="utf-8")
+
+    invocation = runner.invoke(
+        app,
+        ["respond", "T1078", "--input", str(bad)],
+    )
+
+    assert invocation.exit_code == 1
+    assert "Malformed JSON" in invocation.stdout
+
+
+def test_respond_unsupported_schema_version(tmp_path: Path) -> None:
+    unsupported = tmp_path / "v2.json"
+    unsupported.write_text(
+        json.dumps(
+            {
+                "schema_version": "2.0",
+                "scenario": {},
+                "entities": [],
+                "events": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    invocation = runner.invoke(
+        app,
+        ["respond", "T1078", "--input", str(unsupported)],
+    )
+
+    assert invocation.exit_code == 1
+    assert "Unsupported schema version" in invocation.stdout

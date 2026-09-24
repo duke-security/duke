@@ -31,10 +31,12 @@ pytest
 
 Tests live under `tests/`, mirroring the structure of `src/duke`.
 Unit tests for the CLI are in `tests/unit/test_cli.py`, built with
-Typer's `CliRunner`.
+Typer's `CliRunner`. Response-planning and plan-model tests live under
+`tests/unit/response/`.
 
 ```bash
 pytest tests/unit/test_cli.py
+pytest tests/unit/response
 ```
 
 ## Coverage

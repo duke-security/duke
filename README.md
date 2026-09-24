@@ -47,6 +47,11 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
 - Evidence-led investigation of an existing finding, producing a
   chronological timeline, per-event evidence, involved entities, confirmed
   facts, analyst assessments, and unresolved questions
+- `duke respond T1078`
+- Dry-run-only response planning that correlates a finding into a
+  preliminary incident and proposes approval-gated actions grouped into
+  containment, evidence preservation, investigation follow-up, and
+  recovery — never modifying a real system
 - CLI unit tests
 - Quality gates: [Ruff](https://docs.astral.sh/ruff/), mypy (strict), pytest
 
@@ -54,8 +59,8 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
 
 The core domain model and the T1078 scenario’s metadata, simulation,
 normalized telemetry, JSON export, CLI commands, behaviour-based
-detection, and evidence-led investigation are implemented.
-Safe response, detection validation, incident reporting, learning
+detection, evidence-led investigation, and safe dry-run response are
+implemented. Detection validation, incident reporting, learning
 exercises, additional scenarios, and vendor adapters remain
 **planned**.
 
@@ -82,6 +87,7 @@ duke version
 duke simulate T1078
 duke detect T1078 --input data/events/t1078-session-001.json
 duke investigate T1078 --input data/events/t1078-session-001.json
+duke respond T1078 --input data/events/t1078-session-001.json
 ```
 
 ## Documentation

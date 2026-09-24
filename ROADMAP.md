@@ -65,6 +65,12 @@ for the current milestone.
   baseline as context), involved entities, confirmed facts, analyst
   assessments, and unresolved questions — plus benign no-finding handling
   and comprehensive investigation, loader, and CLI tests
+- `duke respond T1078`
+- Safe dry-run-only T1078 response planning (`plan_t1078_response`) that
+  correlates a finding into a deterministic preliminary incident and
+  proposes approval-gated actions grouped into containment, evidence
+  preservation, investigation follow-up, and recovery — with conservative
+  rollback semantics, verified via model, planner, and CLI tests
 - Documentation foundation (this roadmap, README, CONTRIBUTING,
   architecture overview, development guides, and initial ADRs)
 
@@ -82,7 +88,7 @@ below distinguishes that foundation from the capabilities still planned.
 | `telemetry` | Normalized event generation, JSON export, and artefact ingestion implemented; source health and broader ingestion remain planned |
 | `detection` | Deterministic T1078 detection implemented with explainable weighted confidence and automated tests; mutation testing, precision/recall measurement, lifecycle tuning, and additional rules remain planned |
 | `investigation` | Evidence-led T1078 investigation implemented (`duke investigate`), producing timelines, evidence, involved entities, facts, assessments, and open questions; hypothesising and graphs remain planned |
-| `response` | Safe response plans, approvals, dry runs, and rollback |
+| `response` | Dry-run-only T1078 response planning implemented (`duke respond`), producing preliminary-incident correlation and approval-gated actions grouped by category; real execution, approvals, and rollback application remain planned |
 | `reporting` | Incident reports, summaries, and lessons learned |
 | `labs` | T1078 simulation documentation implemented; detection through reporting stages remain planned |
 | `adapters` | Optional vendor or platform integrations |
