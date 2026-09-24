@@ -112,6 +112,7 @@ Validation complete: 16/16 cases passed
 - [T1078 detection documentation](../labs/T1078/overview.md#detection-methodology)
 - [T1078 investigation documentation](../investigations/T1078-compromised-identity.md)
 - [T1078 response documentation](../responses/T1078-safe-response.md)
+- [T1078 incident reporting documentation](../reporting/T1078-incident-reporting.md)
 
 ## Last reviewed
 

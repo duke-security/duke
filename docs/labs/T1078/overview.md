@@ -3,8 +3,8 @@
 ## Status
 
 Simulation, detection, evidence-led investigation, safe dry-run response,
-and deterministic detection validation implemented. Incident reporting
-remains planned.
+deterministic detection validation, and deterministic advisory incident
+reporting implemented.
 
 ## Purpose
 
@@ -93,6 +93,9 @@ duke detect T1078 --input data/events/t1078-session-001.json
 duke investigate T1078 --input data/events/t1078-session-001.json
 duke respond T1078 --input data/events/t1078-session-001.json
 duke validate T1078 --input data/events/t1078-session-001.json
+duke report T1078 \
+  --input data/events/t1078-session-001.json \
+  --output reports/t1078-incident-report.md
 ```
 
 ## Investigation
@@ -184,6 +187,25 @@ artefact or a failed suite exits 1; an unsupported technique exits 2.
 
 See [the validation documentation](../../validation/T1078-detection-validation.md)
 for the full case list.
+
+## Incident reporting
+
+`duke report T1078` renders a deterministic, advisory incident report
+that aggregates the finding, the evidence-led investigation, the dry-run
+response plan, and the validation suite into Markdown. It runs detection
+validation exactly once and requires it to pass and exactly one finding
+to be present before reporting; otherwise it exits 1 and writes no file.
+The report carries a deterministic report ID and timestamp derived from
+the finding (not wall-clock time), separates confirmed facts, analyst
+assessments, and unresolved questions, labels the finding title as an
+analytic label (not confirmation), labels every response recommendation
+as dry-run-only/approval-required/not-executed, and escorts all dynamic
+table content so pipes and line breaks cannot corrupt the table. Export
+is safe: an existing file is never silently replaced without `--force`.
+The report never asserts confirmed compromise, impact, or exfiltration.
+
+See [the reporting documentation](../../reporting/T1078-incident-reporting.md)
+for the section structure, identity strategy, and exit codes.
 
 ## Detection methodology
 

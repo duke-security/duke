@@ -33,12 +33,15 @@ Tests live under `tests/`, mirroring the structure of `src/duke`.
 Unit tests for the CLI are in `tests/unit/test_cli.py`, built with
 Typer's `CliRunner`. Response-planning and plan-model tests live under
 `tests/unit/response/`; detection-validation, mutation, and validation
-result-model tests live under `tests/unit/validation/`.
+result-model tests live under `tests/unit/validation/`; incident-reporting
+report-model, renderer, export, and end-to-end tests live under
+`tests/unit/reporting/`.
 
 ```bash
 pytest tests/unit/test_cli.py
 pytest tests/unit/response
 pytest tests/unit/validation
+pytest tests/unit/reporting
 ```
 
 ## Coverage

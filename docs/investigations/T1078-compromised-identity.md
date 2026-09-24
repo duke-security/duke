@@ -114,14 +114,17 @@ handling, and no remediation. All data is from the exported JSON artefact.
 - Only the events the finding references are surfaced; related but
   unreferenced telemetry is intentionally excluded.
 
-## Next: response and validation
+## Next: response, validation, and reporting
 
 Once an investigation result exists, `duke respond T1078` consumes the
 same artefact and evidence-led result to propose a dry-run-only,
 approval-gated response plan. `duke validate T1078` then proves the whole
 detection → investigation → response pipeline behaves correctly against
-in-memory mutations. See [the response documentation](../responses/T1078-safe-response.md)
-and [the validation documentation](../validation/T1078-detection-validation.md).
+in-memory mutations, and `duke report T1078` renders a deterministic,
+advisory incident report aggregating the finding, investigation, response
+plan, and validation suite. See [the response documentation](../responses/T1078-safe-response.md),
+[the validation documentation](../validation/T1078-detection-validation.md),
+and [the reporting documentation](../reporting/T1078-incident-reporting.md).
 
 ## References
 

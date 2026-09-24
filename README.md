@@ -57,6 +57,11 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
   investigation → response pipeline against controlled in-memory
   mutations of the artefact (which is never modified), reporting pass/fail
   per case
+- `duke report T1078`
+- Deterministic, advisory incident reporting that aggregates the finding,
+  investigation, dry-run response plan, and validation suite into a
+  Markdown report — never asserting confirmed compromise, impact, or
+  exfiltration, and never executing an action
 - CLI unit tests
 - Quality gates: [Ruff](https://docs.astral.sh/ruff/), mypy (strict), pytest
 
@@ -64,10 +69,10 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
 
 The core domain model and the T1078 scenario’s metadata, simulation,
 normalized telemetry, JSON export, CLI commands, behaviour-based
-detection, evidence-led investigation, safe dry-run response, and
-deterministic detection validation are implemented. Incident reporting,
-learning exercises, additional scenarios, and vendor adapters remain
-**planned**.
+detection, evidence-led investigation, safe dry-run response,
+deterministic detection validation, and deterministic incident reporting
+are implemented. Learning exercises, additional scenarios, and vendor
+adapters remain **planned**.
 
 See [the T1078 lab documentation](docs/labs/T1078/overview.md),
 [the architecture overview](docs/architecture/overview.md), and
@@ -94,6 +99,9 @@ duke detect T1078 --input data/events/t1078-session-001.json
 duke investigate T1078 --input data/events/t1078-session-001.json
 duke respond T1078 --input data/events/t1078-session-001.json
 duke validate T1078 --input data/events/t1078-session-001.json
+duke report T1078 \
+  --input data/events/t1078-session-001.json \
+  --output reports/t1078-incident-report.md
 ```
 
 ## Documentation

@@ -45,10 +45,14 @@ The following foundations are implemented:
 - **`validation`** — deterministic validation of the T1078 detection →
   investigation → response pipeline that reruns the workflow against
   controlled in-memory mutations of an artefact, never modifying it.
+- **`reporting`** — deterministic, advisory incident reporting that
+  aggregates the existing finding, investigation, dry-run response plan,
+  and validation suite into a byte-deterministic Markdown report, exported
+  with overwrite protection.
 - **`labs`** — documentation for the implemented T1078 simulation,
-  detection, investigation, response, and validation stages.
+  detection, investigation, response, validation, and reporting stages.
 
-The T1078 reporting and learning stages remain planned.
+The T1078 learning stage remains planned.
 
 ## Component status
 
@@ -63,8 +67,8 @@ The T1078 reporting and learning stages remain planned.
 | `investigation` | Evidence-led T1078 investigation implemented (`duke investigate`); hypothesising and graphs remain planned |
 | `response` | Dry-run-only T1078 response planning implemented (`duke respond`); execution, approvals, and rollback application remain planned |
 | `validation` | Deterministic validation implemented (`duke validate`), rerunning the pipeline against in-memory mutations of an artefact |
-| `reporting` | Planned incident reports, summaries, and lessons learned |
-| `labs` | T1078 simulation documentation implemented; remaining lifecycle stages planned |
+| `reporting` | Deterministic advisory incident reporting implemented (`duke report`), rendering an aggregate of finding, investigation, response plan, and validation suite to Markdown with overwrite-protected export |
+| `labs` | T1078 simulation through reporting documentation implemented (labs overview covers all lifecycle stages); guided lab delivery remains planned |
 | `adapters` | Planned optional vendor and platform integrations |
 
 ## Vendor-agnostic core
@@ -118,11 +122,13 @@ The implemented scenario now also includes:
 - safe dry-run response planning that proposes approval-gated actions
   grouped by category, without ever executing them;
 - deterministic detection validation that reruns the pipeline against
-  controlled in-memory mutations, without modifying the source artefact.
+  controlled in-memory mutations, without modifying the source artefact;
+- deterministic advisory incident reporting that aggregates the workflow
+  data into a Markdown report without asserting confirmed compromise,
+  impact, or exfiltration.
 
 The following scenario components remain planned:
 
-- incident reporting;
 - guided learning exercises.
 
 T1078 Valid Accounts is Duke's first vertical slice, not its only

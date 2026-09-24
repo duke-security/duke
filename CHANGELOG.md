@@ -125,6 +125,27 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
   exit codes, and a side-effect-free package guard.
 - Validation documentation under `docs/validation/` and updated lab,
   README, roadmap, architecture, and changelog entries.
+- The `duke.reporting` package: an `IncidentReport` typed content model
+  aggregating the finding, involved entities, evidence, timeline, analysis,
+  dry-run response plan, and validation suite, with a deterministic
+  `report_id` and `generated_at` derived from the finding.
+- Deterministic incident reporting (`report_t1078`) that consumes the
+  existing telemetry artefact, finding, investigation result, response plan,
+  and validation suite without regenerating telemetry, modifying the source,
+  or executing responses.
+- A deterministic Markdown renderer (`render_incident_report`) with escaped
+  table content and a byte-identical, single-trailing-newline output.
+- Safe report export (`export_report`) with overwrite protection and `--force`.
+- `duke report T1078`: renders an advisory report and exits 0 on success (or
+  for a benign artefact with "No findings to report" and no file), 1 for an
+  invalid artefact, failed validation, unexpected finding count, existing
+  output, or export failure, and 2 for an unsupported technique.
+- Reporting report-model, renderer, export, end-to-end, and CLI tests covering
+  determinism, cautious language, rollback rendering, table escaping, single
+  validation run, unexpected-finding safety, and input immutability.
+- Reporting documentation under `docs/reporting/` and updated README,
+  roadmap, architecture, lab, investigation, response, validation, and
+  changelog entries.
 
 
 ### Changed

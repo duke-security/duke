@@ -11,6 +11,7 @@ from rich.console import Console
 
 from duke.detection import EventLoadError, detect_t1078, load_events
 from duke.investigation import InvestigationResult, investigate_t1078
+from duke.reporting import export_report, render_incident_report, report_t1078
 from duke.response import ResponsePlan, plan_t1078_response
 from duke.simulation import export_simulation, generate_t1078_simulation
 from duke.telemetry import load_telemetry_artefact
@@ -371,6 +372,99 @@ def validate(
 
     if not suite.all_passed:
         raise typer.Exit(code=1)
+
+
+@app.command()
+def report(
+    technique: Annotated[
+        str,
+        typer.Argument(
+            help="MITRE ATT&CK technique to report on, for example T1078.",
+        ),
+    ],
+    read_path: Annotated[
+        Path,
+        typer.Option(
+            "--input",
+            "-i",
+            help="Path to the normalized telemetry JSON artefact to report on.",
+        ),
+    ] = Path("data/events/t1078-session-001.json"),
+    output_path: Annotated[
+        Path,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Path for the rendered incident report.",
+        ),
+    ] = Path("reports/t1078-incident-report.md"),
+    force: Annotated[
+        bool,
+        typer.Option(
+            "--force",
+            "-f",
+            help="Explicitly overwrite an existing report file.",
+        ),
+    ] = False,
+) -> None:
+    """Render a deterministic, advisory incident report from workflow data."""
+    normalized_technique = technique.upper()
+
+    if normalized_technique != "T1078":
+        console.print(
+            f"[red]Unsupported technique:[/red] {technique}. "
+            "Currently available: T1078",
+        )
+        raise typer.Exit(code=2)
+
+    try:
+        artefact = load_telemetry_artefact(read_path)
+    except EventLoadError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=1) from exc
+
+    findings = detect_t1078(artefact.events)
+
+    if not findings:
+        console.print("[yellow]No findings to report[/yellow]")
+        console.print(f"Events analysed: {len(artefact.events)}")
+        return  # exit 0; no output file is created
+
+    # Run detection validation exactly once, before any report is built.
+    suite = validate_t1078(artefact)
+    if not suite.all_passed:
+        console.print("[red]Validation failed[/red]")
+        console.print("No report was generated.")
+        raise typer.Exit(code=1)
+
+    if len(findings) != 1:
+        console.print(
+            f"[red]Expected exactly one finding, got {len(findings)}[/red]"
+        )
+        console.print("No report was generated.")
+        raise typer.Exit(code=1)
+
+    finding = findings[0]
+    result = investigate_t1078(artefact, finding)
+    plan = plan_t1078_response(artefact, result)
+    incident_report = report_t1078(artefact, finding, result, plan, suite)
+    markdown = render_incident_report(incident_report)
+
+    try:
+        export_report(markdown, output_path, overwrite=force)
+    except FileExistsError as exc:
+        console.print(f"[red]{exc}[/red]")
+        console.print("Use --force to overwrite it explicitly.")
+        raise typer.Exit(code=1) from exc
+    except OSError as exc:
+        console.print(f"[red]Failed to write report: {exc}[/red]")
+        raise typer.Exit(code=1) from exc
+
+    console.print("[green]Report complete[/green]")
+    console.print(f"Report ID: {incident_report.report_id}")
+    console.print(f"Validation: {len(suite.cases)}/{len(suite.cases)} cases passed")
+    console.print(f"Saved: {output_path}")
+
 
 if __name__ == "__main__":
     app()

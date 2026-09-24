@@ -77,6 +77,12 @@ for the current milestone.
   response planning against controlled in-memory mutations, and reports a
   read-only `all_passed` suite of explicit cases — with a side-effect-free
   guard and comprehensive validation, mutation, and CLI tests
+- `duke report T1078`
+- Deterministic, advisory incident reporting (`report_t1078` +
+  `render_incident_report`) that aggregates the existing finding,
+  investigation, dry-run response plan, and validation suite into a
+  byte-deterministic Markdown report — with safe overwrite-protected export,
+  and without asserting confirmed compromise, impact, or exfiltration
 - Documentation foundation (this roadmap, README, CONTRIBUTING,
   architecture overview, development guides, and initial ADRs)
 
@@ -95,8 +101,8 @@ below distinguishes that foundation from the capabilities still planned.
 | `detection` | Deterministic T1078 detection implemented with explainable weighted confidence; deterministic detection validation implemented (`duke validate`) with controlled in-memory mutations and an explicit case suite; precision/recall measurement, lifecycle tuning, and additional rules remain planned |
 | `investigation` | Evidence-led T1078 investigation implemented (`duke investigate`), producing timelines, evidence, involved entities, facts, assessments, and open questions; hypothesising and graphs remain planned |
 | `response` | Dry-run-only T1078 response planning implemented (`duke respond`), producing preliminary-incident correlation and approval-gated actions grouped by category; real execution, approvals, and rollback application remain planned |
-| `reporting` | Incident reports, summaries, and lessons learned |
-| `labs` | T1078 simulation documentation implemented; detection through reporting stages remain planned |
+| `reporting` | Deterministic advisory incident reporting implemented (`duke report`), aggregating finding, investigation, dry-run response plan, and validation into byte-deterministic Markdown with overwrite-protected export; PDF/HTML output and lessons-learned remain planned |
+| `labs` | T1078 simulation through reporting documentation implemented (labs overview covers all lifecycle stages); guided lab delivery remains planned |
 | `adapters` | Optional vendor or platform integrations |
 
 The core will not depend directly on AWS, Azure, GCP, a particular
