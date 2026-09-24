@@ -62,6 +62,11 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
   investigation, dry-run response plan, and validation suite into a
   Markdown report — never asserting confirmed compromise, impact, or
   exfiltration, and never executing an action
+- `duke learn T1078`
+- A T1078 guided learning path: an 11-step, deterministic, beginner-friendly
+  walk that teaches Python through Duke's defensive T1078 workflow. Each
+  step reuses real CLI commands and public exports as metadata — it never
+  executes a command, modifies learner files, grades, or persists progress
 - CLI unit tests
 - Quality gates: [Ruff](https://docs.astral.sh/ruff/), mypy (strict), pytest
 
@@ -70,11 +75,15 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
 The core domain model and the T1078 scenario’s metadata, simulation,
 normalized telemetry, JSON export, CLI commands, behaviour-based
 detection, evidence-led investigation, safe dry-run response,
-deterministic detection validation, and deterministic incident reporting
-are implemented. Learning exercises, additional scenarios, and vendor
-adapters remain **planned**.
+deterministic detection validation, deterministic incident reporting, and
+a T1078 guided learning path are implemented. The full learning component
+(additional scenarios and their learning paths, a reusable scenario
+registry/orchestration, learner-progress tracking, broader improve →
+retest learning workflows, further lesson content), additional T1078
+scenarios, and vendor adapters remain **planned**.
 
-See [the T1078 lab documentation](docs/labs/T1078/overview.md),
+See [the T1078 guided learning guide](docs/learning/T1078-guided-learning.md),
+[the T1078 lab documentation](docs/labs/T1078/overview.md),
 [the architecture overview](docs/architecture/overview.md), and
 [ROADMAP.md](ROADMAP.md) for details.
 
@@ -102,6 +111,8 @@ duke validate T1078 --input data/events/t1078-session-001.json
 duke report T1078 \
   --input data/events/t1078-session-001.json \
   --output reports/t1078-incident-report.md
+duke learn T1078
+duke learn T1078 --step detection
 ```
 
 ## Documentation
@@ -110,6 +121,7 @@ duke report T1078 \
 - [CHANGELOG.md](CHANGELOG.md) — release history
 - [CONTRIBUTING.md](CONTRIBUTING.md) — how to contribute
 - [docs/architecture/overview.md](docs/architecture/overview.md) — component architecture
+- [docs/learning/T1078-guided-learning.md](docs/learning/T1078-guided-learning.md) — the guided learning path
 - [docs/development/environment-setup.md](docs/development/environment-setup.md) — local setup
 - [docs/development/testing.md](docs/development/testing.md) — running the test suite
 - [docs/decisions/](docs/decisions/) — Architecture Decision Records

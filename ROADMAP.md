@@ -83,8 +83,14 @@ for the current milestone.
   investigation, dry-run response plan, and validation suite into a
   byte-deterministic Markdown report — with safe overwrite-protected export,
   and without asserting confirmed compromise, impact, or exfiltration
+- `duke learn T1078`
+- A T1078 guided learning path: 11 deterministic, beginner-friendly steps
+  that teach Python through Duke's defensive T1078 workflow, using real CLI
+  commands and public exports as metadata — never executing commands,
+  modifying learner files, grading, or persisting progress
 - Documentation foundation (this roadmap, README, CONTRIBUTING,
-  architecture overview, development guides, and initial ADRs)
+  architecture overview, development guides, initial ADRs, and the guided
+  learning guide under `docs/learning/`)
 
 ### Component roadmap
 
@@ -94,8 +100,8 @@ below distinguishes that foundation from the capabilities still planned.
 | Component | Purpose |
 |---|---|
 | `core` | Domain models implemented; shared interfaces, configuration, and scenario registry planned |
-| `cli` | Typer-based CLI implemented with `version` and T1078 `simulate`; commands will grow with each capability |
-| `learning` | Python lessons, exercises, and challenges |
+| `cli` | Typer-based CLI implemented with `version`, T1078 `simulate`, and T1078 `learn`; commands will grow with each capability |
+| `learning` | T1078 guided learning path implemented (`duke learn T1078`) with typed, metadata-only learning models and deterministic rendering; reusable scenario registry/orchestration, learner-progress tracking, broader improve→retest learning workflows, and further lesson content remain planned |
 | `simulation` | T1078 safe deterministic simulation implemented; additional scenarios and mutation remain planned |
 | `telemetry` | Normalized event generation, JSON export, and artefact ingestion implemented; source health and broader ingestion remain planned |
 | `detection` | Deterministic T1078 detection implemented with explainable weighted confidence; deterministic detection validation implemented (`duke validate`) with controlled in-memory mutations and an explicit case suite; precision/recall measurement, lifecycle tuning, and additional rules remain planned |

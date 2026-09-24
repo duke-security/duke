@@ -146,6 +146,34 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
 - Reporting documentation under `docs/reporting/` and updated README,
   roadmap, architecture, lab, investigation, response, validation, and
   changelog entries.
+- The `duke.learning` package: typed, metadata-only guided-learning models
+  (`LearningPath`, `LearningStep`, `LearningObjective`, `Exercise`, `Hint`,
+  and `KnowledgeCheck`) with strict field validation, plus deterministic
+  literal-pane rendering (`render_path`, `render_step`). The package never
+  executes a command, writes or modifies a learner's files, grades work, or
+  persists progress.
+- A deterministic 11-step T1078 guided learning path (`t1078_learning_path`)
+  that teaches Python through Duke's defensive T1078 workflow: orientation
+  and safety, Python collections, typed models and validation, datetime
+  arithmetic, functions and modules, detection reasoning, investigation,
+  safe response, validation, reporting, and an end-to-end final challenge.
+  Every lesson uses documented public exports and real CLI syntax (the
+  documented confidence threshold is explained as a value, never via a
+  private-constant import), guards with explicit safety notes, and labels
+  knowledge-check answers as reference material for self-check.
+- `duke learn T1078`: renders the path overview (exit 0), a single lesson by
+  stable step id (`--step`, exit 0), and errors with exit 2 for an unknown
+  step or an unsupported technique. Output is literal text, so code with
+  brackets, dictionaries, and type annotations is never swallowed or
+  reformatted by Rich.
+- Guided-learning model, catalogue, renderer, and CLI tests covering stable
+  step ids and ordering, lifecycle-stage coverage, complete lesson material,
+  command examples using only implemented commands, concrete safety
+  properties (no execution, file writes, grading, or persistence; dry-run,
+  approval-gated response), deterministic construction and rendering, literal
+  Rich-safe output, and exit codes.
+- Guided-learning documentation under `docs/learning/` and updated README,
+  roadmap, architecture, lab, testing, and changelog entries.
 
 
 ### Changed

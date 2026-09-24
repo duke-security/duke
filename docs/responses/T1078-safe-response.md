@@ -139,6 +139,7 @@ other stages:
 
 - MITRE ATT&CK — T1078 Valid Accounts (https://attack.mitre.org/techniques/T1078/)
 - [T1078 lab documentation](../labs/T1078/overview.md)
+- [T1078 guided learning path](../learning/T1078-guided-learning.md)
 - [T1078 investigation documentation](../investigations/T1078-compromised-identity.md)
 - [T1078 detection validation documentation](../validation/T1078-detection-validation.md)
 - [T1078 incident reporting documentation](../reporting/T1078-incident-reporting.md)

@@ -35,13 +35,15 @@ Typer's `CliRunner`. Response-planning and plan-model tests live under
 `tests/unit/response/`; detection-validation, mutation, and validation
 result-model tests live under `tests/unit/validation/`; incident-reporting
 report-model, renderer, export, and end-to-end tests live under
-`tests/unit/reporting/`.
+`tests/unit/reporting/`; guided-learning model, catalogue, and rendering
+tests live under `tests/unit/learning/`.
 
 ```bash
 pytest tests/unit/test_cli.py
 pytest tests/unit/response
 pytest tests/unit/validation
 pytest tests/unit/reporting
+pytest tests/unit/learning
 ```
 
 ## Coverage
@@ -57,5 +59,11 @@ pytest --cov=duke --cov-report=term-missing
 ## Adding tests
 
 New components (simulation, telemetry, detection, investigation,
-response, reporting, labs, adapters) must ship with their own tests
-as they are implemented, keeping each layer independently testable.
+response, reporting, learning, labs, adapters) must ship with their own
+tests as they are implemented, keeping each layer independently testable.
+Guided-learning tests verify stable step ids and ordering, coverage of
+every lifecycle stage, complete lesson material, that command examples use
+only implemented CLI commands, concrete safety-property assertions (no
+execution, file writes, grading, or persistence; dry-run/approval-gated
+response), deterministic construction and rendering, and literal
+Rich-safe output so bracket-heavy code is never swallowed.

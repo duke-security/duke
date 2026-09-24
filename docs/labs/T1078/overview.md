@@ -3,8 +3,8 @@
 ## Status
 
 Simulation, detection, evidence-led investigation, safe dry-run response,
-deterministic detection validation, and deterministic advisory incident
-reporting implemented.
+deterministic detection validation, deterministic advisory incident
+reporting, and a T1078 guided learning path implemented.
 
 ## Purpose
 
@@ -206,6 +206,25 @@ The report never asserts confirmed compromise, impact, or exfiltration.
 
 See [the reporting documentation](../../reporting/T1078-incident-reporting.md)
 for the section structure, identity strategy, and exit codes.
+
+## Guided learning
+
+`duke learn T1078` walks a beginner through the full workflow as an ordered,
+deterministic learning path while teaching Python defensively. Eleven steps
+cover orientation and safety, Python collections, typed models and
+validation, datetime arithmetic, functions and modules, detection reasoning,
+investigation, safe response, validation, reporting, and an end-to-end final
+challenge. Each lesson reuses the real CLI commands above and public Python
+exports. It is metadata only: it never executes a command, modifies learner
+files, grades, or persists progress.
+
+```bash
+duke learn T1078
+duke learn T1078 --step detection
+```
+
+See [the guided learning guide](../../learning/T1078-guided-learning.md) for
+the step catalogue, CLI behaviour, and exit codes.
 
 ## Detection methodology
 

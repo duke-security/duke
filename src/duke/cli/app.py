@@ -11,6 +11,7 @@ from rich.console import Console
 
 from duke.detection import EventLoadError, detect_t1078, load_events
 from duke.investigation import InvestigationResult, investigate_t1078
+from duke.learning import T1078_LEARNING_PATH, render_path, render_step
 from duke.reporting import export_report, render_incident_report, report_t1078
 from duke.response import ResponsePlan, plan_t1078_response
 from duke.simulation import export_simulation, generate_t1078_simulation
@@ -464,6 +465,47 @@ def report(
     console.print(f"Report ID: {incident_report.report_id}")
     console.print(f"Validation: {len(suite.cases)}/{len(suite.cases)} cases passed")
     console.print(f"Saved: {output_path}")
+
+
+@app.command()
+def learn(
+    technique: Annotated[
+        str,
+        typer.Argument(
+            help="MITRE ATT&CK technique to learn, for example T1078.",
+        ),
+    ],
+    step: Annotated[
+        str | None,
+        typer.Option(
+            "--step",
+            help="Show one lesson by its step id instead of the overview.",
+        ),
+    ] = None,
+) -> None:
+    """Guided learning lessons for a technique.
+
+    Renders literal lesson text. It never executes the example commands,
+    never modifies or writes a learner's files, never grades, and never
+    persists progress.
+    """
+    if technique != "T1078":
+        typer.echo(f"Unsupported technique: {technique}")
+        raise typer.Exit(code=2)
+
+    path = T1078_LEARNING_PATH
+
+    if step is None:
+        typer.echo(render_path(path))
+        return
+
+    lesson = path.step(step)
+    if lesson is None:
+        typer.echo(f"Unknown step: {step}")
+        typer.echo("Run `duke learn T1078` to list available steps.")
+        raise typer.Exit(code=2)
+
+    typer.echo(render_step(lesson, path.technique_id))
 
 
 if __name__ == "__main__":

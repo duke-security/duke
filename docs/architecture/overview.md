@@ -49,10 +49,13 @@ The following foundations are implemented:
   aggregates the existing finding, investigation, dry-run response plan,
   and validation suite into a byte-deterministic Markdown report, exported
   with overwrite protection.
+- **`learning`** — guided learning paths: typed, metadata-only learning
+  models and deterministic rendering (`duke learn T1078`) that teach Python
+  through Duke's implemented T1078 workflow without executing commands,
+  modifying learner files, grading, or persisting progress.
 - **`labs`** — documentation for the implemented T1078 simulation,
-  detection, investigation, response, validation, and reporting stages.
-
-The T1078 learning stage remains planned.
+  detection, investigation, response, validation, reporting, and guided
+  learning stages.
 
 ## Component status
 
@@ -68,6 +71,7 @@ The T1078 learning stage remains planned.
 | `response` | Dry-run-only T1078 response planning implemented (`duke respond`); execution, approvals, and rollback application remain planned |
 | `validation` | Deterministic validation implemented (`duke validate`), rerunning the pipeline against in-memory mutations of an artefact |
 | `reporting` | Deterministic advisory incident reporting implemented (`duke report`), rendering an aggregate of finding, investigation, response plan, and validation suite to Markdown with overwrite-protected export |
+| `learning` | T1078 guided learning path implemented (`duke learn T1078`) with typed, metadata-only models and deterministic literal rendering; scenario registry/orchestration, learner-progress tracking, and further learning content remain planned |
 | `labs` | T1078 simulation through reporting documentation implemented (labs overview covers all lifecycle stages); guided lab delivery remains planned |
 | `adapters` | Planned optional vendor and platform integrations |
 
@@ -125,11 +129,18 @@ The implemented scenario now also includes:
   controlled in-memory mutations, without modifying the source artefact;
 - deterministic advisory incident reporting that aggregates the workflow
   data into a Markdown report without asserting confirmed compromise,
-  impact, or exfiltration.
+  impact, or exfiltration;
+- a guided learning path that teaches Python through the implemented T1078
+  workflow, reusing the real CLI commands and public exports as metadata
+  without executing them. See
+  [the guided learning guide](../learning/T1078-guided-learning.md).
 
 The following scenario components remain planned:
 
-- guided learning exercises.
+- additional ATT&CK scenarios and their learning paths;
+- a reusable scenario registry/orchestration;
+- learner-progress tracking;
+- broader improve → retest learning workflows.
 
 T1078 Valid Accounts is Duke's first vertical slice, not its only
 planned scenario. See [ROADMAP.md](../../ROADMAP.md) and the

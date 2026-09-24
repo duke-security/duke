@@ -130,6 +130,7 @@ and [the reporting documentation](../reporting/T1078-incident-reporting.md).
 
 - MITRE ATT&CK — T1078 Valid Accounts (https://attack.mitre.org/techniques/T1078/)
 - [T1078 lab documentation](../labs/T1078/overview.md)
+- [T1078 guided learning path](../learning/T1078-guided-learning.md)
 - [Architecture Decision Records](../decisions/)
 
 ## Last reviewed

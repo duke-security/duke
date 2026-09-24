@@ -666,3 +666,93 @@ def test_report_does_not_modify_input_file(tmp_path: Path) -> None:
     )
 
     assert input_path.read_bytes() == before
+
+
+def test_learn_lists_all_steps_in_overview() -> None:
+    result = runner.invoke(app, ["learn", "T1078"])
+
+    assert result.exit_code == 0
+    assert "T1078" in result.stdout
+    assert "Steps" in result.stdout
+    for step_id in (
+        "orientation",
+        "collections",
+        "typed-models",
+        "datetime",
+        "functions-modules",
+        "detection",
+        "investigation",
+        "response",
+        "validation",
+        "reporting",
+        "final-challenge",
+    ):
+        assert step_id in result.stdout
+
+
+def test_learn_render_step_detection() -> None:
+    result = runner.invoke(app, ["learn", "T1078", "--step", "detection"])
+
+    assert result.exit_code == 0
+    assert "Step 6: Detection reasoning" in result.stdout
+    assert "Objective:" in result.stdout
+    assert "Python concepts:" in result.stdout
+    assert "Command examples:" in result.stdout
+    assert "Exercise:" in result.stdout
+    assert "Knowledge check:" in result.stdout
+    assert "Reference answer (self-check)" in result.stdout
+    assert "Safety note:" in result.stdout
+
+
+def test_learn_render_step_investigation() -> None:
+    result = runner.invoke(app, ["learn", "T1078", "--step", "investigation"])
+
+    assert result.exit_code == 0
+    assert "Step 7: Evidence-led investigation" in result.stdout
+    assert "duke investigate T1078" in result.stdout
+
+
+def test_learn_render_step_final_challenge() -> None:
+    result = runner.invoke(app, ["learn", "T1078", "--step", "final-challenge"])
+
+    assert result.exit_code == 0
+    assert "Step 11: Final challenge: the full learning loop" in result.stdout
+    assert "duke simulate T1078" in result.stdout
+    assert "duke report T1078" in result.stdout
+
+
+def test_learn_unknown_step_exits_2() -> None:
+    result = runner.invoke(app, ["learn", "T1078", "--step", "does-not-exist"])
+
+    assert result.exit_code == 2
+    assert "Unknown step" in result.stdout
+
+
+def test_learn_unsupported_technique_exits_2() -> None:
+    result = runner.invoke(app, ["learn", "T9999"])
+
+    assert result.exit_code == 2
+    assert "Unsupported technique" in result.stdout
+
+
+def test_learn_does_not_write_any_files(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.chdir(tmp_path)
+    before = {p for p in tmp_path.rglob("*")}
+
+    result = runner.invoke(app, ["learn", "T1078"])
+    assert result.exit_code == 0
+
+    result_detection = runner.invoke(app, ["learn", "T1078", "--step", "detection"])
+    assert result_detection.exit_code == 0
+
+    after = {p for p in tmp_path.rglob("*")}
+    assert before == after
+
+
+def test_learn_output_is_literal_and_rich_safe() -> None:
+    """Lesson text with brackets/dicts/annotations must not be swallowed."""
+    result = runner.invoke(app, ["learn", "T1078", "--step", "collections"])
+
+    assert result.exit_code == 0
+    assert "dict[str, int]" in result.stdout
+    assert "counts.get(action, 0)" in result.stdout
