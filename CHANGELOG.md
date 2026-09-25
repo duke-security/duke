@@ -9,6 +9,30 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- A second production scenario, MITRE ATT&CK **T1110 — Brute Force**
+  (`duke simulate T1110`), implemented as a **simulation slice only**.
+  It reproducibly models the observable telemetry of sub-technique
+  **T1110.003 Password Spraying**: a benign baseline authentication at a
+  fixed time, six evenly-spaced (2-minute) failed authentications against
+  six distinct accounts from a single external source beginning 12 hours
+  later, and one successful authentication against a previously targeted
+  account 12 minutes after spraying begins. The simulation never performs
+  real authentication, stores or implies a credential value (only the
+  observable `failure_reason="invalid_credentials"` label appears), uses
+  documentation-range RFC 5737 IP addresses, and never labels any account
+  as compromised or any actor as an attacker. T1110 is registered with
+  canonical (`T1110`), slug (`t1110_brute_force`), friendly (`brute-force`),
+  and sub-technique (`T1110.003`) resolution keys and provides **simulation
+  only**; unsupported lifecycle commands (`detect`, `investigate`, `respond`,
+  `validate`, `report`, `learn`) fail safely with exit code 2 through the
+  registry's missing-capability path. The simulation-only scenario passes
+  the generic scenario-conformance checks (metadata, registration, registry,
+  simulation, artefact, relationships) and round-trips through the existing
+  telemetry loader with no schema change. Detection, investigation,
+  response, validation, reporting, and learning for T1110 are intentionally
+  not yet implemented. Includes simulation, registry, CLI, determinism,
+  safety (no credential material, documentation-safe IPs, no side-effecting
+  generation), artefact round-trip, and documentation tests.
 - Packaged YAML loading and validation for built-in Duke scenarios.
 - Safe deterministic simulation for MITRE ATT&CK T1078 Valid Accounts,
   producing eight synthetic entities and eight normalized events.

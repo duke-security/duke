@@ -119,11 +119,21 @@ All subclass `ScenarioRegistryError`.
 
 `ScenarioRegistry.resolve(key)` folds the key to lowercase and looks it up
 against each registration's technique ID, slug, and aliases. The built-in
-T1078 registration resolves all of these to the same registration:
+`builtin_registry()` currently registers two scenarios.
+
+T1078 resolves all of these to the same registration:
 
 - `T1078` / `t1078` (technique ID, case-insensitive)
 - `t1078_valid_accounts` (stable slug)
 - `valid-accounts` (alias)
+
+T1110 (Brute Force), a **simulation-only** slice modelling sub-technique
+T1110.003 Password Spraying, resolves:
+
+- `T1110` / `t1110` (technique ID, case-insensitive)
+- `t1110_brute_force` (stable slug)
+- `brute-force` (friendly alias)
+- `T1110.003` (sub-technique alias)
 
 `register()` builds each registration's normalized key set and rejects any
 collision with an already registered scenario, so duplicate canonical IDs,
@@ -158,7 +168,11 @@ To add a new scenario (e.g. `T9999`):
    entity/event/finding counts and technique in
    `tests/conformance/builtin_pairs.py` so the reusable checks run over it.
    This is optional for production behaviour but required to prove the
-   scenario conforms.
+   scenario conforms. A **partial (simulation-only)** scenario — like the
+   current T1110 slice — does **not** belong in `builtin_pairs.py` (which
+   the full-lifecycle conformance test iterates); instead it is covered by
+   the *generic* metadata, registration, registry, simulation, artefact,
+   and relationship checks directly in `tests/conformance/test_production.py`.
 5. **Do not touch the CLI** — `duke scenarios`, resolution, and every
    command pick the scenario up automatically through the registry.
 
@@ -177,4 +191,4 @@ To add a new scenario (e.g. `T9999`):
 - [T1078 guided learning path](../learning/T1078-guided-learning.md)
 - [CONTRIBUTING.md](../../CONTRIBUTING.md)
 
-Last reviewed: 2026-09-23
+Last reviewed: 2026-09-25

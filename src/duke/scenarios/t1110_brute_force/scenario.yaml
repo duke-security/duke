@@ -1,0 +1,42 @@
+id: "11100000-0000-4000-8000-000000000001"
+name: "Brute Force: Password Spraying"
+description: >-
+  A single external source performs a burst of failed authentication attempts
+  against several distinct accounts on an internet-facing web portal, then one
+  previously targeted account authenticates successfully from that same
+  source. The synthetic telemetry reproduces only the observable
+  authentication outcomes; it does not perform real attempts or assert
+  compromise.
+
+attack_technique_id: "T1110"
+attack_tactics:
+  - "Credential Access"
+
+learning_objectives:
+  - "Recognise a password-spraying pattern by correlating many failed authentications with one later success."
+  - "Distinguish the observable telemetry of a brute-force attempt from the valid-account pattern in T1078."
+  - "Explain that a successful authentication alone does not confirm account compromise."
+
+python_concepts:
+  - "Lists and tuples"
+  - "Functions and modules"
+  - "Typed data models"
+  - "Datetime arithmetic"
+  - "Event outcomes (success vs failure)"
+  - "Deterministic test data"
+
+telemetry_requirements:
+  - "Authentication activity with success and failure outcomes"
+  - "Source host and network context"
+  - "Multiple distinct target accounts"
+  - "A benign baseline authentication"
+
+safety_notes:
+  - "Uses only synthetic identities, hosts, and documentation-range IP addresses."
+  - "Does not perform or attempt real authentication."
+  - "Does not store, generate, or imply any real password or credential value."
+  - "Does not label any account as compromised or any actor as an attacker."
+  - "Does not make real network connections or modify any security settings."
+
+version: "0.1.0"
+last_reviewed: "2026-09-25"

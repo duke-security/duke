@@ -105,6 +105,16 @@ for the current milestone.
   depend on a `duke.*.t1078` implementation module. Conformance lives under
   `tests/` only — no runtime conformance code in the `duke` package — and is
   documented under `docs/scenarios/`
+- **T1110 — Brute Force** simulation slice (`duke simulate T1110`): a second
+  production scenario currently providing **simulation only**. It reproducibly
+  models the observable telemetry of sub-technique **T1110.003 Password
+  Spraying** — a benign baseline authentication, six evenly-spaced failed
+  authentications against distinct accounts from a single external source, and
+  one later success. It never performs real authentication, stores or implies
+  a credential value, or labels any account as compromised. Unsupported T1110
+  lifecycle commands fail safely with exit code 2 through the registry's
+  missing-capability path. Detection, investigation, response, validation,
+  reporting, and learning for T1110 are intentionally **planned**
 - Documentation foundation (this roadmap, README, CONTRIBUTING,
   architecture overview, development guides, initial ADRs, and the guided
   learning guide under `docs/learning/`)
@@ -117,10 +127,10 @@ below distinguishes that foundation from the capabilities still planned.
 | Component | Purpose |
 |---|---|
 | `core` | Domain models implemented; shared interfaces and configuration planned |
-| `scenarios` | Static built-in scenario registry implemented (`duke.scenarios`), registering T1078 once with typed capabilities and metadata loader; all CLI commands resolve scenarios and dispatch to capabilities through the registry. Dynamic/plugin discovery and configuration-driven registries remain planned |
-| `cli` | Typer-based CLI implemented with `version`, `scenarios`, and all seven T1078 lifecycle commands; commands resolve scenarios and their capabilities through the static built-in scenario registry (`duke.scenarios`), so additional scenarios are addable by registration rather than CLI edits |
+| `scenarios` | Static built-in scenario registry implemented (`duke.scenarios`), registering T1078 and T1110 once with typed capabilities and metadata loaders; all CLI commands resolve scenarios and dispatch to capabilities through the registry. Dynamic/plugin discovery and configuration-driven registries remain planned |
+| `cli` | Typer-based CLI implemented with `version`, `scenarios`, and all seven T1078 lifecycle commands plus T1110 simulation; commands resolve scenarios and their capabilities through the static built-in scenario registry (`duke.scenarios`), so additional scenarios are addable by registration rather than CLI edits, and missing capabilities fail clearly with exit code 2 |
 | `learning` | T1078 guided learning path implemented (`duke learn T1078`) with typed, metadata-only learning models and deterministic rendering; learner-progress tracking, broader improve→retest learning workflows, and further lesson content remain planned |
-| `simulation` | T1078 safe deterministic simulation implemented; additional scenarios and mutation remain planned |
+| `simulation` | T1078 and T1110 safe deterministic simulations implemented; additional scenarios and mutation remain planned |
 | `telemetry` | Normalized event generation, JSON export, and artefact ingestion implemented; source health and broader ingestion remain planned |
 | `detection` | Deterministic T1078 detection implemented with explainable weighted confidence; deterministic detection validation implemented (`duke validate`) with controlled in-memory mutations and an explicit case suite; precision/recall measurement, lifecycle tuning, and additional rules remain planned |
 | `investigation` | Evidence-led T1078 investigation implemented (`duke investigate`), producing timelines, evidence, involved entities, facts, assessments, and open questions; hypothesising and graphs remain planned |
@@ -146,3 +156,9 @@ to grow its scenario catalogue to cover additional ATT&CK tactics and
 techniques, always built and documented as complete vertical slices
 rather than partial, cross-cutting layers. The scenario catalogue is
 metadata-driven and is not hardcoded into the CLI.
+
+New scenarios are added as small vertical slices. T1110 begins as a
+**simulation-only** slice (its non-simulation lifecycle capabilities are
+intentionally not yet provided), which proves the multi-scenario
+foundation and the registry's safe missing-capability behaviour before
+the rest of the T1110 vertical is built.

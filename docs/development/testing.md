@@ -71,6 +71,14 @@ T1078 scenario and an independent `probe.py` scenario, and an AST-based
 import guard in `test_production.py` proves the reusable sources never
 import a `duke.*.t1078` implementation module.
 
+The second built-in scenario, T1110 (simulation-only, modelling T1110.003
+Password Spraying), is covered by the **generic** conformance checks
+(metadata, registration, registry, simulation, artefact, and relationships)
+directly in `test_production.py`. Because it provides only the simulation
+capability, it is deliberately **not** added to the full-lifecycle
+`SCENARIO_PAIRS`; the later-lifecycle conformance checks correctly report
+passing "not declared" skips for it.
+
 The scenario-registry tests (`tests/unit/scenarios/`) cover the typed
 registry model — registration validation, case-insensitive resolution by
 technique ID, slug, and alias, duplicate/collision errors, deterministic

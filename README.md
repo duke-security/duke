@@ -73,6 +73,15 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
   investigation, response, validation, reporting, learning), resolved
   case-insensitively by technique/slug/alias, and dispatched by the CLI
   through the registry rather than through hardcoded technique checks
+- A second production scenario, **T1110 — Brute Force** (`duke simulate
+  T1110`), currently a **simulation slice only**: it models the observable
+  telemetry of ATT&CK sub-technique **T1110.003 Password Spraying** — a
+  benign baseline authentication, six evenly-spaced failed authentications
+  against distinct accounts from a single external source, and one later
+  success — without performing real authentication or implying compromise.
+  Lifecycle commands for T1110 (detect/investigate/respond/validate/report/
+  learn) fail safely with exit code 2 through the registry's
+  missing-capability path.
 - Reusable, test-only scenario-conformance infrastructure: the same
   checks validate both the built-in T1078 scenario and an independent
   probe scenario, with an AST guard proving the conformance sources stay
@@ -87,7 +96,9 @@ normalized telemetry, JSON export, CLI commands, behaviour-based
 detection, evidence-led investigation, safe dry-run response,
 deterministic detection validation, deterministic incident reporting, a
 T1078 guided learning path, and a static scenario registry are
-implemented. The full learning component (additional scenarios and their
+implemented. The T1110 scenario currently provides only simulation; its
+detection, investigation, response, validation, reporting, and learning
+capabilities are **planned**. The full learning component (additional scenarios and their
 learning paths, learner-progress tracking, broader improve → retest
 learning workflows, further lesson content), a dynamic/plugin scenario
 registry, additional ATT&CK scenarios, and vendor adapters remain
@@ -95,6 +106,7 @@ registry, additional ATT&CK scenarios, and vendor adapters remain
 
 See [the T1078 guided learning guide](docs/learning/T1078-guided-learning.md),
 [the T1078 lab documentation](docs/labs/T1078/overview.md),
+[the T1110 lab documentation](docs/labs/T1110/overview.md),
 [the architecture overview](docs/architecture/overview.md), and
 [ROADMAP.md](ROADMAP.md) for details.
 
@@ -115,6 +127,7 @@ For local development, install it in editable mode instead — see
 duke --help
 duke version
 duke simulate T1078
+duke simulate T1110 --output data/events/t1110-session-001.json
 duke detect T1078 --input data/events/t1078-session-001.json
 duke investigate T1078 --input data/events/t1078-session-001.json
 duke respond T1078 --input data/events/t1078-session-001.json
@@ -136,6 +149,8 @@ duke scenarios
 - [docs/scenarios/scenario-registry.md](docs/scenarios/scenario-registry.md) — the scenario registry and how to add a scenario
 - [docs/scenarios/scenario-authoring.md](docs/scenarios/scenario-authoring.md) — the authoring contract for a new scenario
 - [docs/scenarios/scenario-conformance.md](docs/scenarios/scenario-conformance.md) — scenario conformance checks
+- [docs/labs/T1078/overview.md](docs/labs/T1078/overview.md) — the T1078 lab
+- [docs/labs/T1110/overview.md](docs/labs/T1110/overview.md) — the T1110 simulation lab
 - [docs/learning/T1078-guided-learning.md](docs/learning/T1078-guided-learning.md) — the guided learning path
 - [docs/development/environment-setup.md](docs/development/environment-setup.md) — local setup
 - [docs/development/testing.md](docs/development/testing.md) — running the test suite

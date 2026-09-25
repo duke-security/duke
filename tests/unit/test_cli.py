@@ -109,6 +109,108 @@ def test_simulate_requires_force_to_overwrite(tmp_path: Path) -> None:
     assert forced.exit_code == 0
 
 
+def test_simulate_t1110_writes_json_artifact(tmp_path: Path) -> None:
+    output_path = tmp_path / "t1110-session-001.json"
+
+    result = runner.invoke(
+        app,
+        ["simulate", "T1110", "--output", str(output_path)],
+    )
+
+    assert result.exit_code == 0
+    assert "Simulation complete" in result.stdout
+    assert "Events generated: 8" in result.stdout
+    assert output_path.exists()
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["scenario"]["attack_technique_id"] == "T1110"
+    assert len(payload["events"]) == 8
+
+
+def test_simulate_t1110_resolves_all_aliases(tmp_path: Path) -> None:
+    for key in ("T1110", "t1110", "t1110_brute_force", "brute-force", "T1110.003"):
+        output_path = tmp_path / f"out-{key.replace('.', '-')}.json"
+        result = runner.invoke(
+            app,
+            ["simulate", key, "--output", str(output_path)],
+        )
+        assert result.exit_code == 0, key
+        assert output_path.exists(), key
+
+
+def test_simulate_t1110_requires_force_to_overwrite(tmp_path: Path) -> None:
+    output_path = tmp_path / "t1110.json"
+
+    first = runner.invoke(
+        app,
+        ["simulate", "T1110", "--output", str(output_path)],
+    )
+    second = runner.invoke(
+        app,
+        ["simulate", "T1110", "--output", str(output_path)],
+    )
+    forced = runner.invoke(
+        app,
+        ["simulate", "T1110", "--output", str(output_path), "--force"],
+    )
+
+    assert first.exit_code == 0
+    assert second.exit_code == 1
+    assert "Output already exists" in second.stdout
+    assert forced.exit_code == 0
+
+
+def test_t1110_missing_lifecycle_capabilities_exit_2_before_reading_input(
+    tmp_path: Path,
+) -> None:
+    """Every unsupported T1110 lifecycle command fails with exit 2 through the
+    missing-capability path before reading any input file."""
+    input_path = tmp_path / "t1110.json"
+    # Produce a valid T1110 artefact first.
+    simulated = runner.invoke(
+        app,
+        ["simulate", "T1110", "--output", str(input_path)],
+    )
+    assert simulated.exit_code == 0
+    before = input_path.read_bytes()
+
+    for command, expected_capability in (
+        ("detect", "detection"),
+        ("investigate", "detection"),
+        ("respond", "detection"),
+        ("validate", "validation"),
+        ("report", "detection"),
+    ):
+        result = runner.invoke(app, [command, "T1110", "--input", str(input_path)])
+        assert result.exit_code == 2, command
+        assert "does not provide capability" in result.stdout, command
+        assert expected_capability in result.stdout, command
+        # The input artefact was never read, modified, or replaced.
+        assert input_path.read_bytes() == before, command
+
+    # learn takes no --input path; confirm it fails on its own via the same
+    # missing-capability path.
+    result = runner.invoke(app, ["learn", "T1110"])
+    assert result.exit_code == 2
+    assert "does not provide capability" in result.stdout
+    assert "learning" in result.stdout
+
+
+def test_scenarios_lists_t1110_with_simulation_only_capability() -> None:
+    result = runner.invoke(app, ["scenarios"])
+
+    assert result.exit_code == 0
+    assert "T1110" in result.stdout
+    assert "Brute Force: Password Spraying" in result.stdout
+    assert "t1110_brute_force" in result.stdout
+    assert "brute-force" in result.stdout
+    assert "T1110.003" in result.stdout
+    # T1110 advertises only the simulation capability (missing others are
+    # intentionally not shown as present).
+    assert "simulation" in result.stdout
+    assert "T1078" in result.stdout
+
+
 def test_detect_t1078_reads_input_artifact(tmp_path: Path) -> None:
     result = generate_t1078_simulation()
     input_path = export_simulation(result, tmp_path / "t1078.json")

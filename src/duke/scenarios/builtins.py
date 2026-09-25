@@ -27,15 +27,21 @@ from duke.scenarios.registry import (
     ScenarioRegistration,
     ScenarioRegistry,
 )
-from duke.simulation import generate_t1078_simulation
+from duke.simulation import generate_t1078_simulation, generate_t1110_simulation
 from duke.validation import validate_t1078
 
 _T1078_SLUG = "t1078_valid_accounts"
+_T1110_SLUG = "t1110_brute_force"
 
 
 def load_t1078_metadata() -> Scenario:
     """Load the packaged T1078 scenario metadata from its YAML definition."""
     return load_builtin_scenario(_T1078_SLUG)
+
+
+def load_t1110_metadata() -> Scenario:
+    """Load the packaged T1110 scenario metadata from its YAML definition."""
+    return load_builtin_scenario(_T1110_SLUG)
 
 
 def t1078_registration() -> ScenarioRegistration:
@@ -58,6 +64,29 @@ def t1078_registration() -> ScenarioRegistration:
     )
 
 
+def t1110_registration() -> ScenarioRegistration:
+    """Build the deterministic T1110 registration.
+
+    This slice provides the simulation capability only. Detection,
+    investigation, response, validation, reporting, and learning are left
+    ``None`` and intentionally not implemented, so lifecycle commands for
+    T1110 fail safely through the CLI's missing-capability path (exit 2).
+    The behaviour models sub-technique T1110.003 (Password Spraying), which
+    is surfaced as a friendly alias alongside the canonical technique ID and
+    slug.
+    """
+    return ScenarioRegistration(
+        technique_id="T1110",
+        slug=_T1110_SLUG,
+        name="Brute Force: Password Spraying",
+        aliases=("brute-force", "T1110.003"),
+        metadata_loader=load_t1110_metadata,
+        capabilities=ScenarioCapabilities(
+            simulation=generate_t1110_simulation,
+        ),
+    )
+
+
 def builtin_registry() -> ScenarioRegistry:
     """Return a fresh registry with all built-in scenarios registered.
 
@@ -67,11 +96,14 @@ def builtin_registry() -> ScenarioRegistry:
     """
     registry = ScenarioRegistry()
     registry.register(t1078_registration())
+    registry.register(t1110_registration())
     return registry
 
 
 __all__ = [
     "builtin_registry",
     "load_t1078_metadata",
+    "load_t1110_metadata",
     "t1078_registration",
+    "t1110_registration",
 ]
