@@ -202,6 +202,29 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
   plus the new CLI missing-capability exit-2 path.
 - Scenario-registry documentation under `docs/scenarios/` and updated README,
   roadmap, architecture, testing, CONTRIBUTING, and changelog entries.
+- Reusable, test-only scenario-conformance infrastructure under
+  `tests/conformance/`: a typed `ScenarioConformanceFixture`, reusable
+  declaration/registry/behavioural checks, and an independent full-lifecycle
+  probe scenario (T9999). The same checks validate both the built-in T1078
+  scenario and the probe, separated into declaration, isolated-registry,
+  behavioural, and production built-in/CLI conformance. Behavioural conformance
+  includes negative tests proving each authoring invariant is enforced
+  (duplicate entity/event IDs, unresolved event/finding references,
+  nondeterministic simulation or detection, non-dry-run/approval-less/non-
+  planned response actions, unsatisfied capability dependencies). An AST-based
+  import guard in production conformance proves the reusable sources never
+  import a `duke.*.t1078` implementation module.
+- Metadata and production checks kept separate: the generic checks validate
+  the `Scenario` returned by the metadata loader (no YAML requirement); only
+  the T1078 production conformance test asserts agreement with its YAML
+  definition.
+- The reusable conformance helpers, fixture, and probe callables are checked
+  under strict mypy (`mypy src tests/conformance`) via a narrow `pyproject`
+  override that exempts only the thin pytest driver modules from untyped-def
+  rules.
+- Scenario authoring and conformance documentation under `docs/scenarios/`
+  (`scenario-authoring.md`, `scenario-conformance.md`) and updated
+  scenario-registry, testing, README, roadmap, and changelog entries.
 
 
 ### Changed

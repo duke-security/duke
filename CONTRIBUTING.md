@@ -74,7 +74,7 @@ New behaviour requires tests. Before submitting a change, run all of:
 
 ```bash
 ruff check .
-mypy src
+mypy src tests/conformance
 pytest
 ```
 
@@ -109,6 +109,13 @@ To add a scenario:
 Because the registry is static and built-in (not a dynamic plugin or
 filesystem discovery), each scenario is a small, testable, documented
 vertical slice. Add registration, capability, and CLI tests alongside it.
+
+New scenarios should also add conformance expectations: declare the
+scenario's expected entity/event/finding counts and technique in
+`tests/conformance/builtin_pairs.py` so the reusable, scenario-independent
+conformance checks (see [scenario-conformance.md](docs/scenarios/scenario-conformance.md))
+run over it too. Do not add conformance code to the production `duke`
+package — conformance lives entirely under `tests/`.
 
 ## Submitting changes
 

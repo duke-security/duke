@@ -97,6 +97,14 @@ for the current milestone.
   hardcoding T1078, so future scenarios are addable by registration rather
   than edits across every command; missing capabilities and unknown scenarios
   fail clearly with exit code 2
+- Reusable, test-only scenario-conformance infrastructure
+  (`tests/conformance/`): the same declaration, registry, and behavioural
+  checks validate both the built-in T1078 scenario and an independent probe
+  scenario, with negative tests proving each authoring invariant is enforced
+  and an AST-based import guard confirming the conformance sources never
+  depend on a `duke.*.t1078` implementation module. Conformance lives under
+  `tests/` only — no runtime conformance code in the `duke` package — and is
+  documented under `docs/scenarios/`
 - Documentation foundation (this roadmap, README, CONTRIBUTING,
   architecture overview, development guides, initial ADRs, and the guided
   learning guide under `docs/learning/`)

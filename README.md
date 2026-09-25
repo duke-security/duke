@@ -73,6 +73,10 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
   investigation, response, validation, reporting, learning), resolved
   case-insensitively by technique/slug/alias, and dispatched by the CLI
   through the registry rather than through hardcoded technique checks
+- Reusable, test-only scenario-conformance infrastructure: the same
+  checks validate both the built-in T1078 scenario and an independent
+  probe scenario, with an AST guard proving the conformance sources stay
+  independent of the T1078 implementation modules
 - CLI unit tests
 - Quality gates: [Ruff](https://docs.astral.sh/ruff/), mypy (strict), pytest
 
@@ -130,6 +134,8 @@ duke scenarios
 - [CONTRIBUTING.md](CONTRIBUTING.md) — how to contribute
 - [docs/architecture/overview.md](docs/architecture/overview.md) — component architecture
 - [docs/scenarios/scenario-registry.md](docs/scenarios/scenario-registry.md) — the scenario registry and how to add a scenario
+- [docs/scenarios/scenario-authoring.md](docs/scenarios/scenario-authoring.md) — the authoring contract for a new scenario
+- [docs/scenarios/scenario-conformance.md](docs/scenarios/scenario-conformance.md) — scenario conformance checks
 - [docs/learning/T1078-guided-learning.md](docs/learning/T1078-guided-learning.md) — the guided learning path
 - [docs/development/environment-setup.md](docs/development/environment-setup.md) — local setup
 - [docs/development/testing.md](docs/development/testing.md) — running the test suite

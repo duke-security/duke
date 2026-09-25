@@ -95,6 +95,15 @@ Validation rejects: empty `technique_id`/`slug`/`name`; duplicate (or empty)
 aliases; an alias duplicating its own technique ID or slug. Lookup is
 case-insensitive but canonical display values (e.g. `T1078`) are preserved.
 
+## Conformance
+
+Authoring and conformance are separate concerns. The registry provides the
+typed contract; reusable, test-only conformance infrastructure under
+`tests/conformance/` verifies that every registered scenario (including the
+built-in T1078 and an independent probe) satisfies that contract — see
+[scenario-authoring.md](scenario-authoring.md) and
+[scenario-conformance.md](scenario-conformance.md).
+
 ### Errors
 
 - `UnknownScenarioError` — a key resolves to no registered scenario.
@@ -145,7 +154,12 @@ To add a new scenario (e.g. `T9999`):
    capabilities `None`).
 3. **Register it** — add `registry.register(t9999_registration())` to
    `builtin_registry()`.
-4. **Do not touch the CLI** — `duke scenarios`, resolution, and every
+4. **Add conformance expectations** — declare the scenario's expected
+   entity/event/finding counts and technique in
+   `tests/conformance/builtin_pairs.py` so the reusable checks run over it.
+   This is optional for production behaviour but required to prove the
+   scenario conforms.
+5. **Do not touch the CLI** — `duke scenarios`, resolution, and every
    command pick the scenario up automatically through the registry.
 
 ## Deterministic listing
@@ -157,6 +171,8 @@ To add a new scenario (e.g. `T9999`):
 ## References
 
 - [Architecture overview](../architecture/overview.md)
+- [scenario-authoring.md](scenario-authoring.md) — the authoring contract
+- [scenario-conformance.md](scenario-conformance.md) — conformance checks
 - [ROADMAP.md](../../ROADMAP.md)
 - [T1078 guided learning path](../learning/T1078-guided-learning.md)
 - [CONTRIBUTING.md](../../CONTRIBUTING.md)

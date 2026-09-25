@@ -24,7 +24,18 @@ pytest
 
 - **Ruff** lints the codebase (`E`, `F`, `I`, `B`, `UP` rule sets, 88
   character line length).
-- **mypy** type-checks the `duke` package in strict mode.
+- **mypy** type-checks the `duke` package in strict mode. The reusable
+  scenario-conformance code under `tests/conformance/` is also
+  type-checked in strict mode, including its independent probe callables:
+
+  ```bash
+  mypy src tests/conformance
+  ```
+
+  The thin pytest *drivers* in that package are exempt from the untyped-def
+  and typed-context rules via a `pyproject.toml` override, so existing test
+  conventions do not have to be migrated; the helpers, fixtures, and probe
+  callables they exercise remain fully strict-checked.
 - **pytest** runs the test suite.
 
 ## Test layout
@@ -46,7 +57,19 @@ pytest tests/unit/validation
 pytest tests/unit/reporting
 pytest tests/unit/learning
 pytest tests/unit/scenarios
+pytest tests/conformance
 ```
+
+### Scenario conformance
+
+Reusable, **test-only** conformance infrastructure lives under
+`tests/conformance/` and validates that every registered scenario satisfies
+the same authoring contract — see
+[docs/scenarios/scenario-conformance.md](../scenarios/scenario-conformance.md).
+It is scenario-independent: the same `checks.py` verifies both the built-in
+T1078 scenario and an independent `probe.py` scenario, and an AST-based
+import guard in `test_production.py` proves the reusable sources never
+import a `duke.*.t1078` implementation module.
 
 The scenario-registry tests (`tests/unit/scenarios/`) cover the typed
 registry model — registration validation, case-insensitive resolution by

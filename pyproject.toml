@@ -51,10 +51,32 @@ select = ["E", "F", "I", "B", "UP"]
 python_version = "3.11"
 strict = true
 packages = ["duke"]
+explicit_package_bases = true
+namespace_packages = true
+mypy_path = ["src"]
 
 [[tool.mypy.overrides]]
 module = ["yaml.*"]
 ignore_missing_imports = true
+
+# The reusable conformance helpers, fixtures, and probe callables are checked
+# under full strict mode. The thin pytest *drivers* under the same package are
+# exempt from the untyped-definition/typed-context rules so existing test
+# conventions do not have to be migrated, while the code they exercise stays
+# fully typed and strict-checked.
+[[tool.mypy.overrides]]
+module = [
+    "conformance.test_declaration",
+    "conformance.test_registry",
+    "conformance.test_behavioural",
+    "conformance.test_production",
+    "conformance.builtin_pairs",
+    "tests.conformance.test_declaration",
+    "tests.conformance.test_registry",
+    "tests.conformance.test_behavioural",
+    "tests.conformance.test_production",
+]
+disable_error_code = ["no-untyped-def", "no-untyped-call", "type-arg"]
 
 [tool.coverage.run]
 source = ["duke"]
