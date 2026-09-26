@@ -54,6 +54,30 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
   accounts (the shared service stays contextual). Includes unit, CLI,
   malformed-input, threshold/window-boundary, mixed-source, determinism,
   attribution, and conformance tests.
+- Deterministic, explainable **T1110 investigation** (`duke investigate
+  T1110`). It consumes the existing finding (never rerunning detection or
+  rescanning the artefact) and builds an `InvestigationResult` strictly from
+  `finding.event_ids`: one `SUPPORTS` `Evidence` per referenced failed
+  authentication, with a credited later success framed only as supporting
+  evidence (consistent with a credential having validated, never proof of
+  compromise), a chronological timeline ordered by `occurred_at` then event
+  ID that preserves each source event's original target IDs, and involved
+  entities resolved from `finding.entity_ids` (source plus sprayed accounts;
+  the shared authentication service stays context and is never implicated).
+  Account classification relies on resolved entity types, never on
+  subtracting the actor or duplicating detection's service logic. Confirmed
+  facts are strictly telemetry-derived and distinguish referenced failures,
+  resolved implicated targets, and unresolved references; interpretation
+  lives only in analyst assessments; unresolved questions cover source
+  authorization, failure cause, success legitimacy, follow-on account
+  activity, and off-window source activity. Missing referenced events or
+  entities are skipped without substitution, and a deterministic
+  incompleteness question/assessment is added; an empty or fully unresolved
+  `event_ids` set returns an empty result with the incompleteness question,
+  never a failure. No confirmed compromise, malicious attribution, credential
+  theft, impact, or successful intrusion is ever asserted. Includes unit,
+  CLI, registry, missing-reference, portal-context, determinism, and cautious-
+  language tests.
 - Packaged YAML loading and validation for built-in Duke scenarios.
 - Safe deterministic simulation for MITRE ATT&CK T1078 Valid Accounts,
   producing eight synthetic entities and eight normalized events.

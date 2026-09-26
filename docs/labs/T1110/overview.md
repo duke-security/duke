@@ -2,14 +2,14 @@
 
 ## Status
 
-**Simulation and detection slice.** This lab currently implements the safe,
-deterministic **simulation** of ATT&CK T1110 — Brute Force (sub-technique
-**T1110.003 Password Spraying**) and a deterministic, explainable
-**detection** rule (`duke detect T1110`). Evidence-led investigation, safe
-dry-run response, validation, reporting, and guided learning for T1110 are
-**intentionally not yet implemented**; those lifecycle commands fail safely
-with exit code 2 through the registry's missing-capability path until such
-slices land.
+**Simulation, detection, and investigation slice.** This lab currently
+implements the safe, deterministic **simulation** of ATT&CK T1110 — Brute
+Force (sub-technique **T1110.003 Password Spraying**), a deterministic,
+explainable **detection** rule (`duke detect T1110`), and an evidence-led
+**investigation** (`duke investigate T1110`). Safe dry-run response,
+validation, reporting, and guided learning for T1110 are **intentionally not
+yet implemented**; those lifecycle commands fail safely with exit code 2
+through the registry's missing-capability path until such slices land.
 
 ## Purpose
 
@@ -194,6 +194,43 @@ deterministic:
 For the shipped corpus: 6 distinct accounts (1 over the 5 threshold → +5) plus
 the later success (+15) gives **confidence 80 → high**.
 
+## Run investigation
+
+Investigation reads the same artefact and works from the finding detection
+already produced; it never reruns detection or rescans for a new pattern.
+
+```bash
+duke simulate T1110 --output data/events/t1110-session-001.json
+duke investigate T1110 --input data/events/t1110-session-001.json
+```
+
+## Investigation methodology
+
+`duke investigate T1110` (`investigate_t1110`) turns the existing finding and
+its referenced telemetry into an evidence-led `InvestigationResult`. It is
+fully deterministic and cautious:
+
+- **Event boundary.** Only the events referenced by `finding.event_ids` are
+  considered — it never searches the whole artefact. Events or entities
+  referenced by the finding that cannot be resolved are skipped (never
+  substituted with unrelated data), and an explicit incompleteness
+  question/assessment is added when any are missing.
+- **Evidence.** Every referenced failed authentication is `SUPPORTS`; a
+  credited later success is `SUPPORTS` framed as "consistent with a credential
+  having validated — supporting evidence, not proof of compromise." A shared
+  authentication service is treated as context, never as an implicated account.
+- **Timeline.** Listed by `occurred_at`, then event ID, preserving each source
+  event's original target IDs (so a shared-service target may appear as event
+  context) — it is never an involved entity.
+- **Involved entities.** Resolved from `finding.entity_ids` only: the source
+  and the distinct sprayed accounts. The shared service stays out.
+- **Facts vs assessments.** Confirmed facts are strictly telemetry-derived
+  (reported failure counts, resolved implicated targets, unresolved
+  references, source-zone attributes). Interpretation — intent, credential
+  validity, whether a success was legitimate — lives in analyst assessments.
+- **Language.** No confirmed compromise, malicious attribution, credential
+  theft, impact, or successful intrusion is ever asserted.
+
 ## Intentionally not implemented yet
 
 The following T1110 lifecycle commands fail **safely with exit code 2**
@@ -201,15 +238,14 @@ The following T1110 lifecycle commands fail **safely with exit code 2**
 touching any input):
 
 ```bash
-duke investigate T1110 ...
 duke respond T1110 ...
 duke validate T1110 ...
 duke report T1110 ...
 duke learn T1110
 ```
 
-Investigation, response, validation, reporting, and learning for T1110 are
-planned follow-on slices.
+Response, validation, reporting, and learning for T1110 are planned follow-on
+slices.
 
 ## Limitations
 
@@ -236,6 +272,7 @@ planned follow-on slices.
 
 - MITRE ATT&CK — [T1110 Brute Force](https://attack.mitre.org/techniques/T1110/),
   [T1110.003 Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
+- [T1110 investigation documentation](../../investigations/T1110-password-spraying.md)
 - [scenario-registry.md](../../scenarios/scenario-registry.md)
 - [scenario-authoring.md](../../scenarios/scenario-authoring.md)
 - [scenario-conformance.md](../../scenarios/scenario-conformance.md)

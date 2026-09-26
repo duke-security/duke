@@ -74,18 +74,20 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
   case-insensitively by technique/slug/alias, and dispatched by the CLI
   through the registry rather than through hardcoded technique checks
 - A second production scenario, **T1110 — Brute Force** (`duke simulate
-  T1110`), currently a **simulation and detection slice**: it models the
-  observable telemetry of ATT&CK sub-technique **T1110.003 Password
-  Spraying** — a benign baseline authentication, six evenly-spaced failed
-  authentications against distinct accounts from a single external source,
-  and one later success — without performing real authentication or
+  T1110`), currently a **simulation, detection, and investigation slice**: it
+  models the observable telemetry of ATT&CK sub-technique **T1110.003
+  Password Spraying** — a benign baseline authentication, six evenly-spaced
+  failed authentications against distinct accounts from a single external
+  source, and one later success — without performing real authentication or
   implying compromise. `duke detect T1110` identifies the spray pattern as a
   behaviour-based finding: a deterministic sliding-window rule requires at
   least five distinct accounts failed from one source within 30 minutes,
   credits a later success only as supporting evidence, and never assumes
-  compromise. The remaining T1110 lifecycle commands
-  (investigate/respond/validate/report/learn) still fail safely with exit
-  code 2 through the registry's missing-capability path.
+  compromise. `duke investigate T1110` turns that finding into an
+  evidence-led timeline, cautious confirmed facts, and unresolved questions,
+  without ever claiming compromise or attribution. The remaining T1110
+  lifecycle commands (respond/validate/report/learn) still fail safely with
+  exit code 2 through the registry's missing-capability path.
 - Reusable, test-only scenario-conformance infrastructure: the same
   checks validate both the built-in T1078 scenario and an independent
   probe scenario, with an AST guard proving the conformance sources stay
@@ -100,8 +102,8 @@ normalized telemetry, JSON export, CLI commands, behaviour-based
 detection, evidence-led investigation, safe dry-run response,
 deterministic detection validation, deterministic incident reporting, a
 T1078 guided learning path, and a static scenario registry are
-implemented. The T1110 scenario currently provides simulation and detection;
-its investigation, response, validation, reporting, and learning
+implemented. The T1110 scenario currently provides simulation, detection,
+and investigation; its response, validation, reporting, and learning
 capabilities are **planned**. The full learning component (additional scenarios and their
 learning paths, learner-progress tracking, broader improve → retest
 learning workflows, further lesson content), a dynamic/plugin scenario
@@ -135,6 +137,7 @@ duke simulate T1110 --output data/events/t1110-session-001.json
 duke detect T1078 --input data/events/t1078-session-001.json
 duke detect T1110 --input data/events/t1110-session-001.json
 duke investigate T1078 --input data/events/t1078-session-001.json
+duke investigate T1110 --input data/events/t1110-session-001.json
 duke respond T1078 --input data/events/t1078-session-001.json
 duke validate T1078 --input data/events/t1078-session-001.json
 duke report T1078 \
@@ -155,7 +158,8 @@ duke scenarios
 - [docs/scenarios/scenario-authoring.md](docs/scenarios/scenario-authoring.md) — the authoring contract for a new scenario
 - [docs/scenarios/scenario-conformance.md](docs/scenarios/scenario-conformance.md) — scenario conformance checks
 - [docs/labs/T1078/overview.md](docs/labs/T1078/overview.md) — the T1078 lab
-- [docs/labs/T1110/overview.md](docs/labs/T1110/overview.md) — the T1110 simulation lab
+- [docs/labs/T1110/overview.md](docs/labs/T1110/overview.md) — the T1110 simulation/detection/investigation lab
+- [docs/investigations/T1110-password-spraying.md](docs/investigations/T1110-password-spraying.md) — the T1110 investigation
 - [docs/learning/T1078-guided-learning.md](docs/learning/T1078-guided-learning.md) — the guided learning path
 - [docs/development/environment-setup.md](docs/development/environment-setup.md) — local setup
 - [docs/development/testing.md](docs/development/testing.md) — running the test suite

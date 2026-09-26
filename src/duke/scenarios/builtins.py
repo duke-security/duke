@@ -17,7 +17,7 @@ registration or import; each capability runs only when the CLI calls it.
 
 from duke.core import Scenario
 from duke.detection import detect_t1078, detect_t1110
-from duke.investigation import investigate_t1078
+from duke.investigation import investigate_t1078, investigate_t1110
 from duke.learning import t1078_learning_path
 from duke.reporting import report_t1078
 from duke.response import plan_t1078_response
@@ -67,8 +67,8 @@ def t1078_registration() -> ScenarioRegistration:
 def t1110_registration() -> ScenarioRegistration:
     """Build the deterministic T1110 registration.
 
-    This slice provides the simulation and detection capabilities.
-    Investigation, response, validation, reporting, and learning are left
+    This slice provides the simulation, detection, and investigation
+    capabilities. Response, validation, reporting, and learning are left
     ``None`` and intentionally not implemented, so the remaining T1110
     lifecycle commands fail safely through the CLI's missing-capability path
     (exit 2). The behaviour models sub-technique T1110.003 (Password
@@ -84,6 +84,7 @@ def t1110_registration() -> ScenarioRegistration:
         capabilities=ScenarioCapabilities(
             simulation=generate_t1110_simulation,
             detection=detect_t1110,
+            investigation=investigate_t1110,
         ),
     )
 

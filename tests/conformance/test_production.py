@@ -72,10 +72,10 @@ def test_cli_resolves_the_builtin_scenario():
 
 
 def test_t1110_metadata_agrees_via_generic_checks():
-    """The partial built-in (simulation + detection) passes the same generic
-    metadata and registration-shape checks as T1078 and the probe. It is
-    deliberately not part of the full-lifecycle SCENARIO_PAIRS; only the
-    generic checks apply to this partial scenario."""
+    """The partial built-in (simulation + detection + investigation) passes
+    the same generic metadata and registration-shape checks as T1078 and the
+    probe. It is deliberately not part of the full-lifecycle SCENARIO_PAIRS;
+    only the generic checks apply to this partial scenario."""
     reg = t1110_registration()
     fixture = load_conformance_fixture(
         reg,
@@ -103,7 +103,8 @@ def test_t1110_metadata_agrees_via_generic_checks():
 def test_t1110_simulation_conforms_generically():
     """The T1110 simulation, its canonical artefact, and its detection all
     satisfy the generic behavioural invariants (determinism, valid
-    relationship references, non-empty artefact). Response, validation,
+    relationship references, non-empty artefact). Investigation is declared
+    and its dependency on detection is satisfied. Response, validation,
     reporting, and learning are still absent, so those checks report passing
     skips."""
     reg = t1110_registration()

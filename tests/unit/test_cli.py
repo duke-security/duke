@@ -205,6 +205,28 @@ def test_detect_t1110_no_findings_on_benign_artifact(tmp_path: Path) -> None:
     assert "No findings" in result.stdout
 
 
+def test_investigate_t1110_reads_input_artifact(tmp_path: Path) -> None:
+    """duke investigate T1110 reads a simulated artefact and reports an
+    evidence-led investigation for the single finding."""
+    input_path = tmp_path / "t1110.json"
+    simulated = runner.invoke(
+        app,
+        ["simulate", "T1110", "--output", str(input_path)],
+    )
+    assert simulated.exit_code == 0
+
+    result = runner.invoke(app, ["investigate", "T1110", "--input", str(input_path)])
+
+    assert result.exit_code == 0
+    assert "Investigation complete" in result.stdout
+    assert "Password spray against multiple distinct accounts" in result.stdout
+    assert "Evidence items:" in result.stdout
+    assert "Timeline:" in result.stdout
+    assert "Confirmed facts:" in result.stdout
+    assert "Analyst assessments:" in result.stdout
+    assert "Unresolved questions:" in result.stdout
+
+
 def test_t1110_unsupported_lifecycle_capabilities_exit_2(
     tmp_path: Path,
 ) -> None:
@@ -219,8 +241,9 @@ def test_t1110_unsupported_lifecycle_capabilities_exit_2(
     before = input_path.read_bytes()
 
     for command, expected_capability in (
-        ("investigate", "investigation"),
-        ("respond", "investigation"),
+        # respond resolves detection + investigation (both present) then
+        # response (missing).
+        ("respond", "response"),
         # report resolves detection (present) then validation (missing).
         ("report", "validation"),
         ("validate", "validation"),
@@ -240,7 +263,7 @@ def test_t1110_unsupported_lifecycle_capabilities_exit_2(
     assert "learning" in result.stdout
 
 
-def test_scenarios_lists_t1110_with_simulation_and_detection() -> None:
+def test_scenarios_lists_t1110_with_simulation_detection_investigation() -> None:
     result = runner.invoke(app, ["scenarios"])
 
     assert result.exit_code == 0
@@ -249,10 +272,11 @@ def test_scenarios_lists_t1110_with_simulation_and_detection() -> None:
     assert "t1110_brute_force" in result.stdout
     assert "brute-force" in result.stdout
     assert "T1110.003" in result.stdout
-    # T1110 advertises simulation and detection (other capabilities are
-    # intentionally not yet provided).
+    # T1110 advertises simulation, detection, and investigation (other
+    # capabilities are intentionally not yet provided).
     assert "simulation" in result.stdout
     assert "detection" in result.stdout
+    assert "investigation" in result.stdout
     assert "T1078" in result.stdout
 
 
