@@ -78,6 +78,36 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
   theft, impact, or successful intrusion is ever asserted. Includes unit,
   CLI, registry, missing-reference, portal-context, determinism, and cautious-
   language tests.
+- Deterministic, safe dry-run **T1110 response planning** (`duke respond
+  T1110`). `plan_t1110_response(artefact, result)` consumes the existing
+  investigation result (never rerunning detection or investigation) and
+  correlates the finding into a deterministic preliminary `Incident` record
+  before proposing actions grouped by category (containment, evidence
+  preservation, investigation follow-up, recovery). Every action is
+  `dry_run=True`, `requires_approval=True`, and `status=PLANNED`, with a
+  deterministic `uuid5` ID and finding-derived timestamp; nothing executes,
+  contacts, or modifies a real account, session, credential, MFA, permission,
+  network, or security control. Targets are evidence-led: the source is the
+  unique actor across the finding-referenced events intersected with the
+  investigated entities, and the success-associated account is the uniquely
+  resolved, finding-scoped `ACCOUNT` target of a referenced success. Source
+  containment is a temporary rate limit/challenge conditioned on ruling out
+  shared NAT, proxy, scanner, identity provider, or corporate egress — never
+  an unconditional permanent block. Session revocation and credential
+  rotation are conditional on a verified success-associated account and human
+  approval. A `apply-temporary-step-up-authentication` recovery action is a
+  clearly temporary, reversible challenge whose rollback never weakens the
+  baseline MFA/security requirements. Rollback is conservative: session and
+  credential changes are irreversible (prior credentials never restored),
+  preserved evidence is never deleted, review/monitoring actions have no
+  rollback, and the source throttle is reversible only without weakening
+  existing controls. Ambiguous or unresolved sources or success accounts
+  cause the related targeted action to be omitted, and incomplete context is
+  recorded in the incident summary; targeted actions are never emitted with a
+  `None` target. Wording is cautious throughout (suspected password-spraying
+  behaviour, possible credential validation, no confirmed compromise or
+  attribution). Includes unit, CLI, registry, model, side-effect,
+  cautious-language, target-resolution, rollback, and conformance tests.
 - Packaged YAML loading and validation for built-in Duke scenarios.
 - Safe deterministic simulation for MITRE ATT&CK T1078 Valid Accounts,
   producing eight synthetic entities and eight normalized events.

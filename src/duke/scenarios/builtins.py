@@ -20,7 +20,7 @@ from duke.detection import detect_t1078, detect_t1110
 from duke.investigation import investigate_t1078, investigate_t1110
 from duke.learning import t1078_learning_path
 from duke.reporting import report_t1078
-from duke.response import plan_t1078_response
+from duke.response import plan_t1078_response, plan_t1110_response
 from duke.scenarios.loader import load_builtin_scenario
 from duke.scenarios.registry import (
     ScenarioCapabilities,
@@ -67,9 +67,9 @@ def t1078_registration() -> ScenarioRegistration:
 def t1110_registration() -> ScenarioRegistration:
     """Build the deterministic T1110 registration.
 
-    This slice provides the simulation, detection, and investigation
-    capabilities. Response, validation, reporting, and learning are left
-    ``None`` and intentionally not implemented, so the remaining T1110
+    This slice provides the simulation, detection, investigation, and
+    response-planning capabilities. Validation, reporting, and learning are
+    left ``None`` and intentionally not implemented, so the remaining T1110
     lifecycle commands fail safely through the CLI's missing-capability path
     (exit 2). The behaviour models sub-technique T1110.003 (Password
     Spraying), which is surfaced as a friendly alias alongside the canonical
@@ -85,6 +85,7 @@ def t1110_registration() -> ScenarioRegistration:
             simulation=generate_t1110_simulation,
             detection=detect_t1110,
             investigation=investigate_t1110,
+            response=plan_t1110_response,
         ),
     )
 

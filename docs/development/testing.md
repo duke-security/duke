@@ -72,14 +72,15 @@ import guard in `test_production.py` proves the reusable sources never
 import a `duke.*.t1078` implementation module.
 
 The second built-in scenario, T1110 (simulation + detection +
-investigation, modelling T1110.003 Password Spraying), is covered by the
-**generic** conformance checks (metadata, registration, registry,
-simulation, artefact, relationships, the deterministic detection check, and
-the declared/dependency checks now that investigation is provided) directly
-in `test_production.py`. Because it does not yet provide the full lifecycle,
-it is deliberately **not** added to the full-lifecycle `SCENARIO_PAIRS`; the
-later-lifecycle conformance checks (response, validation, reporting,
-learning) correctly report passing "not declared" skips for it.
+investigation + response, modelling T1110.003 Password Spraying), is covered
+by the **generic** conformance checks (metadata, registration, registry,
+simulation, artefact, relationships, the deterministic detection check, the
+declared/dependency checks, and — now that response is provided — the
+deterministic safe-response check over the derived plan) directly in
+`test_production.py`. Because it does not yet provide the full lifecycle, it
+is deliberately **not** added to the full-lifecycle `SCENARIO_PAIRS`; the
+later-lifecycle conformance checks (validation, reporting, learning)
+correctly report passing "not declared" skips for it.
 
 The scenario-registry tests (`tests/unit/scenarios/`) cover the typed
 registry model — registration validation, case-insensitive resolution by

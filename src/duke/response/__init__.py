@@ -13,10 +13,12 @@ from duke.response.plan import (
     ResponsePlan,
 )
 from duke.response.t1078 import plan_t1078_response
+from duke.response.t1110 import plan_t1110_response
 
 __all__ = [
     "ResponseActionGroup",
     "ResponseCategory",
     "ResponsePlan",
     "plan_t1078_response",
+    "plan_t1110_response",
 ]

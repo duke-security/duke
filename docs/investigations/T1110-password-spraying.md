@@ -138,18 +138,21 @@ handling, and no remediation. All data is from the exported JSON artefact.
 - Unresolved questions require additional evidence that this slice does not
   attempt to collect.
 
-## Next: response, validation, and reporting
+## Next: response
 
-Response, validation, reporting, and guided learning for T1110 are not yet
-implemented. `duke respond T1110` and `duke report T1110` currently fail
-safely with exit code 2 through the registry's missing-capability path until
-those slices land. See the [T1110 lab overview](../labs/T1110/overview.md).
+`duke respond T1110` consumes the same artefact and the evidence-led
+investigation result to propose a dry-run-only, approval-gated response plan.
+See [the response documentation](../responses/T1110-safe-response.md).
+Validation, reporting, and guided learning for T1110 are not yet implemented
+and fail safely with exit code 2 through the registry's missing-capability
+path. See the [T1110 lab overview](../labs/T1110/overview.md).
 
 ## References
 
 - MITRE ATT&CK — T1110 Brute Force (https://attack.mitre.org/techniques/T1110/),
   T1110.003 Password Spraying (https://attack.mitre.org/techniques/T1110/003/)
 - [T1110 lab documentation](../labs/T1110/overview.md)
+- [T1110 response documentation](../responses/T1110-safe-response.md)
 - [Architecture Decision Records](../decisions/)
 
 ## Last reviewed

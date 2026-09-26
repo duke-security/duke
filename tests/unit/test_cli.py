@@ -227,6 +227,25 @@ def test_investigate_t1110_reads_input_artifact(tmp_path: Path) -> None:
     assert "Unresolved questions:" in result.stdout
 
 
+def test_respond_t1110_reads_input_artifact(tmp_path: Path) -> None:
+    """duke respond T1110 reads a simulated artefact and prints a dry-run plan."""
+    input_path = tmp_path / "t1110.json"
+    simulated = runner.invoke(
+        app,
+        ["simulate", "T1110", "--output", str(input_path)],
+    )
+    assert simulated.exit_code == 0
+
+    result = runner.invoke(app, ["respond", "T1110", "--input", str(input_path)])
+
+    assert result.exit_code == 0
+    assert "Response plan complete (DRY RUN" in result.stdout
+    assert "Containment" in result.stdout
+    assert "temporarily-rate-limit-source" in result.stdout
+    assert "nothing executed" in result.stdout
+    assert "No real account" in result.stdout
+
+
 def test_t1110_unsupported_lifecycle_capabilities_exit_2(
     tmp_path: Path,
 ) -> None:
@@ -241,9 +260,6 @@ def test_t1110_unsupported_lifecycle_capabilities_exit_2(
     before = input_path.read_bytes()
 
     for command, expected_capability in (
-        # respond resolves detection + investigation (both present) then
-        # response (missing).
-        ("respond", "response"),
         # report resolves detection (present) then validation (missing).
         ("report", "validation"),
         ("validate", "validation"),
@@ -263,7 +279,7 @@ def test_t1110_unsupported_lifecycle_capabilities_exit_2(
     assert "learning" in result.stdout
 
 
-def test_scenarios_lists_t1110_with_simulation_detection_investigation() -> None:
+def test_scenarios_lists_t1110_capabilities() -> None:
     result = runner.invoke(app, ["scenarios"])
 
     assert result.exit_code == 0
@@ -272,11 +288,12 @@ def test_scenarios_lists_t1110_with_simulation_detection_investigation() -> None
     assert "t1110_brute_force" in result.stdout
     assert "brute-force" in result.stdout
     assert "T1110.003" in result.stdout
-    # T1110 advertises simulation, detection, and investigation (other
-    # capabilities are intentionally not yet provided).
+    # T1110 advertises simulation, detection, investigation, and response
+    # (other capabilities are intentionally not yet provided).
     assert "simulation" in result.stdout
     assert "detection" in result.stdout
     assert "investigation" in result.stdout
+    assert "response" in result.stdout
     assert "T1078" in result.stdout
 
 

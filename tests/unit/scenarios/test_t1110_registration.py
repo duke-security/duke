@@ -5,6 +5,7 @@ import pytest
 from duke.core import Scenario
 from duke.detection import detect_t1110
 from duke.investigation import investigate_t1110
+from duke.response import plan_t1110_response
 from duke.scenarios import ScenarioCapability, UnknownScenarioError, has_capability
 from duke.scenarios.builtins import (
     builtin_registry,
@@ -22,9 +23,10 @@ def test_registration_core_metadata() -> None:
     assert reg.aliases == ("brute-force", "T1110.003")
 
 
-def test_registration_provides_simulation_detection_and_investigation() -> None:
-    """This slice provides simulation, detection, and investigation; response,
-    validation, reporting, and learning remain intentionally unimplemented."""
+def test_registration_provides_simulation_detection_investigation_response() -> None:
+    """This slice provides simulation, detection, investigation, and response
+    planning; validation, reporting, and learning remain intentionally
+    unimplemented."""
     reg = t1110_registration()
     assert has_capability(reg, ScenarioCapability.SIMULATION)
     assert reg.capabilities.simulation is generate_t1110_simulation
@@ -32,8 +34,9 @@ def test_registration_provides_simulation_detection_and_investigation() -> None:
     assert reg.capabilities.detection is detect_t1110
     assert has_capability(reg, ScenarioCapability.INVESTIGATION)
     assert reg.capabilities.investigation is investigate_t1110
+    assert has_capability(reg, ScenarioCapability.RESPONSE)
+    assert reg.capabilities.response is plan_t1110_response
     for capability in (
-        ScenarioCapability.RESPONSE,
         ScenarioCapability.VALIDATION,
         ScenarioCapability.REPORTING,
         ScenarioCapability.LEARNING,

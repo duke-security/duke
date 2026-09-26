@@ -2,14 +2,15 @@
 
 ## Status
 
-**Simulation, detection, and investigation slice.** This lab currently
-implements the safe, deterministic **simulation** of ATT&CK T1110 — Brute
-Force (sub-technique **T1110.003 Password Spraying**), a deterministic,
-explainable **detection** rule (`duke detect T1110`), and an evidence-led
-**investigation** (`duke investigate T1110`). Safe dry-run response,
-validation, reporting, and guided learning for T1110 are **intentionally not
-yet implemented**; those lifecycle commands fail safely with exit code 2
-through the registry's missing-capability path until such slices land.
+**Simulation, detection, investigation, and response slice.** This lab
+currently implements the safe, deterministic **simulation** of ATT&CK T1110
+— Brute Force (sub-technique **T1110.003 Password Spraying**), a
+deterministic, explainable **detection** rule (`duke detect T1110`), an
+evidence-led **investigation** (`duke investigate T1110`), and safe, dry-run
+**response planning** (`duke respond T1110`). Validation, reporting, and
+guided learning for T1110 are **intentionally not yet implemented**; those
+lifecycle commands fail safely with exit code 2 through the registry's
+missing-capability path until such slices land.
 
 ## Purpose
 
@@ -231,6 +232,47 @@ fully deterministic and cautious:
 - **Language.** No confirmed compromise, malicious attribution, credential
   theft, impact, or successful intrusion is ever asserted.
 
+## Run response
+
+Response reads the same artefact and works from the investigation result it
+already produced; it never reruns detection or investigation and never
+executes anything.
+
+```bash
+duke simulate T1110 --output data/events/t1110-session-001.json
+duke respond T1110 --input data/events/t1110-session-001.json
+```
+
+## Response methodology
+
+`duke respond T1110` (`plan_t1110_response`) builds a dry-run-only, approval-
+gated `ResponsePlan` from the existing investigation result. It is fully
+deterministic and cautious:
+
+- **Plan-only.** Every action is `dry_run=True`, `requires_approval=True`,
+  and `status=PLANNED`; nothing executes, contacts, or modifies a real
+  system, account, sessions, credentials, MFA, permissions, or network.
+- **Evidence-led targets.** The source is the unique actor across the
+  finding-referenced events, intersected with the investigated entities; the
+  success-associated account is the uniquely resolved finding-scoped
+  `ACCOUNT` target of a referenced success. Ambiguous or unresolved targets
+  cause the related targeted action to be omitted, and incomplete context is
+  recorded in the incident summary. The shared portal is never targeted.
+- **Proportionate and conditional.** Source containment is a temporary rate
+  limit or challenge conditioned on ruling out shared NAT, proxy, authorized
+  scanner, identity provider, or corporate egress — never an unconditional
+  permanent block. Session revocation and credential rotation are conditional
+  on a verified success-associated account and human review/approval.
+- **Safe rollback.** Source throttle is reversible with removal criteria;
+  session revocation is irreversible; credential rotation is irreversible and
+  never restores prior credentials; preserved evidence is never deleted;
+  review/monitoring actions have no rollback; the temporary step-up challenge
+  is reversible only without weakening the baseline MFA/security
+  requirements.
+- **Non-asserting wording.** Only suspected password-spraying behaviour and
+  possible credential validation are referenced; compromise, attribution,
+  impact, and malicious intent are never confirmed.
+
 ## Intentionally not implemented yet
 
 The following T1110 lifecycle commands fail **safely with exit code 2**
@@ -238,14 +280,12 @@ The following T1110 lifecycle commands fail **safely with exit code 2**
 touching any input):
 
 ```bash
-duke respond T1110 ...
 duke validate T1110 ...
 duke report T1110 ...
 duke learn T1110
 ```
 
-Response, validation, reporting, and learning for T1110 are planned follow-on
-slices.
+Validation, reporting, and learning for T1110 are planned follow-on slices.
 
 ## Limitations
 
@@ -273,6 +313,7 @@ slices.
 - MITRE ATT&CK — [T1110 Brute Force](https://attack.mitre.org/techniques/T1110/),
   [T1110.003 Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
 - [T1110 investigation documentation](../../investigations/T1110-password-spraying.md)
+- [T1110 response documentation](../../responses/T1110-safe-response.md)
 - [scenario-registry.md](../../scenarios/scenario-registry.md)
 - [scenario-authoring.md](../../scenarios/scenario-authoring.md)
 - [scenario-conformance.md](../../scenarios/scenario-conformance.md)
