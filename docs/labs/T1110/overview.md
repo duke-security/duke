@@ -2,13 +2,14 @@
 
 ## Status
 
-**Simulation slice only.** This lab currently implements the safe,
+**Simulation and detection slice.** This lab currently implements the safe,
 deterministic **simulation** of ATT&CK T1110 — Brute Force (sub-technique
-**T1110.003 Password Spraying**). Detection, evidence-led investigation,
-safe dry-run response, validation, reporting, and guided learning for T1110
-are **intentionally not yet implemented**; lifecycle commands for T1110
-fail safely with exit code 2 through the registry's missing-capability path
-until those slices land.
+**T1110.003 Password Spraying**) and a deterministic, explainable
+**detection** rule (`duke detect T1110`). Evidence-led investigation, safe
+dry-run response, validation, reporting, and guided learning for T1110 are
+**intentionally not yet implemented**; those lifecycle commands fail safely
+with exit code 2 through the registry's missing-capability path until such
+slices land.
 
 ## Purpose
 
@@ -39,11 +40,12 @@ spray variant is both the safest and the most detectable to model.
 
 The synthetic telemetry confirms only that individual authentications
 succeeded or failed. It does **not** label any account as compromised,
-identify any actor as an attacker, or assert any impact. A single
-successful authentication after failures is **suspicious** and a suitable
-anchor for a future detection rule, but success alone does **not** prove
-that an account is compromised — that determination belongs to later
-investigation, which is not yet implemented for this scenario.
+identify any actor as an attacker, or assert any impact. The detection rule
+reports a **suspicious spray pattern**, and it explicitly states that
+"compromise is not confirmed": a single successful authentication after
+failures is supporting evidence only and does not prove that an account is
+compromised — that determination belongs to later investigation, which is
+not yet implemented for this scenario.
 
 ## Learning objectives
 
@@ -54,8 +56,9 @@ After completing the lab, a learner should be able to:
 - distinguish the brute-force (failed-login) pattern from the T1078
   valid-account pattern, which contains no failed logins;
 - use typed Python models with success/failure event outcomes to generate
-  reproducible security telemetry;
-- explain that the sequence is suspicious without asserting compromise.
+  and detect reproducible security telemetry;
+- explain that the detection is a suspicious behavioural pattern without
+  asserting compromise.
 
 ## Python concepts
 
@@ -67,6 +70,7 @@ After completing the lab, a learner should be able to:
 - event outcomes (success vs failure);
 - UUID generation;
 - deterministic, evenly-spaced time offsets;
+- sliding-window correlation and deterministic ranking;
 - JSON serialization and overwrite protection.
 
 ## Threat relevance
@@ -135,6 +139,61 @@ Resolution also works via the slug (`t1110_brute_force`), the friendly alias
 artefact uses schema version `1.0` and round-trips through the existing
 telemetry loader unchanged.
 
+## Run detection
+
+Detection reads the normalized events exported by the simulation; it never
+silently regenerates them, so it can be replayed against any exported
+artefact.
+
+```bash
+duke simulate T1110 --output data/events/t1110-session-001.json
+duke detect T1110 --input data/events/t1110-session-001.json
+```
+
+For the shipped corpus the rule produces a single finding
+(`password-spraying-window`): **confidence 80 (high)**, tracing the six
+failed authentications and the credited later success.
+
+## Detection methodology
+
+`duke detect T1110` infers a spray pattern purely from authentication
+outcomes, never from an answer label. It is explainable and fully
+deterministic:
+
+- **Correlation key.** Events are grouped by acting source
+  (`actor_entity_id`) — the entity performing the attempts.
+- **Sliding 30-minute window.** Every failed authentication begins a
+  candidate window; the contributing failures are those within
+  `CORRELATION_WINDOW` (30 minutes) of that start. The **best qualifying
+  window** is selected by: greatest distinct-account count, then greatest
+  contributing failure count, then earliest window start, then deterministic
+  event-ID ordering. This keeps an unrelated early failure from hiding a
+  later valid spray burst.
+- **Hard gate.** A window qualifies only when at least `MIN_DISTINCT_ACCOUNTS`
+  (5) distinct accounts failed within it. A shared service target (present in
+  every failure of the window) never counts as an account, and repeated
+  failures against an already-counted account do not inflate the count.
+- **Confidence.** The gate alone is worth `BASE_SPRAY_CONFIDENCE` (60), so a
+  bare spray is still reported. Each distinct account beyond the threshold
+  adds `EXTRA_ACCOUNT_POINTS` (5), capped at four. A later successful
+  authentication from the same source to a previously-failed account (strictly
+  after that account's failure and no later than the window end) adds
+  `LATER_SUCCESS_POINTS` (15) as **supporting evidence only**. Confidence is
+  capped at 100.
+- **Severity.** Derived from confidence — 60–74 `medium`, 75–99 `high` —
+  never `critical`, because investigation is not implemented and compromise
+  is never confirmed.
+- **Attribution.** `event_ids` trace every in-window failed authentication
+  (including repeated attempts) plus any credited success, ordered by
+  `occurred_at` then event ID. `entity_ids` implicate only the source and the
+  distinct sprayed accounts; the shared service stays contextual.
+- **Language.** The finding explicitly states "compromise is not confirmed"
+  and describes a later success as supporting evidence only — it never asserts
+  credential validity, compromise, attacker ownership, or impact.
+
+For the shipped corpus: 6 distinct accounts (1 over the 5 threshold → +5) plus
+the later success (+15) gives **confidence 80 → high**.
+
 ## Intentionally not implemented yet
 
 The following T1110 lifecycle commands fail **safely with exit code 2**
@@ -142,7 +201,6 @@ The following T1110 lifecycle commands fail **safely with exit code 2**
 touching any input):
 
 ```bash
-duke detect T1110 ...
 duke investigate T1110 ...
 duke respond T1110 ...
 duke validate T1110 ...
@@ -150,11 +208,8 @@ duke report T1110 ...
 duke learn T1110
 ```
 
-Detection, investigation, response, validation, reporting, and learning for
-T1110 are planned follow-on slices. Until then, the fingerprint of this
-scenario for a future detector would be: one benign baseline success, six
-distinct failing accounts from a single external source, and one later
-success against a previously targeted account.
+Investigation, response, validation, reporting, and learning for T1110 are
+planned follow-on slices.
 
 ## Limitations
 
@@ -163,8 +218,19 @@ success against a previously targeted account.
   policy.
 - The later success is modelled only as an authentication outcome; no
   follow-on activity (access, privilege, lateral movement) is simulated.
-- No false-positive analysis is possible yet because detection is not
-  implemented; that belongs to a later slice.
+- **False positives:** a load-balanced or centralized authentication point
+  that emits many failures from one apparent source IP in a short window, or
+  an automated sync job hurt by a shared password, could trip the
+  5-distinct/30-minute gate. The base of 60 (medium) keeps a bare spray
+  low-severity so analysts can triage.
+- **False negatives:** a slow, low-and-slow spray spread beyond 30 minutes,
+  or a source that rotates per-attempt host identities (each source under the
+  threshold), evades this single-source/window rule. This is out of scope for
+  the current slice.
+- The detection is tuned to the observable spray invariant (many distinct
+  accounts, one source, one window), not to the specific synthetic account
+  names or the portal UUID, so it generalizes to other data with or without a
+  shared service target.
 
 ## References
 
@@ -176,4 +242,4 @@ success against a previously targeted account.
 - [T1078 lab overview](../T1078/overview.md) — the complementary valid-account scenario
 - [ROADMAP.md](../../../ROADMAP.md)
 
-Last reviewed: 2026-09-25
+Last reviewed: 2026-09-26

@@ -74,14 +74,18 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
   case-insensitively by technique/slug/alias, and dispatched by the CLI
   through the registry rather than through hardcoded technique checks
 - A second production scenario, **T1110 — Brute Force** (`duke simulate
-  T1110`), currently a **simulation slice only**: it models the observable
-  telemetry of ATT&CK sub-technique **T1110.003 Password Spraying** — a
-  benign baseline authentication, six evenly-spaced failed authentications
-  against distinct accounts from a single external source, and one later
-  success — without performing real authentication or implying compromise.
-  Lifecycle commands for T1110 (detect/investigate/respond/validate/report/
-  learn) fail safely with exit code 2 through the registry's
-  missing-capability path.
+  T1110`), currently a **simulation and detection slice**: it models the
+  observable telemetry of ATT&CK sub-technique **T1110.003 Password
+  Spraying** — a benign baseline authentication, six evenly-spaced failed
+  authentications against distinct accounts from a single external source,
+  and one later success — without performing real authentication or
+  implying compromise. `duke detect T1110` identifies the spray pattern as a
+  behaviour-based finding: a deterministic sliding-window rule requires at
+  least five distinct accounts failed from one source within 30 minutes,
+  credits a later success only as supporting evidence, and never assumes
+  compromise. The remaining T1110 lifecycle commands
+  (investigate/respond/validate/report/learn) still fail safely with exit
+  code 2 through the registry's missing-capability path.
 - Reusable, test-only scenario-conformance infrastructure: the same
   checks validate both the built-in T1078 scenario and an independent
   probe scenario, with an AST guard proving the conformance sources stay
@@ -96,8 +100,8 @@ normalized telemetry, JSON export, CLI commands, behaviour-based
 detection, evidence-led investigation, safe dry-run response,
 deterministic detection validation, deterministic incident reporting, a
 T1078 guided learning path, and a static scenario registry are
-implemented. The T1110 scenario currently provides only simulation; its
-detection, investigation, response, validation, reporting, and learning
+implemented. The T1110 scenario currently provides simulation and detection;
+its investigation, response, validation, reporting, and learning
 capabilities are **planned**. The full learning component (additional scenarios and their
 learning paths, learner-progress tracking, broader improve → retest
 learning workflows, further lesson content), a dynamic/plugin scenario
@@ -129,6 +133,7 @@ duke version
 duke simulate T1078
 duke simulate T1110 --output data/events/t1110-session-001.json
 duke detect T1078 --input data/events/t1078-session-001.json
+duke detect T1110 --input data/events/t1110-session-001.json
 duke investigate T1078 --input data/events/t1078-session-001.json
 duke respond T1078 --input data/events/t1078-session-001.json
 duke validate T1078 --input data/events/t1078-session-001.json

@@ -72,16 +72,16 @@ def test_cli_resolves_the_builtin_scenario():
 
 
 def test_t1110_metadata_agrees_via_generic_checks():
-    """The simulation-only built-in passes the same generic metadata and
-    registration-shape checks as T1078 and the probe. It is deliberately not
-    part of the full-lifecycle SCENARIO_PAIRS; only the generic checks apply
-    to a partial (simulation-only) scenario."""
+    """The partial built-in (simulation + detection) passes the same generic
+    metadata and registration-shape checks as T1078 and the probe. It is
+    deliberately not part of the full-lifecycle SCENARIO_PAIRS; only the
+    generic checks apply to this partial scenario."""
     reg = t1110_registration()
     fixture = load_conformance_fixture(
         reg,
         expected_entity_count=10,
         expected_event_count=8,
-        expected_finding_count=0,
+        expected_finding_count=1,
         expected_finding_technique="T1110",
     )
     for check in check_metadata(fixture):
@@ -101,16 +101,17 @@ def test_t1110_metadata_agrees_via_generic_checks():
 
 
 def test_t1110_simulation_conforms_generically():
-    """The T1110 simulation and its canonical artefact satisfy the same
-    behavioural invariants (determinism, valid relationship references, non-
-    empty artefact) as every other scenario. Detection and later-lifecycle
-    checks skip because those capabilities are intentionally not provided."""
+    """The T1110 simulation, its canonical artefact, and its detection all
+    satisfy the generic behavioural invariants (determinism, valid
+    relationship references, non-empty artefact). Response, validation,
+    reporting, and learning are still absent, so those checks report passing
+    skips."""
     reg = t1110_registration()
     fixture = load_conformance_fixture(
         reg,
         expected_entity_count=10,
         expected_event_count=8,
-        expected_finding_count=0,
+        expected_finding_count=1,
         expected_finding_technique="T1110",
     )
     for check in check_simulation(fixture):
@@ -119,10 +120,12 @@ def test_t1110_simulation_conforms_generically():
         assert check.passed, f"[T1110.artefact] {check.name}: {check.detail}"
     for check in check_relationships(fixture):
         assert check.passed, f"[T1110.relationships] {check.name}: {check.detail}"
-    # Detection / response / validation / reporting / learning checks are skips
-    # for a simulation-only scenario; each must report a passing skip.
+    # Detection is now provided and must be deterministic, produce exactly one
+    # finding, and carry the T1110 technique.
     for check in check_detection(fixture):
         assert check.passed, f"[T1110.detection] {check.name}: {check.detail}"
+    # Response / validation / reporting / learning remain unsupported and must
+    # each report a passing skip.
     for check in check_safe_response(fixture):
         assert check.passed, f"[T1110.response] {check.name}: {check.detail}"
     for check in check_validation(fixture):

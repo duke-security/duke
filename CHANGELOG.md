@@ -33,6 +33,27 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
   not yet implemented. Includes simulation, registry, CLI, determinism,
   safety (no credential material, documentation-safe IPs, no side-effecting
   generation), artefact round-trip, and documentation tests.
+- Deterministic, explainable **T1110 detection** (`duke detect T1110`) for
+  the T1110.003 password-spraying simulation (`password-spraying-window`).
+  It groups events by source actor and evaluates a sliding 30-minute
+  correlation window, selecting the best qualifying window by greatest
+  distinct-account count, then failure count, then earliest start, then
+  event-ID ordering. The hard gate requires at least five distinct accounts
+  failed from a single source within the window; a shared service target
+  (present in every failure) never counts as an account, and repeated
+  failures against one account never inflate the count. Confidence starts at
+  a base of 60 (so a bare spray is still reported), gains points for distinct
+  accounts beyond the threshold (capped), and gains a 15-point bonus only
+  when the same source later authenticates, strictly after the account's
+  failure and no later than the window end, to a previously-failed account —
+  credited strictly as **supporting evidence**, never as proof of compromise.
+  Severity derives from confidence (medium or high, never critical); the
+  finding explicitly states that compromise is not confirmed. event_ids trace
+  every in-window failed authentication (including repeats) plus any credited
+  success; entity_ids implicate only the source and the distinct sprayed
+  accounts (the shared service stays contextual). Includes unit, CLI,
+  malformed-input, threshold/window-boundary, mixed-source, determinism,
+  attribution, and conformance tests.
 - Packaged YAML loading and validation for built-in Duke scenarios.
 - Safe deterministic simulation for MITRE ATT&CK T1078 Valid Accounts,
   producing eight synthetic entities and eight normalized events.

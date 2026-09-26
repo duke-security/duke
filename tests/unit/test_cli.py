@@ -160,13 +160,57 @@ def test_simulate_t1110_requires_force_to_overwrite(tmp_path: Path) -> None:
     assert forced.exit_code == 0
 
 
-def test_t1110_missing_lifecycle_capabilities_exit_2_before_reading_input(
+def test_detect_t1110_reads_input_artifact(tmp_path: Path) -> None:
+    """duke detect T1110 reads a simulated artefact and reports one finding."""
+    input_path = tmp_path / "t1110.json"
+    simulated = runner.invoke(
+        app,
+        ["simulate", "T1110", "--output", str(input_path)],
+    )
+    assert simulated.exit_code == 0
+
+    result = runner.invoke(app, ["detect", "T1110", "--input", str(input_path)])
+
+    assert result.exit_code == 0
+    assert "Detection complete" in result.stdout
+    assert "Findings: 1" in result.stdout
+    assert "Confidence: 80/100" in result.stdout
+    assert "compromise is not confirmed" in result.stdout.lower()
+
+
+def test_detect_t1110_no_findings_on_benign_artifact(tmp_path: Path) -> None:
+    """A benign artefact (no spray) yields no T1110 finding, exit 0."""
+    input_path = tmp_path / "benign.json"
+    benign = json.dumps(
+        {
+            "schema_version": "1.0",
+            "scenario": {"attack_technique_id": "T1110"},
+            "entities": [],
+            "events": [
+                {
+                    "occurred_at": "2026-09-25T09:00:00+00:00",
+                    "action": "authenticate",
+                    "outcome": "success",
+                    "source": "identity_provider",
+                    "attributes": {},
+                }
+            ],
+        }
+    )
+    input_path.write_text(benign, encoding="utf-8")
+
+    result = runner.invoke(app, ["detect", "T1110", "--input", str(input_path)])
+
+    assert result.exit_code == 0
+    assert "No findings" in result.stdout
+
+
+def test_t1110_unsupported_lifecycle_capabilities_exit_2(
     tmp_path: Path,
 ) -> None:
-    """Every unsupported T1110 lifecycle command fails with exit 2 through the
-    missing-capability path before reading any input file."""
+    """Commands whose capabilities T1110 does not yet provide fail with exit 2
+    through the missing-capability path before reading any input file."""
     input_path = tmp_path / "t1110.json"
-    # Produce a valid T1110 artefact first.
     simulated = runner.invoke(
         app,
         ["simulate", "T1110", "--output", str(input_path)],
@@ -175,11 +219,11 @@ def test_t1110_missing_lifecycle_capabilities_exit_2_before_reading_input(
     before = input_path.read_bytes()
 
     for command, expected_capability in (
-        ("detect", "detection"),
-        ("investigate", "detection"),
-        ("respond", "detection"),
+        ("investigate", "investigation"),
+        ("respond", "investigation"),
+        # report resolves detection (present) then validation (missing).
+        ("report", "validation"),
         ("validate", "validation"),
-        ("report", "detection"),
     ):
         result = runner.invoke(app, [command, "T1110", "--input", str(input_path)])
         assert result.exit_code == 2, command
@@ -196,7 +240,7 @@ def test_t1110_missing_lifecycle_capabilities_exit_2_before_reading_input(
     assert "learning" in result.stdout
 
 
-def test_scenarios_lists_t1110_with_simulation_only_capability() -> None:
+def test_scenarios_lists_t1110_with_simulation_and_detection() -> None:
     result = runner.invoke(app, ["scenarios"])
 
     assert result.exit_code == 0
@@ -205,9 +249,10 @@ def test_scenarios_lists_t1110_with_simulation_only_capability() -> None:
     assert "t1110_brute_force" in result.stdout
     assert "brute-force" in result.stdout
     assert "T1110.003" in result.stdout
-    # T1110 advertises only the simulation capability (missing others are
-    # intentionally not shown as present).
+    # T1110 advertises simulation and detection (other capabilities are
+    # intentionally not yet provided).
     assert "simulation" in result.stdout
+    assert "detection" in result.stdout
     assert "T1078" in result.stdout
 
 
