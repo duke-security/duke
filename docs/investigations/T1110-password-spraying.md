@@ -138,14 +138,17 @@ handling, and no remediation. All data is from the exported JSON artefact.
 - Unresolved questions require additional evidence that this slice does not
   attempt to collect.
 
-## Next: response
+## Next: response, validation
 
 `duke respond T1110` consumes the same artefact and the evidence-led
-investigation result to propose a dry-run-only, approval-gated response plan.
-See [the response documentation](../responses/T1110-safe-response.md).
-Validation, reporting, and guided learning for T1110 are not yet implemented
-and fail safely with exit code 2 through the registry's missing-capability
-path. See the [T1110 lab overview](../labs/T1110/overview.md).
+investigation result to propose a dry-run-only, approval-gated response plan,
+and `duke validate T1110` proves the detection → investigation → response
+pipeline with an ordered 19-case deterministic validation suite. See
+[the response documentation](../responses/T1110-safe-response.md) and
+[the validation documentation](../validation/T1110-detection-validation.md).
+Reporting and guided learning for T1110 are not yet implemented and fail
+safely with exit code 2 through the registry's missing-capability path. See
+the [T1110 lab overview](../labs/T1110/overview.md).
 
 ## References
 
@@ -153,6 +156,7 @@ path. See the [T1110 lab overview](../labs/T1110/overview.md).
   T1110.003 Password Spraying (https://attack.mitre.org/techniques/T1110/003/)
 - [T1110 lab documentation](../labs/T1110/overview.md)
 - [T1110 response documentation](../responses/T1110-safe-response.md)
+- [T1110 validation documentation](../validation/T1110-detection-validation.md)
 - [Architecture Decision Records](../decisions/)
 
 ## Last reviewed

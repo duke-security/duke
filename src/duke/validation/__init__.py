@@ -13,10 +13,12 @@ from duke.validation.result import (
     ValidationSuiteResult,
 )
 from duke.validation.t1078 import validate_t1078
+from duke.validation.t1110 import validate_t1110
 
 __all__ = [
     "ValidationCase",
     "ValidationStatus",
     "ValidationSuiteResult",
     "validate_t1078",
+    "validate_t1110",
 ]

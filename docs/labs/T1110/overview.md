@@ -2,14 +2,15 @@
 
 ## Status
 
-**Simulation, detection, investigation, and response slice.** This lab
-currently implements the safe, deterministic **simulation** of ATT&CK T1110
-— Brute Force (sub-technique **T1110.003 Password Spraying**), a
+**Simulation, detection, investigation, response, and validation slice.**
+This lab currently implements the safe, deterministic **simulation** of
+ATT&CK T1110 — Brute Force (sub-technique **T1110.003 Password Spraying**), a
 deterministic, explainable **detection** rule (`duke detect T1110`), an
-evidence-led **investigation** (`duke investigate T1110`), and safe, dry-run
-**response planning** (`duke respond T1110`). Validation, reporting, and
-guided learning for T1110 are **intentionally not yet implemented**; those
-lifecycle commands fail safely with exit code 2 through the registry's
+evidence-led **investigation** (`duke investigate T1110`), safe, dry-run
+**response planning** (`duke respond T1110`), and deterministic **detection
+validation** (`duke validate T1110`, 19 cases). Reporting and guided learning
+for T1110 are **intentionally not yet implemented**; those lifecycle commands
+fail safely with exit code 2 through the registry's
 missing-capability path until such slices land.
 
 ## Purpose
@@ -273,6 +274,35 @@ deterministic and cautious:
   possible credential validation are referenced; compromise, attribution,
   impact, and malicious intent are never confirmed.
 
+## Run validation
+
+Validation reads the same artefact and proves the detection → investigation →
+response pipeline by rerunning it against controlled, in-memory mutations; it
+never modifies the source artefact or input file.
+
+```bash
+duke simulate T1110 --output data/events/t1110-session-001.json
+duke validate T1110 --input data/events/t1110-session-001.json
+```
+
+For the canonical corpus this reports **Validation complete: 19/19 cases
+passed** and exits 0.
+
+## Validation methodology
+
+`duke validate T1110` (`validate_t1110`) runs an ordered 19-case catalogue.
+Finding-producing cases assert an exact finding count, confidence, and
+severity, run investigation and response, and verify every response action is
+dry-run, approval-required, and `PLANNED`; no-finding cases stop after
+detection and verify investigation and response were not invoked. All the
+detector's hard boundaries are exercised: the five/four-account threshold,
+repeated failures (counted once), shared-service exclusion, mixed source
+actors, single-account guessing, an unrelated early failure, attempts split
+beyond the window, and deterministic earliest-window selection between two
+equal bursts. See
+[the validation documentation](../../validation/T1110-detection-validation.md)
+for the full case table.
+
 ## Intentionally not implemented yet
 
 The following T1110 lifecycle commands fail **safely with exit code 2**
@@ -280,12 +310,11 @@ The following T1110 lifecycle commands fail **safely with exit code 2**
 touching any input):
 
 ```bash
-duke validate T1110 ...
 duke report T1110 ...
 duke learn T1110
 ```
 
-Validation, reporting, and learning for T1110 are planned follow-on slices.
+Reporting and learning for T1110 are planned follow-on slices.
 
 ## Limitations
 
@@ -314,6 +343,7 @@ Validation, reporting, and learning for T1110 are planned follow-on slices.
   [T1110.003 Password Spraying](https://attack.mitre.org/techniques/T1110/003/)
 - [T1110 investigation documentation](../../investigations/T1110-password-spraying.md)
 - [T1110 response documentation](../../responses/T1110-safe-response.md)
+- [T1110 validation documentation](../../validation/T1110-detection-validation.md)
 - [scenario-registry.md](../../scenarios/scenario-registry.md)
 - [scenario-authoring.md](../../scenarios/scenario-authoring.md)
 - [scenario-conformance.md](../../scenarios/scenario-conformance.md)

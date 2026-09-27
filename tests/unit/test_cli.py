@@ -9,6 +9,7 @@ from duke.cli.app import app
 from duke.simulation import (
     export_simulation,
     generate_t1078_simulation,
+    generate_t1110_simulation,
     simulation_payload,
 )
 
@@ -246,6 +247,54 @@ def test_respond_t1110_reads_input_artifact(tmp_path: Path) -> None:
     assert "No real account" in result.stdout
 
 
+def test_validate_t1110_reads_input_artifact(tmp_path: Path) -> None:
+    """duke validate T1110 runs the 19-case suite over a canonical artefact."""
+    input_path = tmp_path / "t1110.json"
+    simulated = runner.invoke(
+        app,
+        ["simulate", "T1110", "--output", str(input_path)],
+    )
+    assert simulated.exit_code == 0
+
+    result = runner.invoke(app, ["validate", "T1110", "--input", str(input_path)])
+
+    assert result.exit_code == 0
+    assert "Validation complete: 19/19 cases passed" in result.stdout
+    assert "suspicious-corpus-unmodified" in result.stdout
+
+
+def test_validate_t1110_benign_artefact_exits_one(tmp_path: Path) -> None:
+    """A benign artefact yields a failing suite, so the CLI exits 1."""
+    result = generate_t1110_simulation()
+    benign_input = tmp_path / "benign.json"
+    payload = simulation_payload(result)
+    payload["events"] = [payload["events"][0]]  # only the baseline
+    benign_input.write_text(json.dumps(payload), encoding="utf-8")
+
+    invocation = runner.invoke(
+        app, ["validate", "T1110", "--input", str(benign_input)]
+    )
+
+    assert invocation.exit_code == 1
+    assert "Validation failed" in invocation.stdout
+
+
+def test_validate_t1110_does_not_modify_input_bytes(tmp_path: Path) -> None:
+    """Input-file bytes must remain unchanged after `duke validate T1110`."""
+    input_path = tmp_path / "t1110.json"
+    simulated = runner.invoke(
+        app,
+        ["simulate", "T1110", "--output", str(input_path)],
+    )
+    assert simulated.exit_code == 0
+    before = input_path.read_bytes()
+
+    invocation = runner.invoke(app, ["validate", "T1110", "--input", str(input_path)])
+    assert invocation.exit_code == 0
+
+    assert input_path.read_bytes() == before
+
+
 def test_t1110_unsupported_lifecycle_capabilities_exit_2(
     tmp_path: Path,
 ) -> None:
@@ -259,17 +308,13 @@ def test_t1110_unsupported_lifecycle_capabilities_exit_2(
     assert simulated.exit_code == 0
     before = input_path.read_bytes()
 
-    for command, expected_capability in (
-        # report resolves detection (present) then validation (missing).
-        ("report", "validation"),
-        ("validate", "validation"),
-    ):
-        result = runner.invoke(app, [command, "T1110", "--input", str(input_path)])
-        assert result.exit_code == 2, command
-        assert "does not provide capability" in result.stdout, command
-        assert expected_capability in result.stdout, command
-        # The input artefact was never read, modified, or replaced.
-        assert input_path.read_bytes() == before, command
+    # report now resolves detection/validation/investigation/response (all
+    # present) and fails on the missing reporting capability.
+    result = runner.invoke(app, ["report", "T1110", "--input", str(input_path)])
+    assert result.exit_code == 2
+    assert "does not provide capability" in result.stdout
+    assert "reporting" in result.stdout
+    assert input_path.read_bytes() == before
 
     # learn takes no --input path; confirm it fails on its own via the same
     # missing-capability path.
@@ -288,12 +333,13 @@ def test_scenarios_lists_t1110_capabilities() -> None:
     assert "t1110_brute_force" in result.stdout
     assert "brute-force" in result.stdout
     assert "T1110.003" in result.stdout
-    # T1110 advertises simulation, detection, investigation, and response
-    # (other capabilities are intentionally not yet provided).
+    # T1110 advertises simulation, detection, investigation, response, and
+    # validation (reporting and learning are intentionally not yet provided).
     assert "simulation" in result.stdout
     assert "detection" in result.stdout
     assert "investigation" in result.stdout
     assert "response" in result.stdout
+    assert "validation" in result.stdout
     assert "T1078" in result.stdout
 
 

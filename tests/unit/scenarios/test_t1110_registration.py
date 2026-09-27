@@ -13,6 +13,7 @@ from duke.scenarios.builtins import (
     t1110_registration,
 )
 from duke.simulation import generate_t1110_simulation
+from duke.validation import validate_t1110
 
 
 def test_registration_core_metadata() -> None:
@@ -23,10 +24,9 @@ def test_registration_core_metadata() -> None:
     assert reg.aliases == ("brute-force", "T1110.003")
 
 
-def test_registration_provides_simulation_detection_investigation_response() -> None:
-    """This slice provides simulation, detection, investigation, and response
-    planning; validation, reporting, and learning remain intentionally
-    unimplemented."""
+def test_registration_provides_full_lifecycle_through_validation() -> None:
+    """This slice provides simulation, detection, investigation, response, and
+    validation; reporting and learning remain intentionally unimplemented."""
     reg = t1110_registration()
     assert has_capability(reg, ScenarioCapability.SIMULATION)
     assert reg.capabilities.simulation is generate_t1110_simulation
@@ -36,8 +36,9 @@ def test_registration_provides_simulation_detection_investigation_response() -> 
     assert reg.capabilities.investigation is investigate_t1110
     assert has_capability(reg, ScenarioCapability.RESPONSE)
     assert reg.capabilities.response is plan_t1110_response
+    assert has_capability(reg, ScenarioCapability.VALIDATION)
+    assert reg.capabilities.validation is validate_t1110
     for capability in (
-        ScenarioCapability.VALIDATION,
         ScenarioCapability.REPORTING,
         ScenarioCapability.LEARNING,
     ):

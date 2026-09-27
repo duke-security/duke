@@ -108,6 +108,33 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
   behaviour, possible credential validation, no confirmed compromise or
   attribution). Includes unit, CLI, registry, model, side-effect,
   cautious-language, target-resolution, rollback, and conformance tests.
+- Deterministic, side-effect-free **T1110 validation** (`duke validate
+  T1110`). `validate_t1110(artefact)` proves the detection → investigation →
+  response-planning pipeline with a fixed, ordered 19-case catalogue
+  exercised against immutable, in-memory mutations built in dedicated
+  `duke.validation.mutations_t1110` helpers (deterministic `uuid5` namespaces
+  for cloned events and created entities, no `uuid4`/wall-clock). Every
+  finding-producing case asserts an exact finding count, confidence (80 for
+  the canonical corpus, 65 or 60 at the credit/threshold boundaries), and
+  severity (HIGH/MEDIUM), runs investigation and response, and verifies every
+  response action is dry-run, approval-required, and `PLANNED`; no-finding
+  cases stop after detection and prove investigation/response were not
+  invoked. The catalogue exercises the detector's hard boundaries: the
+  five/four-account threshold, repeated failures (counted once and retained in
+  `event_ids`), shared-service exclusion, mixed source actors, single-account
+  guessing, an unrelated early failure, attempts split beyond the 30-minute
+  window, deterministic earliest-window selection between two equal bursts,
+  missing actors, success-credit rules (before the failure, against an
+  unrelated account, outside the window, or removal of success), plus a benign
+  control, determinism, traceability, and response-safety cases. The source
+  artefact is snapshotted and proven structurally unchanged, the input file
+  bytes are verified unchanged via the CLI, and per-case exceptions are
+  converted into deterministic FAILED results without aborting the suite. An
+  exhaustiveness test pins the exact ordered set of 19 case IDs so cases
+  cannot silently disappear or reorder. Includes a minimal scoped fix so the
+  detector's documented "earliest window start" tie-break matches its code.
+  Includes unit, mutation, pipeline, CLI, conformance, determinism,
+  immutability, no-I/O, and failure-reporting tests.
 - Packaged YAML loading and validation for built-in Duke scenarios.
 - Safe deterministic simulation for MITRE ATT&CK T1078 Valid Accounts,
   producing eight synthetic entities and eight normalized events.

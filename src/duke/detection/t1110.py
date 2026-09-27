@@ -121,7 +121,7 @@ def _select_window(
     """
     best: tuple[SecurityEvent, ...] | None = None
     best_accounts: frozenset[UUID] = frozenset()
-    best_rank: tuple[int, int, datetime, tuple[str, ...]] | None = None
+    best_rank: tuple[int, int, float, tuple[str, ...]] | None = None
 
     for index, start_event in enumerate(ordered_failures):
         window_end = start_event.occurred_at + CORRELATION_WINDOW
@@ -141,7 +141,15 @@ def _select_window(
             event.id.__str__()
             for event in sorted(window_tuple, key=lambda e: e.id)
         )
-        rank = (distinct, len(window_tuple), start_event.occurred_at, id_order)
+        # Negate the window start so that, among equal distinct-account and
+        # failure counts, the EARLIEST-starting window ranks highest (matching
+        # the documented "earliest window start" tie-break).
+        rank = (
+            distinct,
+            len(window_tuple),
+            -start_event.occurred_at.timestamp(),
+            id_order,
+        )
 
         if best_rank is None or rank > best_rank:
             best = window_tuple

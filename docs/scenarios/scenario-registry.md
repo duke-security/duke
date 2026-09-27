@@ -127,8 +127,9 @@ T1078 resolves all of these to the same registration:
 - `t1078_valid_accounts` (stable slug)
 - `valid-accounts` (alias)
 
-T1110 (Brute Force), a **simulation/detection/investigation/response**
-slice modelling sub-technique T1110.003 Password Spraying, resolves:
+T1110 (Brute Force), a **simulation/detection/investigation/response/
+validation** slice modelling sub-technique T1110.003 Password Spraying,
+resolves:
 
 - `T1110` / `t1110` (technique ID, case-insensitive)
 - `t1110_brute_force` (stable slug)
@@ -170,8 +171,8 @@ To add a new scenario (e.g. `T9999`):
    This is optional for production behaviour but required to prove the
    scenario conforms. A **partial** scenario that is not yet full-lifecycle
    (like the current T1110 slice, which provides simulation, detection,
-   investigation, and response but not the later stages) does **not** belong
-   in `builtin_pairs.py` (which
+   investigation, response, and validation but not the later stages) does
+   **not** belong in `builtin_pairs.py` (which
    the full-lifecycle conformance test iterates); instead it is covered by
    the *generic* metadata, registration, registry, simulation, artefact,
    relationship, and detection checks directly in
