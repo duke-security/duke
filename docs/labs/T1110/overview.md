@@ -2,16 +2,16 @@
 
 ## Status
 
-**Simulation, detection, investigation, response, and validation slice.**
-This lab currently implements the safe, deterministic **simulation** of
-ATT&CK T1110 — Brute Force (sub-technique **T1110.003 Password Spraying**), a
-deterministic, explainable **detection** rule (`duke detect T1110`), an
-evidence-led **investigation** (`duke investigate T1110`), safe, dry-run
-**response planning** (`duke respond T1110`), and deterministic **detection
-validation** (`duke validate T1110`, 19 cases). Reporting and guided learning
-for T1110 are **intentionally not yet implemented**; those lifecycle commands
-fail safely with exit code 2 through the registry's
-missing-capability path until such slices land.
+**Full lifecycle through reporting.** This lab currently implements the safe,
+deterministic **simulation** of ATT&CK T1110 — Brute Force (sub-technique
+**T1110.003 Password Spraying**), a deterministic, explainable **detection**
+rule (`duke detect T1110`), an evidence-led **investigation**
+(`duke investigate T1110`), safe, dry-run **response planning**
+(`duke respond T1110`), deterministic **detection validation**
+(`duke validate T1110`, 19 cases), and deterministic **incident reporting**
+(`duke report T1110`). Guided learning for T1110 is **intentionally not yet
+implemented**; that lifecycle command fails safely with exit code 2 through the
+registry's missing-capability path.
 
 ## Purpose
 
@@ -303,18 +303,32 @@ equal bursts. See
 [the validation documentation](../../validation/T1110-detection-validation.md)
 for the full case table.
 
-## Intentionally not implemented yet
+## Run report
 
-The following T1110 lifecycle commands fail **safely with exit code 2**
-(they resolve the scenario, then report the missing capability before
-touching any input):
+Reporting aggregates the existing workflow data into a deterministic Markdown
+report rendered by the shared renderer and written atomically.
 
 ```bash
-duke report T1110 ...
+duke simulate T1110 --output data/events/t1110-session-001.json
+duke report T1110 \
+  --input data/events/t1110-session-001.json \
+  --output reports/t1110-incident-report.md
+```
+
+On the canonical corpus this produces the 12-section T1110 report and exits 0.
+See [the reporting documentation](../../reporting/T1110-incident-reporting.md)
+for the report-candidate flow, exit codes, entity roles, and atomic export.
+
+## Intentionally not implemented yet
+
+The following T1110 lifecycle command fails **safely with exit code 2**
+(guided learning is the one capability T1110 does not yet provide):
+
+```bash
 duke learn T1110
 ```
 
-Reporting and learning for T1110 are planned follow-on slices.
+Guided learning for T1110 is a planned follow-on slice.
 
 ## Limitations
 
@@ -344,6 +358,7 @@ Reporting and learning for T1110 are planned follow-on slices.
 - [T1110 investigation documentation](../../investigations/T1110-password-spraying.md)
 - [T1110 response documentation](../../responses/T1110-safe-response.md)
 - [T1110 validation documentation](../../validation/T1110-detection-validation.md)
+- [T1110 reporting documentation](../../reporting/T1110-incident-reporting.md)
 - [scenario-registry.md](../../scenarios/scenario-registry.md)
 - [scenario-authoring.md](../../scenarios/scenario-authoring.md)
 - [scenario-conformance.md](../../scenarios/scenario-conformance.md)

@@ -12,10 +12,12 @@ from duke.reporting.export import export_report
 from duke.reporting.render import render_incident_report
 from duke.reporting.result import IncidentReport
 from duke.reporting.t1078 import report_t1078
+from duke.reporting.t1110 import report_t1110
 
 __all__ = [
     "IncidentReport",
     "export_report",
     "render_incident_report",
     "report_t1078",
+    "report_t1110",
 ]

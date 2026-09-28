@@ -10,9 +10,10 @@ telemetry and performs no action; it exists so the Markdown renderer
 already produced by earlier Duke stages.
 """
 
+from typing import Self
 from uuid import UUID
 
-from pydantic import AwareDatetime, Field
+from pydantic import AwareDatetime, Field, model_validator
 
 from duke.core import Entity, Evidence, Finding
 from duke.core._base import DukeModel
@@ -27,6 +28,12 @@ class IncidentReport(DukeModel):
     ``report_id`` and ``generated_at`` are deterministic: they derive from
     the underlying finding, not from wall-clock time, so the same input
     always yields the same report identity and timestamp.
+
+    Scenario-visible rendering metadata (``title``, ``technique_label``,
+    ``involved_entities_intro``, and the index-aligned ``entity_roles``) is
+    carried on the report so the shared renderer stays scenario-agnostic.
+    ``entity_roles`` must have exactly one non-empty role per involved
+    entity, in the same order.
     """
 
     report_id: UUID = Field(
@@ -40,6 +47,15 @@ class IncidentReport(DukeModel):
     )
     finding: Finding
     involved_entities: tuple[Entity, ...]
+    entity_roles: tuple[str, ...] = Field(
+        description=(
+            "One deterministic role label per involved entity, in the same "
+            "order as ``involved_entities``."
+        ),
+    )
+    involved_entities_intro: str = Field(
+        description="Preamble for the involved-entities section.",
+    )
     timeline: tuple[TimelineEntry, ...]
     evidence: tuple[Evidence, ...]
     confirmed_facts: tuple[str, ...]
@@ -47,6 +63,10 @@ class IncidentReport(DukeModel):
     unresolved_questions: tuple[str, ...]
     plan: ResponsePlan
     suite: ValidationSuiteResult
+    title: str = Field(description="Report title rendered as the H1 heading.")
+    technique_label: str = Field(
+        description="Human technique label shown after the technique ID.",
+    )
     executive_summary: str = Field(
         description="Cautious, evidence-based narrative summary.",
     )
@@ -67,3 +87,13 @@ class IncidentReport(DukeModel):
             "impact, or exfiltration."
         ),
     )
+
+    @model_validator(mode="after")
+    def _entity_roles_align(self) -> Self:
+        if len(self.entity_roles) != len(self.involved_entities):
+            raise ValueError(
+                "entity_roles must have exactly one role per involved entity"
+            )
+        if any(not role.strip() for role in self.entity_roles):
+            raise ValueError("entity_roles must not contain empty roles")
+        return self

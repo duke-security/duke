@@ -35,6 +35,21 @@ def _t1078_registry_with(**capability_overrides):
     return registry
 
 
+def _t1110_registry_with(**capability_overrides):
+    """Return a registry whose T1110 registration has capability overrides."""
+    import dataclasses
+
+    from duke.scenarios.builtins import t1110_registration
+    from duke.scenarios.registry import ScenarioRegistry
+
+    base = t1110_registration()
+    caps = dataclasses.replace(base.capabilities, **capability_overrides)
+    registration = dataclasses.replace(base, capabilities=caps)
+    registry = ScenarioRegistry()
+    registry.register(registration)
+    return registry
+
+
 def test_help_displays_project_description() -> None:
     """The help command should explain Duke's purpose."""
     result = runner.invoke(app, ["--help"])
@@ -295,6 +310,220 @@ def test_validate_t1110_does_not_modify_input_bytes(tmp_path: Path) -> None:
     assert input_path.read_bytes() == before
 
 
+def test_report_t1110_writes_output_and_runs_validation_once(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """Canonical T1110 report: exit 0, output written, validation exactly once."""
+    input_path = tmp_path / "t1110.json"
+    simulated = runner.invoke(
+        app,
+        ["simulate", "T1110", "--output", str(input_path)],
+    )
+    assert simulated.exit_code == 0
+    output_path = tmp_path / "report.md"
+    before_bytes = input_path.read_bytes()
+
+    # Count invocations of the registered validation capability only.
+    from duke.validation import validate_t1110 as real
+
+    calls = {"count": 0}
+
+    def counting(artefact):
+        calls["count"] += 1
+        return real(artefact)
+
+    monkeypatch.setattr(
+        "duke.cli.app.REGISTRY",
+        _t1110_registry_with(validation=counting),
+    )
+
+    invocation = runner.invoke(
+        app,
+        ["report", "T1110", "--input", str(input_path), "--output", str(output_path)],
+    )
+
+    assert invocation.exit_code == 0
+    assert "Report complete" in invocation.stdout
+    assert output_path.exists()
+    assert calls["count"] == 1
+    assert input_path.read_bytes() == before_bytes
+    body = output_path.read_text(encoding="utf-8")
+    assert "# T1110 Incident Report" in body
+    assert "## 12. Conclusion" in body
+
+
+def test_report_t1110_benign_short_circuits_before_validation(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """Zero findings: exit 0, no output file, validation/downstream never run."""
+    from duke.detection import detect_t1110 as real_detect
+
+    result = generate_t1110_simulation()
+    benign_input = tmp_path / "benign.json"
+    payload = simulation_payload(result)
+    payload["events"] = [payload["events"][0]]
+    benign_input.write_text(json.dumps(payload), encoding="utf-8")
+
+    calls = {"detect": 0, "validate": 0}
+
+    def spy_detect(events):
+        calls["detect"] += 1
+        return real_detect(events)
+
+    def spy_validate(artefact):
+        calls["validate"] += 1
+        raise AssertionError("validation must not run on the benign path")
+
+    monkeypatch.setattr(
+        "duke.cli.app.REGISTRY",
+        _t1110_registry_with(detection=spy_detect, validation=spy_validate),
+    )
+
+    output_path = tmp_path / "report.md"
+    invocation = runner.invoke(
+        app,
+        ["report", "T1110", "--input", str(benign_input), "--output", str(output_path)],
+    )
+
+    assert invocation.exit_code == 0
+    assert "No findings to report" in invocation.stdout
+    assert not output_path.exists()
+    assert calls["detect"] >= 1
+    assert calls["validate"] == 0
+
+
+def test_report_t1110_multiple_findings_short_circuits_before_validation(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """Multiple findings: exit 1, no output file, validation/downstream never
+    run."""
+    from duke.detection import detect_t1110 as real_detect
+
+    input_path = tmp_path / "t1110.json"
+    simulated = runner.invoke(
+        app,
+        ["simulate", "T1110", "--output", str(input_path)],
+    )
+    assert simulated.exit_code == 0
+
+    def two_findings(events):
+        finding = real_detect(events)[0]
+        return (finding, finding)
+
+    def spy_validate(artefact):
+        raise AssertionError("validation must not run on the multi-finding path")
+
+    monkeypatch.setattr(
+        "duke.cli.app.REGISTRY",
+        _t1110_registry_with(detection=two_findings, validation=spy_validate),
+    )
+
+    output_path = tmp_path / "report.md"
+    invocation = runner.invoke(
+        app,
+        ["report", "T1110", "--input", str(input_path), "--output", str(output_path)],
+    )
+
+    assert invocation.exit_code == 1
+    assert "Expected exactly one finding, got 2" in invocation.stdout
+    assert not output_path.exists()
+
+
+def test_report_t1110_failed_validation_writes_nothing(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """Failed validation: exit 1, no output file, downstream never run."""
+    from duke.validation import (
+        ValidationCase,
+        ValidationStatus,
+        ValidationSuiteResult,
+    )
+
+    input_path = tmp_path / "t1110.json"
+    simulated = runner.invoke(
+        app,
+        ["simulate", "T1110", "--output", str(input_path)],
+    )
+    assert simulated.exit_code == 0
+
+    def failing(_artefact):
+        return ValidationSuiteResult(
+            technique_id="T1110",
+            cases=(
+                ValidationCase(
+                    name="x",
+                    expected="e",
+                    actual="a",
+                    status=ValidationStatus.FAIL,
+                    explanation="why.",
+                ),
+            ),
+        )
+
+    monkeypatch.setattr(
+        "duke.cli.app.REGISTRY",
+        _t1110_registry_with(validation=failing),
+    )
+
+    output_path = tmp_path / "report.md"
+    invocation = runner.invoke(
+        app,
+        ["report", "T1110", "--input", str(input_path), "--output", str(output_path)],
+    )
+
+    assert invocation.exit_code == 1
+    assert "Validation failed" in invocation.stdout
+    assert not output_path.exists()
+
+
+def test_report_t1110_refuses_existing_output_without_force(tmp_path: Path) -> None:
+    input_path = tmp_path / "t1110.json"
+    simulated = runner.invoke(
+        app,
+        ["simulate", "T1110", "--output", str(input_path)],
+    )
+    assert simulated.exit_code == 0
+    output_path = tmp_path / "report.md"
+    output_path.write_text("existing", encoding="utf-8")
+
+    first = runner.invoke(
+        app,
+        ["report", "T1110", "--input", str(input_path), "--output", str(output_path)],
+    )
+
+    assert first.exit_code == 1
+    assert "Output already exists" in first.stdout
+    assert output_path.read_text(encoding="utf-8") == "existing"
+
+    forced = runner.invoke(
+        app,
+        [
+            "report", "T1110",
+            "--input", str(input_path),
+            "--output", str(output_path),
+            "--force",
+        ],
+    )
+
+    assert forced.exit_code == 0
+    assert "# T1110 Incident Report" in output_path.read_text(encoding="utf-8")
+
+
+def test_report_t1110_missing_input_is_exit_one(tmp_path: Path) -> None:
+    output_path = tmp_path / "report.md"
+    invocation = runner.invoke(
+        app,
+        [
+            "report", "T1110",
+            "--input", str(tmp_path / "missing.json"),
+            "--output", str(output_path),
+        ],
+    )
+
+    assert invocation.exit_code == 1
+    assert not output_path.exists()
+
+
 def test_t1110_unsupported_lifecycle_capabilities_exit_2(
     tmp_path: Path,
 ) -> None:
@@ -306,18 +535,9 @@ def test_t1110_unsupported_lifecycle_capabilities_exit_2(
         ["simulate", "T1110", "--output", str(input_path)],
     )
     assert simulated.exit_code == 0
-    before = input_path.read_bytes()
-
-    # report now resolves detection/validation/investigation/response (all
-    # present) and fails on the missing reporting capability.
-    result = runner.invoke(app, ["report", "T1110", "--input", str(input_path)])
-    assert result.exit_code == 2
-    assert "does not provide capability" in result.stdout
-    assert "reporting" in result.stdout
-    assert input_path.read_bytes() == before
 
     # learn takes no --input path; confirm it fails on its own via the same
-    # missing-capability path.
+    # missing-capability path (the only remaining unavailable capability).
     result = runner.invoke(app, ["learn", "T1110"])
     assert result.exit_code == 2
     assert "does not provide capability" in result.stdout
@@ -333,13 +553,14 @@ def test_scenarios_lists_t1110_capabilities() -> None:
     assert "t1110_brute_force" in result.stdout
     assert "brute-force" in result.stdout
     assert "T1110.003" in result.stdout
-    # T1110 advertises simulation, detection, investigation, response, and
-    # validation (reporting and learning are intentionally not yet provided).
+    # T1110 advertises simulation through validation and reporting (learning
+    # is intentionally not yet provided).
     assert "simulation" in result.stdout
     assert "detection" in result.stdout
     assert "investigation" in result.stdout
     assert "response" in result.stdout
     assert "validation" in result.stdout
+    assert "reporting" in result.stdout
     assert "T1078" in result.stdout
 
 

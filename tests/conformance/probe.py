@@ -355,6 +355,12 @@ def report_probe(
         unresolved_questions=result.unresolved_questions,
         plan=plan,
         suite=suite,
+        title="Probe Incident Report",
+        technique_label="Probe observation",
+        involved_entities_intro="Entities implicated by the probe finding.",
+        entity_roles=tuple(
+            "involved entity" for _ in result.involved_entities
+        ),
         executive_summary="A single finding consistent with possible misuse.",
         scope_summary="Covers the probe synthetic artefact only.",
         methodology=("Ran detection once.",),

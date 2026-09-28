@@ -14,7 +14,7 @@ one finding; this function does not rerun validation (see the CLI).
 
 from uuid import UUID, uuid5
 
-from duke.core import Finding
+from duke.core import Entity, Finding
 from duke.investigation import InvestigationResult
 from duke.reporting.result import IncidentReport
 from duke.response import ResponsePlan
@@ -27,6 +27,28 @@ _REPORT_NAMESPACE = UUID("1078d000-0000-4000-8000-000000000000")
 
 _TECHNIQUE_ID = "T1078"
 _TECHNIQUE_LABEL = "valid-account misuse (MITRE ATT&CK T1078)"
+_REPORT_TITLE = "T1078 Incident Report"
+_REPORT_TECHNIQUE_LABEL = "Valid Accounts"
+_INVOLVED_INTRO = (
+    "The account, unfamiliar device, resources, and external destination "
+    "implicated by the finding."
+)
+
+
+def _entity_role(entity: Entity) -> str:
+    """A deterministic role label for a T1078 entity (byte-identical to the
+    historical renderer labels)."""
+    roles = {
+        "alex.morgan@example.lab": "Account",
+        "device-unknown-442": "Unfamiliar device",
+        "workstation-017": "Known device (context)",
+        "source-repository": "Resource (repository)",
+        "repository/secrets/deployment-notes.txt": "Resource (restricted file)",
+        "privileged-access-service": "Resource (privileged access service)",
+        "workspace/export-20260922.zip": "Resource (archive)",
+        "203.0.113.80:443": "External destination",
+    }
+    return roles.get(entity.identifier, entity.entity_type.value)
 
 
 def _executive_summary(finding: Finding, suite: ValidationSuiteResult) -> str:
@@ -115,6 +137,10 @@ def report_t1078(
         generated_at=finding.created_at,
         finding=finding,
         involved_entities=result.involved_entities,
+        entity_roles=tuple(
+            _entity_role(entity) for entity in result.involved_entities
+        ),
+        involved_entities_intro=_INVOLVED_INTRO,
         timeline=result.timeline,
         evidence=result.evidence,
         confirmed_facts=result.confirmed_facts,
@@ -122,6 +148,8 @@ def report_t1078(
         unresolved_questions=result.unresolved_questions,
         plan=plan,
         suite=suite,
+        title=_REPORT_TITLE,
+        technique_label=_REPORT_TECHNIQUE_LABEL,
         executive_summary=_executive_summary(finding, suite),
         scope_summary=_scope_summary(artefact, finding),
         methodology=_METHODOLOGY,

@@ -7,7 +7,6 @@ descriptions, evidence, and timeline summaries cannot corrupt the table
 structure.
 """
 
-from duke.core import EntityType
 from duke.reporting.result import IncidentReport
 from duke.response import ResponseCategory
 
@@ -17,21 +16,6 @@ __all__ = ["render_incident_report"]
 def _escape(value: str) -> str:
     """Escape a string for safe use inside a Markdown table cell."""
     return value.replace("|", "\\|").replace("\r", " ").replace("\n", " ")
-
-
-def _role_for(identifier: str, entity_type: EntityType) -> str:
-    """A short human label for a known T1078 entity, else its type."""
-    roles = {
-        "alex.morgan@example.lab": "Account",
-        "device-unknown-442": "Unfamiliar device",
-        "workstation-017": "Known device (context)",
-        "source-repository": "Resource (repository)",
-        "repository/secrets/deployment-notes.txt": "Resource (restricted file)",
-        "privileged-access-service": "Resource (privileged access service)",
-        "workspace/export-20260922.zip": "Resource (archive)",
-        "203.0.113.80:443": "External destination",
-    }
-    return roles.get(identifier, entity_type.value)
 
 
 _CATEGORY_TITLES = {
@@ -70,7 +54,7 @@ def _render_actions(report: IncidentReport) -> str:
 def render_incident_report(report: IncidentReport) -> str:
     """Render an :class:`IncidentReport` as deterministic Markdown."""
     lines: list[str] = []
-    lines.append("# T1078 Incident Report")
+    lines.append(f"# {report.title}")
     lines.append("")
     lines.append(
         "> Advisory: this report reads synthetic observables and does not assert "
@@ -89,7 +73,9 @@ def render_incident_report(report: IncidentReport) -> str:
         "`finding.created_at`, not wall-clock export time): "
         f"{report.generated_at.isoformat()}"
     )
-    lines.append(f"- Technique: {report.finding.technique_id} (Valid Accounts)")
+    lines.append(
+        f"- Technique: {report.finding.technique_id} ({report.technique_label})"
+    )
     lines.append("")
 
     # 2. Executive summary
@@ -128,15 +114,12 @@ def render_incident_report(report: IncidentReport) -> str:
     # 5. Involved entities
     lines.append("## 5. Involved entities")
     lines.append("")
-    lines.append(
-        "The account, unfamiliar device, resources, and external destination "
-        "implicated by the finding."
-    )
+    lines.append(report.involved_entities_intro)
     lines.append("")
     lines.append("| Role | Type | Identifier | Display name |")
     lines.append("|---|---|---|---|")
-    for entity in report.involved_entities:
-        role = _role_for(entity.identifier, entity.entity_type)
+    for index, entity in enumerate(report.involved_entities):
+        role = report.entity_roles[index]
         lines.append(
             f"| {_escape(role)} | {_escape(entity.entity_type.value)} | "
             f"{_escape(entity.identifier)} | {_escape(entity.display_name or '')} |"

@@ -138,16 +138,18 @@ handling, and no remediation. All data is from the exported JSON artefact.
 - Unresolved questions require additional evidence that this slice does not
   attempt to collect.
 
-## Next: response, validation
+## Next: response, validation, reporting
 
 `duke respond T1110` consumes the same artefact and the evidence-led
 investigation result to propose a dry-run-only, approval-gated response plan,
-and `duke validate T1110` proves the detection → investigation → response
-pipeline with an ordered 19-case deterministic validation suite. See
-[the response documentation](../responses/T1110-safe-response.md) and
-[the validation documentation](../validation/T1110-detection-validation.md).
-Reporting and guided learning for T1110 are not yet implemented and fail
-safely with exit code 2 through the registry's missing-capability path. See
+`duke validate T1110` proves the detection → investigation → response pipeline
+with an ordered 19-case deterministic validation suite, and `duke report T1110`
+renders a deterministic advisory report aggregating all of it. See
+[the response documentation](../responses/T1110-safe-response.md),
+[the validation documentation](../validation/T1110-detection-validation.md),
+and [the reporting documentation](../reporting/T1110-incident-reporting.md).
+Guided learning for T1110 is not yet implemented and fails safely with exit
+code 2 through the registry's missing-capability path. See
 the [T1110 lab overview](../labs/T1110/overview.md).
 
 ## References
@@ -157,6 +159,7 @@ the [T1110 lab overview](../labs/T1110/overview.md).
 - [T1110 lab documentation](../labs/T1110/overview.md)
 - [T1110 response documentation](../responses/T1110-safe-response.md)
 - [T1110 validation documentation](../validation/T1110-detection-validation.md)
+- [T1110 reporting documentation](../reporting/T1110-incident-reporting.md)
 - [Architecture Decision Records](../decisions/)
 
 ## Last reviewed

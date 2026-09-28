@@ -435,17 +435,20 @@ def report(
         console.print(f"Events analysed: {len(artefact.events)}")
         return  # exit 0; no output file is created
 
-    # Run detection validation exactly once, before any report is built.
-    suite = validate_artefact(artefact)
-    if not suite.all_passed:
-        console.print("[red]Validation failed[/red]")
-        console.print("No report was generated.")
-        raise typer.Exit(code=1)
-
+    # Require exactly one finding before running validation: a benign result
+    # (zero findings) and an ambiguous multi-finding result both skip
+    # validation and downstream execution entirely.
     if len(findings) != 1:
         console.print(
             f"[red]Expected exactly one finding, got {len(findings)}[/red]"
         )
+        console.print("No report was generated.")
+        raise typer.Exit(code=1)
+
+    # Run detection validation exactly once, before any report is built.
+    suite = validate_artefact(artefact)
+    if not suite.all_passed:
+        console.print("[red]Validation failed[/red]")
         console.print("No report was generated.")
         raise typer.Exit(code=1)
 

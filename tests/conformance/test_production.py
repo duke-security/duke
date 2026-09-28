@@ -73,7 +73,7 @@ def test_cli_resolves_the_builtin_scenario():
 
 def test_t1110_metadata_agrees_via_generic_checks():
     """The partial built-in (simulation + detection + investigation +
-    response + validation) passes the same generic metadata and
+    response + validation + reporting) passes the same generic metadata and
     registration-shape checks as T1078 and the probe. It is deliberately not
     part of the full-lifecycle SCENARIO_PAIRS; only the generic checks apply
     to this partial scenario."""

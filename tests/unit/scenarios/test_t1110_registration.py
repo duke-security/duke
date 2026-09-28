@@ -5,6 +5,7 @@ import pytest
 from duke.core import Scenario
 from duke.detection import detect_t1110
 from duke.investigation import investigate_t1110
+from duke.reporting import report_t1110
 from duke.response import plan_t1110_response
 from duke.scenarios import ScenarioCapability, UnknownScenarioError, has_capability
 from duke.scenarios.builtins import (
@@ -24,9 +25,9 @@ def test_registration_core_metadata() -> None:
     assert reg.aliases == ("brute-force", "T1110.003")
 
 
-def test_registration_provides_full_lifecycle_through_validation() -> None:
-    """This slice provides simulation, detection, investigation, response, and
-    validation; reporting and learning remain intentionally unimplemented."""
+def test_registration_provides_lifecycle_through_reporting() -> None:
+    """This slice provides simulation through reporting; learning remains
+    intentionally unimplemented."""
     reg = t1110_registration()
     assert has_capability(reg, ScenarioCapability.SIMULATION)
     assert reg.capabilities.simulation is generate_t1110_simulation
@@ -38,11 +39,9 @@ def test_registration_provides_full_lifecycle_through_validation() -> None:
     assert reg.capabilities.response is plan_t1110_response
     assert has_capability(reg, ScenarioCapability.VALIDATION)
     assert reg.capabilities.validation is validate_t1110
-    for capability in (
-        ScenarioCapability.REPORTING,
-        ScenarioCapability.LEARNING,
-    ):
-        assert not has_capability(reg, capability), capability
+    assert has_capability(reg, ScenarioCapability.REPORTING)
+    assert reg.capabilities.reporting is report_t1110
+    assert not has_capability(reg, ScenarioCapability.LEARNING)
 
 
 def test_builtin_resolution_forms_resolve_to_same_registration() -> None:

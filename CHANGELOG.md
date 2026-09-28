@@ -135,6 +135,40 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
   detector's documented "earliest window start" tie-break matches its code.
   Includes unit, mutation, pipeline, CLI, conformance, determinism,
   immutability, no-I/O, and failure-reporting tests.
+- Deterministic **T1110 incident reporting** (`duke report T1110`).
+  `report_t1110(artefact, finding, result, plan, suite)` aggregates the
+  existing workflow data into a typed `IncidentReport` and renders it with the
+  shared, scenario-agnostic renderer as the same 12-section Markdown structure
+  used by T1078. The report establishes a deterministic identity
+  (`report_id = uuid5(1110e000-…, f"report:{finding.id}")`,
+  `generated_at = finding.created_at`; no wall-clock/randomness). Entity roles
+  are derived safely and deterministically — source from the unique
+  finding-referenced actor, sprayed-account only for finding-scoped
+  `EntityType.ACCOUNT` entities, a uniquely-resolved success-associated
+  account noted as `sprayed account; later success observed`, contextual
+  authentication services never labelled sprayed accounts, and the neutral
+  `involved entity` fallback on ambiguity — never from fixed identifiers,
+  names, IPs, order, or literals. The generic renderer was minimally
+  generalized (report-carried `title`, `technique_label`, `entity_roles`
+  with index-aligned coverage validation, and `involved_entities_intro`),
+  with **T1078 report bytes preserved byte-for-byte** (verified against a
+  pre-refactor golden fixture). Report export is **atomic**: writes a unique
+  temporary file, then atomically replaces the destination only on success,
+  cleaning up on failure and never leaving a partial file; `--force`
+  overwrites. The CLI report flow requires exactly one finding and runs the
+  registered validation capability **exactly once** before constructing or
+  exporting a report; zero-finding and multi-finding inputs short-circuit to
+  0/1 respectively without validation or downstream execution, and no file is
+  written on validation failure, wrong finding count, render failure, missing
+  `--force`, or malformed input. Narrative is cautious throughout (suspected
+  password-spraying behaviour, possible credential validation, no confirmed
+  compromise/credential-theft/attribution/intrusion/impact); the finding title
+  is shown only as an analytic label, confirmed facts stay distinct from
+  assessments, incomplete-context wording is preserved, and rollback rendering
+  never deletes evidence, restores old credentials, or weakens MFA. Includes
+  model, aggregation, renderer, export (atomic-failure-injection), CLI,
+  registry, conformance, determinism, cautious-language, escaping, rollback,
+  input-immutability, and T1078 golden-byte tests.
 - Packaged YAML loading and validation for built-in Duke scenarios.
 - Safe deterministic simulation for MITRE ATT&CK T1078 Valid Accounts,
   producing eight synthetic entities and eight normalized events.
