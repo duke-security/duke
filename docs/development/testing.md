@@ -71,17 +71,17 @@ T1078 scenario and an independent `probe.py` scenario, and an AST-based
 import guard in `test_production.py` proves the reusable sources never
 import a `duke.*.t1078` implementation module.
 
-The second built-in scenario, T1110 (simulation + detection + investigation +
-response + validation + reporting, modelling T1110.003 Password Spraying), is
-covered by the **generic** conformance checks (metadata, registration,
-registry, simulation, artefact, relationships, the deterministic detection
-check, the declared/dependency checks, the deterministic safe-response check
-over the derived plan, the deterministic all-passing validation check, and —
-now that reporting is provided — the deterministic reporting check returning
-an `IncidentReport`) directly in `test_production.py`. Because it does not yet
-provide the full lifecycle (guided learning), it is deliberately **not** added
-to the full-lifecycle `SCENARIO_PAIRS`; only the learning conformance check
-reports a passing "not declared" skip for it.
+The second built-in scenario, T1110 (now providing all seven capabilities:
+simulation, detection, investigation, response, validation, reporting, and
+learning, modelling T1110.003 Password Spraying) is a **full-lifecycle**
+scenario: it is registered in the full-lifecycle fixture set
+(`tests/conformance/builtin_pairs.py` alongside T1078 and the independent
+probe) and is exercised by every generic conformance check — declaration,
+dependency, registry, simulation, artefact, relationships, detection,
+safe-response, validation, reporting, and learning. The production
+`builtin_registry()` still contains exactly T1078 and T1110 (never the probe),
+and the conformance fixture registry count (3: T1078, T1110, probe) is
+distinct from that production count, as asserted by tests.
 
 The scenario-registry tests (`tests/unit/scenarios/`) cover the typed
 registry model — registration validation, case-insensitive resolution by

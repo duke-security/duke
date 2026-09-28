@@ -50,8 +50,22 @@ def test_resolution_is_case_insensitive_and_disjoint(isolated_registry):
 
 
 def test_registry_without_duplicates(isolated_registry):
+    """The full-lifecycle conformance fixture registry holds T1078, T1110, and
+    the independent probe (this is a test fixture, not the production built-in
+    registry)."""
     registry, _ = isolated_registry
-    assert len(registry.scenarios()) == 2
+    assert len(registry.scenarios()) == 3
+
+
+def test_production_builtin_registry_holds_only_t1078_and_t1110():
+    """The production built-in registry must never contain the probe; its count
+    is distinct from the conformance fixture registry count above."""
+    from duke.scenarios.builtins import builtin_registry
+
+    registry = builtin_registry()
+    ids = [registration.technique_id for registration in registry.scenarios()]
+    assert ids == ["T1078", "T1110"]
+    assert "T9999" not in ids
 
 
 def test_unknown_scenario_raises(isolated_registry):

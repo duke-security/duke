@@ -105,33 +105,18 @@ for the current milestone.
   depend on a `duke.*.t1078` implementation module. Conformance lives under
   `tests/` only — no runtime conformance code in the `duke` package — and is
   documented under `docs/scenarios/`
-- **T1110 — Brute Force** simulation/detection/investigation/response/
-  validation slice (`duke simulate T1110` / `duke detect T1110` /
-  `duke investigate T1110` / `duke respond T1110` / `duke validate T1110`): a
-  second production scenario providing **simulation, detection,
-  investigation, response planning, and validation**. It reproducibly models
-  the observable telemetry of sub-technique **T1110.003 Password Spraying** —
-  a benign baseline authentication, six evenly-spaced failed authentications
-  against distinct accounts from a single external source, and one later
-  success. It never performs real authentication, stores or implies a
-  credential value, or labels any account as compromised. `duke detect T1110`
-  reports the spray pattern as a deterministic finding (a sliding 30-minute
-  window requiring at least five distinct failed accounts from one source; a
-  later success is credited only as supporting evidence; compromise is never
-  assumed). `duke investigate T1110` produces an evidence-led timeline,
-  cautious confirmed facts, and unresolved questions without ever claiming
-  compromise or attribution. `duke respond T1110` proposes a dry-run-only,
-  approval-gated response plan with evidence-led targets (the source and a
-  verified success-associated account), conditional and proportionate source
-  containment, and conservative rollback; it never executes anything.
-  `duke validate T1110` proves the pipeline with an ordered 19-case,
-  deterministic validation suite (19/19 passing on the canonical corpus),
-  never mutating the source artefact or input file. `duke report T1110`
-  renders a deterministic 12-section advisory Markdown report (atomic export,
-  validation-once, exactly-one-finding) reusing the shared renderer, keeping
-  T1078 report bytes intact. Only the T1110 **guided-learning** capability is
-  still unavailable (`duke learn T1110` exits 2); it is intentionally
-  **planned**
+- **T1110 — Brute Force** — a second production scenario now providing the
+  **full seven-capability lifecycle** (`duke simulate/detect/investigate/
+  respond/validate/report/learn T1110`), joining the full-lifecycle conformance
+  fixture set. It reproducibly models the observable telemetry of sub-technique
+  **T1110.003 Password Spraying** and never performs real authentication,
+  stores or implies a credential value, or labels any account as compromised.
+  `duke learn T1110` provides a defensive 11-step guided learning path.
+  Broader future work — additional scenarios, adapters, a GUI/API, progress
+  tracking, auto-grading, and real response execution — remains **planned**
+- Documentation foundation (this roadmap, README, CONTRIBUTING,
+  architecture overview, development guides, initial ADRs, and the guided
+  learning guide under `docs/learning/`)
 - Documentation foundation (this roadmap, README, CONTRIBUTING,
   architecture overview, development guides, initial ADRs, and the guided
   learning guide under `docs/learning/`)
@@ -145,8 +130,8 @@ below distinguishes that foundation from the capabilities still planned.
 |---|---|
 | `core` | Domain models implemented; shared interfaces and configuration planned |
 | `scenarios` | Static built-in scenario registry implemented (`duke.scenarios`), registering T1078 and T1110 once with typed capabilities and metadata loaders; all CLI commands resolve scenarios and dispatch to capabilities through the registry. Dynamic/plugin discovery and configuration-driven registries remain planned |
-| `cli` | Typer-based CLI implemented with `version`, `scenarios`, and all seven T1078 lifecycle commands plus T1110 simulation, detection, investigation, response, validation, and reporting; commands resolve scenarios and their capabilities through the static built-in scenario registry (`duke.scenarios`), so additional scenarios are addable by registration rather than CLI edits, and missing capabilities fail clearly with exit code 2 |
-| `learning` | T1078 guided learning path implemented (`duke learn T1078`) with typed, metadata-only learning models and deterministic rendering; learner-progress tracking, broader improve→retest learning workflows, further lesson content, and a T1110 learning path remain planned |
+| `cli` | Typer-based CLI implemented with `version`, `scenarios`, and all seven T1078 lifecycle commands plus all seven T1110 lifecycle commands (simulation, detection, investigation, response, validation, reporting, learning); commands resolve scenarios and their capabilities through the static built-in scenario registry (`duke.scenarios`), so additional scenarios are addable by registration rather than CLI edits, and missing capabilities fail clearly with exit code 2 |
+| `learning` | T1078 and T1110 guided learning paths implemented (`duke learn T1078`/`duke learn T1110`) with typed, metadata-only learning models and deterministic rendering; learner-progress tracking, broader improve→retest learning workflows, and further lesson content remain planned |
 | `simulation` | T1078 and T1110 safe deterministic simulations implemented; additional scenarios and mutation remain planned |
 | `telemetry` | Normalized event generation, JSON export, and artefact ingestion implemented; source health and broader ingestion remain planned |
 | `detection` | Deterministic T1078 detection implemented with explainable weighted confidence; deterministic T1110 password-spraying detection implemented via a sliding-window rule (hard gate of ≥5 distinct failed accounts in 30 minutes, later success credited only as supporting evidence, never assuming compromise, earliest-starting window tie-break); deterministic T1110 detection validation (`duke validate T1110`) with a fixed ordered 19-case catalogue over immutable in-memory mutations and an exhaustiveness test; T1078 detection validation (`duke validate`) with controlled in-memory mutations and an explicit case suite; precision/recall measurement, lifecycle tuning, and additional rules remain planned |
@@ -174,10 +159,9 @@ techniques, always built and documented as complete vertical slices
 rather than partial, cross-cutting layers. The scenario catalogue is
 metadata-driven and is not hardcoded into the CLI.
 
-New scenarios are added as small vertical slices. T1110 progresses slice by
-slice: it began as a **simulation-only** slice, added **detection**,
-**investigation**, **response planning**, **validation**, and now **incident
-reporting**, while its remaining lifecycle capability (guided learning) is
-intentionally not yet provided. Each step proves the multi-scenario foundation
-and the registry's safe missing-capability behaviour before the rest of the
-T1110 vertical is built.
+New scenarios are added as small vertical slices. T1110 is now a complete
+seven-capability vertical: it began as a **simulation-only** slice and added
+**detection**, **investigation**, **response planning**, **validation**,
+**incident reporting**, and finally **guided learning**, joining the
+full-lifecycle conformance fixture set. Each step proved the multi-scenario
+foundation and the registry's safe missing-capability behaviour.

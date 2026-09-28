@@ -94,7 +94,10 @@ will ever support — see [ROADMAP.md](ROADMAP.md).
   canonical corpus), never mutating the source artefact or input file.
   `duke report T1110` renders a deterministic 12-section advisory Markdown
   report (atomic export, validation-once, exactly-one-finding) reusing the
-  shared renderer. Only T1110 **guided learning** remains unavailable (exit 2).
+  shared renderer. `duke learn T1110` provides an 11-step defensive guided
+  learning path. T1110 now provides **all seven** registered lifecycle
+  capabilities (simulation, detection, investigation, response, validation,
+  reporting, learning) and joins the full-lifecycle conformance fixture set.
 - Reusable, test-only scenario-conformance infrastructure: the same
   checks validate both the built-in T1078 scenario and an independent
   probe scenario, with an AST guard proving the conformance sources stay
@@ -109,9 +112,11 @@ normalized telemetry, JSON export, CLI commands, behaviour-based
 detection, evidence-led investigation, safe dry-run response,
 deterministic detection validation, deterministic incident reporting, a
 T1078 guided learning path, and a static scenario registry are
-implemented. The T1110 scenario currently provides the full lifecycle through
-reporting (simulation, detection, investigation, response, validation,
-reporting); its guided-learning capability is **planned**. The full learning component (additional scenarios and their
+implemented. The T1110 scenario now provides the full seven-capability
+lifecycle (simulation, detection, investigation, response, validation,
+reporting, learning) and joins the full-lifecycle conformance fixture set;
+broader future work such as additional scenarios, adapters, a GUI/API, and
+real execution remains planned. The full learning component (additional scenarios and their
 learning paths, learner-progress tracking, broader improve → retest
 learning workflows, further lesson content), a dynamic/plugin scenario
 registry, additional ATT&CK scenarios, and vendor adapters remain
@@ -120,6 +125,7 @@ registry, additional ATT&CK scenarios, and vendor adapters remain
 See [the T1078 guided learning guide](docs/learning/T1078-guided-learning.md),
 [the T1078 lab documentation](docs/labs/T1078/overview.md),
 [the T1110 lab documentation](docs/labs/T1110/overview.md),
+[the T1110 guided learning guide](docs/learning/T1110-guided-learning.md),
 [the architecture overview](docs/architecture/overview.md), and
 [ROADMAP.md](ROADMAP.md) for details.
 
@@ -157,6 +163,8 @@ duke report T1110 \
   --output reports/t1110-incident-report.md
 duke learn T1078
 duke learn T1078 --step detection
+duke learn T1110
+duke learn T1110 --step detection
 duke scenarios
 ```
 
@@ -176,6 +184,7 @@ duke scenarios
 - [docs/validation/T1110-detection-validation.md](docs/validation/T1110-detection-validation.md) — the T1110 validation suite
 - [docs/reporting/T1110-incident-reporting.md](docs/reporting/T1110-incident-reporting.md) — the T1110 incident report
 - [docs/learning/T1078-guided-learning.md](docs/learning/T1078-guided-learning.md) — the guided learning path
+- [docs/learning/T1110-guided-learning.md](docs/learning/T1110-guided-learning.md) — the T1110 guided learning path
 - [docs/development/environment-setup.md](docs/development/environment-setup.md) — local setup
 - [docs/development/testing.md](docs/development/testing.md) — running the test suite
 - [docs/decisions/](docs/decisions/) — Architecture Decision Records

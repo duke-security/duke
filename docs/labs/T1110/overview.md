@@ -2,16 +2,19 @@
 
 ## Status
 
-**Full lifecycle through reporting.** This lab currently implements the safe,
+**Complete, full-lifecycle Duke scenario.** This lab implements the safe,
 deterministic **simulation** of ATT&CK T1110 — Brute Force (sub-technique
 **T1110.003 Password Spraying**), a deterministic, explainable **detection**
 rule (`duke detect T1110`), an evidence-led **investigation**
 (`duke investigate T1110`), safe, dry-run **response planning**
 (`duke respond T1110`), deterministic **detection validation**
-(`duke validate T1110`, 19 cases), and deterministic **incident reporting**
-(`duke report T1110`). Guided learning for T1110 is **intentionally not yet
-implemented**; that lifecycle command fails safely with exit code 2 through the
-registry's missing-capability path.
+(`duke validate T1110`, 19 cases), deterministic **incident reporting**
+(`duke report T1110`), and a defensive **guided learning** path
+(`duke learn T1110`, 11 steps). T1110 now provides all seven registered
+lifecycle capabilities. Broader future work — additional scenarios, adapters,
+a GUI/API, progress tracking, auto-grading, and real response execution —
+remains planned; T1110's completion does not mean the entire Duke platform
+roadmap is finished.
 
 ## Purpose
 
@@ -319,16 +322,21 @@ On the canonical corpus this produces the 12-section T1110 report and exits 0.
 See [the reporting documentation](../../reporting/T1110-incident-reporting.md)
 for the report-candidate flow, exit codes, entity roles, and atomic export.
 
-## Intentionally not implemented yet
+## Guided learning
 
-The following T1110 lifecycle command fails **safely with exit code 2**
-(guided learning is the one capability T1110 does not yet provide):
+`duke learn T1110` walks a beginner through the full defensive workflow as an
+ordered, deterministic 11-step path while teaching Python. It is metadata-only
+and never executes commands, writes files, grades work, or persists progress.
 
 ```bash
 duke learn T1110
+duke learn T1110 --step detection
+duke learn T1110 --step final-challenge
 ```
 
-Guided learning for T1110 is a planned follow-on slice.
+Exit codes: `0` — rendered; `2` — unknown step or scenario. See
+[the guided learning documentation](../../learning/T1110-guided-learning.md)
+for the step catalogue and safety boundaries.
 
 ## Limitations
 
@@ -359,6 +367,7 @@ Guided learning for T1110 is a planned follow-on slice.
 - [T1110 response documentation](../../responses/T1110-safe-response.md)
 - [T1110 validation documentation](../../validation/T1110-detection-validation.md)
 - [T1110 reporting documentation](../../reporting/T1110-incident-reporting.md)
+- [T1110 guided learning documentation](../../learning/T1110-guided-learning.md)
 - [scenario-registry.md](../../scenarios/scenario-registry.md)
 - [scenario-authoring.md](../../scenarios/scenario-authoring.md)
 - [scenario-conformance.md](../../scenarios/scenario-conformance.md)

@@ -169,6 +169,28 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
   model, aggregation, renderer, export (atomic-failure-injection), CLI,
   registry, conformance, determinism, cautious-language, escaping, rollback,
   input-immutability, and T1078 golden-byte tests.
+- Deterministic, defensive **T1110 guided learning** (`duke learn T1110`). An
+  11-step, metadata-only learning path that teaches Python through Duke's
+  T1110.003 Password Spraying workflow, reusing the six existing learning
+  models unchanged and a one-line `render_path` generalization
+  (`path.technique_id` instead of a literal `T1078`, byte-identical for T1078).
+  Content is strictly defensive — it never teaches real spraying, credential
+  acquisition, evasion, target discovery, or offensive tools, and it always
+  distinguishes Duke's synthetic simulation from a real authentication attempt.
+  Every step carries learning objectives, Python concepts, real command
+  examples, an explanation, a hands-on exercise with a deterministic expected
+  result, ordered hints, a self-check knowledge check, and an explicit safety
+  note. Taught numbers are verified against the live public pipeline by tests
+  to prevent documentation drift; snippets use only documented public imports
+  (never private or `duke.*.t1110` implementation modules); Rich-sensitive
+  Python renders literally; and the package has no subprocess, network,
+  filesystem-write, grading, or persistence code. With learning registered,
+  T1110 now provides all seven registered capabilities and joins the
+  full-lifecycle conformance fixture set (T1078, T1110, and the independent
+  probe), while production `builtin_registry()` still contains exactly T1078
+  and T1110. Includes model, catalogue, render, CLI, public-import, fidelity,
+  safety, side-effect, determinism, registry, conformance, and T1078
+  byte-output tests.
 - Packaged YAML loading and validation for built-in Duke scenarios.
 - Safe deterministic simulation for MITRE ATT&CK T1078 Valid Accounts,
   producing eight synthetic entities and eight normalized events.

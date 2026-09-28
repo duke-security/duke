@@ -15,6 +15,7 @@ from duke.learning.models import (
 )
 from duke.learning.render import render_path, render_step
 from duke.learning.t1078 import T1078_LEARNING_PATH, t1078_learning_path
+from duke.learning.t1110 import T1110_LEARNING_PATH, t1110_learning_path
 
 __all__ = [
     "Exercise",
@@ -24,7 +25,9 @@ __all__ = [
     "LearningPath",
     "LearningStep",
     "T1078_LEARNING_PATH",
+    "T1110_LEARNING_PATH",
     "render_path",
     "render_step",
     "t1078_learning_path",
+    "t1110_learning_path",
 ]

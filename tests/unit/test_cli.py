@@ -524,24 +524,58 @@ def test_report_t1110_missing_input_is_exit_one(tmp_path: Path) -> None:
     assert not output_path.exists()
 
 
-def test_t1110_unsupported_lifecycle_capabilities_exit_2(
-    tmp_path: Path,
-) -> None:
-    """Commands whose capabilities T1110 does not yet provide fail with exit 2
-    through the missing-capability path before reading any input file."""
-    input_path = tmp_path / "t1110.json"
-    simulated = runner.invoke(
-        app,
-        ["simulate", "T1110", "--output", str(input_path)],
-    )
-    assert simulated.exit_code == 0
-
-    # learn takes no --input path; confirm it fails on its own via the same
-    # missing-capability path (the only remaining unavailable capability).
+def test_learn_t1110_lists_path_and_steps() -> None:
+    """duke learn T1110 renders the ordered overview, exit 0."""
     result = runner.invoke(app, ["learn", "T1110"])
+
+    assert result.exit_code == 0
+    assert "T1110" in result.stdout
+    assert "Steps" in result.stdout
+    for step_id in (
+        "orientation",
+        "collections",
+        "typed-models",
+        "datetime",
+        "functions-modules",
+        "detection",
+        "investigation",
+        "response",
+        "validation",
+        "reporting",
+        "final-challenge",
+    ):
+        assert step_id in result.stdout
+
+
+def test_learn_t1110_step_renders_full_lesson() -> None:
+    for step_id in (
+        "detection",
+        "investigation",
+        "response",
+        "validation",
+        "reporting",
+        "final-challenge",
+    ):
+        result = runner.invoke(app, ["learn", "T1110", "--step", step_id])
+        assert result.exit_code == 0, step_id
+        assert "Objective:" in result.stdout, step_id
+        assert "Command examples:" in result.stdout, step_id
+        assert "Exercise:" in result.stdout, step_id
+        assert "Knowledge check:" in result.stdout, step_id
+        assert "Reference answer (self-check):" in result.stdout, step_id
+        assert "Safety note:" in result.stdout, step_id
+
+
+def test_learn_t1110_unknown_step_exits_2() -> None:
+    result = runner.invoke(app, ["learn", "T1110", "--step", "not-a-step"])
     assert result.exit_code == 2
-    assert "does not provide capability" in result.stdout
-    assert "learning" in result.stdout
+    assert "Unknown step" in result.stdout
+
+
+def test_learn_t1110_unsupported_scenario_exits_2() -> None:
+    result = runner.invoke(app, ["learn", "T9999"])
+    assert result.exit_code == 2
+    assert "Unsupported technique" in result.stdout
 
 
 def test_scenarios_lists_t1110_capabilities() -> None:

@@ -20,7 +20,7 @@ def render_path(path: LearningPath) -> str:
         f"{path.technique_id} — {path.title}",
         path.description,
         "",
-        "Steps (run `duke learn T1078 --step <id>` for one lesson):",
+        f"Steps (run `duke learn {path.technique_id} --step <id>` for one lesson):",
         "",
     ]
     for step in path.ordered_steps:

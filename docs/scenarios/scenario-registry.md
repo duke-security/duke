@@ -127,9 +127,9 @@ T1078 resolves all of these to the same registration:
 - `t1078_valid_accounts` (stable slug)
 - `valid-accounts` (alias)
 
-T1110 (Brute Force), a **full-lifecycle-through-reporting** slice
-(simulation/detection/investigation/response/validation/reporting) modelling
-sub-technique T1110.003 Password Spraying,
+T1110 (Brute Force), a **full-lifecycle** scenario
+(simulation/detection/investigation/response/validation/reporting/learning)
+modelling sub-technique T1110.003 Password Spraying,
 resolves:
 
 - `T1110` / `t1110` (technique ID, case-insensitive)
@@ -170,14 +170,14 @@ To add a new scenario (e.g. `T9999`):
    entity/event/finding counts and technique in
    `tests/conformance/builtin_pairs.py` so the reusable checks run over it.
    This is optional for production behaviour but required to prove the
-   scenario conforms. A **partial** scenario that is not yet full-lifecycle
-   (like the current T1110 slice, which provides everything through reporting
-   but still lacks guided learning) does **not** belong in `builtin_pairs.py`
-   (which
-   the full-lifecycle conformance test iterates); instead it is covered by
+   scenario conforms. A scenario joins the **full-lifecycle** fixture set in
+   `builtin_pairs.py` (which the full-lifecycle conformance test iterates)
+   only when it provides all seven capabilities. Before it is full-lifecycle
+   (e.g. T1078 before learning, or a partial slice), it is instead covered by
    the *generic* metadata, registration, registry, simulation, artefact,
    relationship, and detection checks directly in
-   `tests/conformance/test_production.py`.
+   `tests/conformance/test_production.py`. T1110 now provides all seven
+   capabilities and is part of the full-lifecycle fixture set.
 5. **Do not touch the CLI** — `duke scenarios`, resolution, and every
    command pick the scenario up automatically through the registry.
 

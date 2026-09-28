@@ -148,8 +148,8 @@ renders a deterministic advisory report aggregating all of it. See
 [the response documentation](../responses/T1110-safe-response.md),
 [the validation documentation](../validation/T1110-detection-validation.md),
 and [the reporting documentation](../reporting/T1110-incident-reporting.md).
-Guided learning for T1110 is not yet implemented and fails safely with exit
-code 2 through the registry's missing-capability path. See
+`duke learn T1110` provides an 11-step defensive guided learning path — see
+[the learning documentation](../learning/T1110-guided-learning.md). See
 the [T1110 lab overview](../labs/T1110/overview.md).
 
 ## References
@@ -160,6 +160,7 @@ the [T1110 lab overview](../labs/T1110/overview.md).
 - [T1110 response documentation](../responses/T1110-safe-response.md)
 - [T1110 validation documentation](../validation/T1110-detection-validation.md)
 - [T1110 reporting documentation](../reporting/T1110-incident-reporting.md)
+- [T1110 learning documentation](../learning/T1110-guided-learning.md)
 - [Architecture Decision Records](../decisions/)
 
 ## Last reviewed

@@ -1,18 +1,20 @@
 """Scenario/expectation pairs shared by conformance tests.
 
-Brings together each scenario under conformance (the built-in T1078 and the
-independent probe) with the explicit expectations their authors declare for
-them. Importing ``duke.scenarios.builtins`` here is the intended composition
-point: this is the one place conformance touches the production built-ins,
-so the reusable ``checks``, ``fixture``, and ``probe`` modules stay
-implementation-independent.
+Brings together each scenario under conformance (the built-in T1078 and T1110
+— both now full-lifecycle — and the independent probe) with the explicit
+expectations their authors declare for them. Importing
+``duke.scenarios.builtins`` here is the intended composition point: this is
+the one place conformance touches the production built-ins, so the reusable
+``checks``, ``fixture``, and ``probe`` modules stay implementation-
+independent. This fixture list is *not* the production ``builtin_registry()``
+count; the probe is test-only.
 """
 
 from typing import TypedDict
 
 from tests.conformance.probe import probe_registration
 
-from duke.scenarios.builtins import t1078_registration
+from duke.scenarios.builtins import t1078_registration, t1110_registration
 from duke.scenarios.registry import ScenarioRegistration
 
 
@@ -37,6 +39,16 @@ SCENARIO_PAIRS: tuple[
             expected_event_count=8,
             expected_finding_count=1,
             expected_finding_technique="T1078",
+        ),
+    ),
+    (
+        "T1110",
+        t1110_registration(),
+        dict(
+            expected_entity_count=10,
+            expected_event_count=8,
+            expected_finding_count=1,
+            expected_finding_technique="T1110",
         ),
     ),
     (
