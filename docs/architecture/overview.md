@@ -14,6 +14,13 @@ design. This separation keeps every stage independently testable and
 lets learners see how a real security-engineering workflow is
 composed, rather than experiencing it as a single opaque tool.
 
+Two companion documents go deeper and are the best starting points:
+
+- [components.md](components.md) — the component diagram and each
+  component's role and implementation status.
+- [lifecycle.md](lifecycle.md) — the pedagogy lifecycle versus the
+  concrete data flow the CLI implements today.
+
 ## Current implementation
 
 The following foundations are implemented:
@@ -21,33 +28,34 @@ The following foundations are implemented:
 - **`core`** — vendor-neutral models for entities, security events,
   evidence, findings, incidents, response actions, and scenarios.
 - **`cli`** — Typer/Rich commands for help, version information, the
-  `scenarios` listing, and all seven T1078 lifecycle commands. Commands
-  resolve scenarios and dispatch to capabilities through the static
-  built-in registry rather than hardcoding T1078.
+  `scenarios` listing, and all seven lifecycle commands for both the T1078
+  and T1110 scenarios. Commands resolve scenarios and dispatch to
+  capabilities through the static built-in registry rather than hardcoding
+  a technique.
 - **`scenarios`** — a static built-in scenario registry that registers
-  T1078 once (`ScenarioRegistration`) with a lazy metadata loader and
+  T1078 and T1110 (`ScenarioRegistration`) with a lazy metadata loader and
   seven typed optional capabilities, plus packaged YAML definitions
   loaded and validated as typed `Scenario` models. The CLI resolves
   scenarios and dispatches to capabilities through this registry.
-- **`simulation`** — a deterministic and safe T1078 event generator.
-- **`telemetry`** — normalized synthetic events and structured JSON
-  export with overwrite protection.
-- **`detection`** — deterministic, behaviour-based T1078 detection that
-  scores an actor's event sequence with an explainable weighted
-  confidence value and emits vendor-neutral `Finding` objects. Artefact
-  loading and validation live in `telemetry` and are re-exported here for
-  compatibility.
-- **`telemetry`** — normalized artefact ingestion: loads validated
+- **`simulation`** — deterministic and safe T1078 and T1110 event
+  generators.
+- **`telemetry`** — normalized synthetic events, structured JSON export
+  with overwrite protection, and artefact ingestion that loads validated
   `Entity` and `SecurityEvent` collections from exported JSON.
-- **`investigation`** — evidence-led T1078 investigation that consumes an
-  existing `Finding` and produces a chronological timeline, per-event
-  evidence, involved entities, confirmed facts, analyst assessments, and
-  unresolved questions.
-- **`response`** — dry-run-only T1078 response planning that correlates a
-  finding into a deterministic preliminary incident and proposes
-  approval-gated actions grouped into containment, evidence preservation,
-  investigation follow-up, and recovery.
-- **`validation`** — deterministic validation of the T1078 detection →
+- **`detection`** — deterministic, behaviour-based detection (T1078 and
+  T1110) that scores an actor's event sequence with an explainable
+  weighted confidence value and emits vendor-neutral `Finding` objects.
+  Artefact loading and validation live in `telemetry` and are re-exported
+  here for compatibility.
+- **`investigation`** — evidence-led T1078 and T1110 investigation that
+  consumes an existing `Finding` and produces a chronological timeline,
+  per-event evidence, involved entities, confirmed facts, analyst
+  assessments, and unresolved questions.
+- **`response`** — dry-run-only T1078 and T1110 response planning that
+  correlates a finding into a deterministic preliminary incident and
+  proposes approval-gated actions grouped into containment, evidence
+  preservation, investigation follow-up, and recovery.
+- **`validation`** — deterministic validation of the detection →
   investigation → response pipeline that reruns the workflow against
   controlled in-memory mutations of an artefact, never modifying it.
 - **`reporting`** — deterministic, advisory incident reporting that
@@ -55,29 +63,30 @@ The following foundations are implemented:
   and validation suite into a byte-deterministic Markdown report, exported
   with overwrite protection.
 - **`learning`** — guided learning paths: typed, metadata-only learning
-  models and deterministic rendering (`duke learn T1078`) that teach Python
-  through Duke's implemented T1078 workflow without executing commands,
-  modifying learner files, grading, or persisting progress.
-- **`labs`** — documentation for the implemented T1078 simulation,
-  detection, investigation, response, validation, reporting, and guided
-  learning stages.
+  models and deterministic rendering (`duke learn T1078`,
+  `duke learn T1110`) that teach Python through Duke's implemented
+  workflow without executing commands, modifying learner files, grading,
+  or persisting progress.
+- **`labs`** — documentation for the implemented T1078 and T1110
+  simulation, detection, investigation, response, validation, reporting,
+  and guided learning stages.
 
 ## Component status
 
 | Component | Current status and responsibility |
 |---|---|
 | `core` | Domain models implemented; shared interfaces and configuration remain planned |
-| `scenarios` | Static built-in scenario registry implemented, registering T1078 once with typed capabilities and a lazy metadata loader; dynamic/plugin discovery and configuration-driven registries remain planned |
-| `cli` | Typer/Rich CLI implemented with `version`, `scenarios`, and all seven T1078 lifecycle commands; commands resolve scenarios and dispatch to capabilities through the `scenarios` registry |
-| `learning` | Planned Python lessons, exercises, and challenges |
-| `simulation` | T1078 deterministic simulation implemented; additional scenarios and mutation planned |
+| `scenarios` | Static built-in scenario registry implemented, registering T1078 and T1110 with typed capabilities and a lazy metadata loader; dynamic/plugin discovery and configuration-driven registries remain planned |
+| `cli` | Typer/Rich CLI implemented with `version`, `scenarios`, and all seven lifecycle commands for both T1078 and T1110; commands resolve scenarios and dispatch to capabilities through the `scenarios` registry |
+| `learning` | Guided learning paths implemented (`duke learn T1078`, `duke learn T1110`); learner-progress tracking and further learning content remain planned |
+| `simulation` | T1078 and T1110 deterministic simulation implemented; additional scenarios and mutation planned |
 | `telemetry` | Normalized event generation, JSON export, and artefact ingestion implemented; source-health monitoring and broader ingestion planned |
-| `detection` | Deterministic T1078 detection implemented with explainable weighted confidence; detection validation implemented (`duke validate`); precision/recall, tuning, and additional rules planned |
-| `investigation` | Evidence-led T1078 investigation implemented (`duke investigate`); hypothesising and graphs remain planned |
-| `response` | Dry-run-only T1078 response planning implemented (`duke respond`); execution, approvals, and rollback application remain planned |
+| `detection` | Deterministic T1078 and T1110 detection implemented with explainable weighted confidence; detection validation implemented (`duke validate`); precision/recall, tuning, and additional rules planned |
+| `investigation` | Evidence-led T1078 and T1110 investigation implemented (`duke investigate`); hypothesising and graphs remain planned |
+| `response` | Dry-run-only T1078 and T1110 response planning implemented (`duke respond`); execution, approvals, and rollback application remain planned |
 | `validation` | Deterministic validation implemented (`duke validate`), rerunning the pipeline against in-memory mutations of an artefact |
 | `reporting` | Deterministic advisory incident reporting implemented (`duke report`), rendering an aggregate of finding, investigation, response plan, and validation suite to Markdown with overwrite-protected export |
-| `learning` | T1078 guided learning path implemented (`duke learn T1078`) with typed, metadata-only models and deterministic literal rendering; learner-progress tracking and further learning content remain planned |
+| `learning` | T1078 and T1110 guided learning paths implemented with typed, metadata-only models and deterministic literal rendering; learner-progress tracking and further learning content remain planned |
 | `labs` | T1078 simulation through reporting documentation implemented (labs overview covers all lifecycle stages); guided lab delivery remains planned |
 | `adapters` | Planned optional vendor and platform integrations |
 
@@ -136,10 +145,17 @@ The implemented scenario now also includes:
 - deterministic advisory incident reporting that aggregates the workflow
   data into a Markdown report without asserting confirmed compromise,
   impact, or exfiltration;
-- a guided learning path that teaches Python through the implemented T1078
+- a guided learning path that teaches Python through the implemented
   workflow, reusing the real CLI commands and public exports as metadata
   without executing them. See
-  [the guided learning guide](../learning/T1078-guided-learning.md).
+  [the T1078 guided learning guide](../learning/T1078-guided-learning.md)
+  and [the T1110 guided learning guide](../learning/T1110-guided-learning.md).
+
+Both **T1078 Valid Accounts** and **T1110 Brute Force (Password
+Spraying)** are completed two-production-scenario full-lifecycle verticals:
+each exposes all seven registered capabilities
+(simulation, detection, investigation, response, validation, reporting,
+learning).
 
 Scenarios are registered in a **static built-in scenario registry**
 (`duke.scenarios`), not discovered from the filesystem. Each registration
@@ -158,9 +174,12 @@ The following scenario components remain planned:
 - learner-progress tracking;
 - broader improve → retest learning workflows.
 
-T1078 Valid Accounts is Duke's first vertical slice, not its only
-planned scenario. See [ROADMAP.md](../../ROADMAP.md) and the
-[T1078 lab documentation](../labs/T1078/overview.md).
+T1078 Valid Accounts is Duke's first vertical slice, and
+T1110 Brute Force is the second completed full-lifecycle vertical;
+together they are the current two-scenario production portfolio. More
+scenarios are planned. See [ROADMAP.md](../../ROADMAP.md) and the
+[T1078 lab documentation](../labs/T1078/overview.md) and
+[T1110 lab documentation](../labs/T1110/overview.md).
 
 
 ## CLI-first interface

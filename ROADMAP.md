@@ -121,7 +121,37 @@ for the current milestone.
   architecture overview, development guides, initial ADRs, and the guided
   learning guide under `docs/learning/`)
 
-### Component roadmap
+### Current phase
+
+The **two-scenario milestone is complete**: T1078 and T1110 are both
+full-lifecycle production verticals (each exposing simulation, detection,
+investigation, response, validation, reporting, and learning). The current
+phase is **Phase 1 — portfolio / release preparation**: architecture
+diagrams, lifecycle/data-flow diagram, a concise README showcase, a
+reproducible demonstration, and a release-readiness review.
+
+The forward roadmap, in order:
+
+- **Phase 1 — Portfolio / release preparation** *(current)*: architecture
+  and lifecycle diagrams, README showcase, reproducible demonstration,
+  version/release-readiness review.
+- **Phase 2 — Narrow T1566 simulation**: a single, deterministic,
+  defensive simulation of a proposed future scenario based on
+  **T1566.002 Spearphishing Link**. **T1566 is proposed, not implemented
+  or registered**; this roadmap describes the ordering only and commits
+  to no event-level design.
+- **Phase 3 — T1566 detection through learning**: detection, investigation,
+  response, validation, reporting, and learning for T1566, one reviewed
+  slice at a time.
+- **Phase 4 — Evidence-backed refactoring future work**: shared helper
+  extractions only when each third implementation exists (rule of three).
+
+A **`0.2.0` release is pending separate approval** and is not performed by
+the portfolio slice. Its scope is the completed T1078 + T1110 portfolio plus
+the portfolio documentation; T1566 is outside that scope. See
+[docs/release/0.2.0-release-readiness.md](docs/release/0.2.0-release-readiness.md).
+
+## Component roadmap
 
 The core domain models and CLI foundation are implemented. The table
 below distinguishes that foundation from the capabilities still planned.
@@ -153,10 +183,10 @@ will be introduced only with clear purpose, tests, and documentation.
 
 ## Beyond the first milestone
 
-Once the T1078 vertical slice is complete and validated, Duke intends
+With the two-scenario vertical slice complete and validated, Duke intends
 to grow its scenario catalogue to cover additional ATT&CK tactics and
-techniques, always built and documented as complete vertical slices
-rather than partial, cross-cutting layers. The scenario catalogue is
+techniques, always built and documented as complete vertical slices rather
+than partial, cross-cutting layers. The scenario catalogue is
 metadata-driven and is not hardcoded into the CLI.
 
 New scenarios are added as small vertical slices. T1110 is now a complete
@@ -165,3 +195,16 @@ seven-capability vertical: it began as a **simulation-only** slice and added
 **incident reporting**, and finally **guided learning**, joining the
 full-lifecycle conformance fixture set. Each step proved the multi-scenario
 foundation and the registry's safe missing-capability behaviour.
+
+**Proposed future work** (not yet implemented or registered):
+
+- **T1566.002 Spearphishing Link** as the third scenario vertical —
+  proposed, under active design, and out of scope for the current
+  portfolio slice and for the `0.2.0` release. This roadmap commits to
+  the *ordering* above, not to any event-level design.
+- **Later lifecycle slices and evidence-backed refactoring** — shared-helper
+  extraction only once a third implementation exists for each candidate
+  (e.g. simulation builder, investigation scaffold, response action
+  builder, validation harness, reporting aggregation, learning step
+  builder), each separately reviewable and preserving existing T1078/T1110
+  outputs.

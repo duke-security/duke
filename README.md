@@ -20,11 +20,32 @@ See [ADR 0001](docs/decisions/0001-vendor-agnostic-core.md).
 
 ## Project status
 
-Duke is under active early development. The first milestone is a
-single, complete, end-to-end scenario based on MITRE ATT&CK
-**T1078 — Valid Accounts**. T1078 is the first vertical slice used to
-prove out the platform's architecture, not the only scenario Duke
-will ever support — see [ROADMAP.md](ROADMAP.md).
+Duke is under active early development. The first milestone was a single,
+complete, end-to-end scenario based on MITRE ATT&CK **T1078 — Valid
+Accounts**, used to prove out the platform's architecture. That vertical is
+done, and a second full-lifecycle scenario, **T1110 — Brute Force
+(Password Spraying)**, is complete alongside it. The current production
+portfolio is exactly these two scenarios — see [ROADMAP.md](ROADMAP.md).
+
+### Try Duke
+
+```bash
+pip install -e .                      # local, editable install
+duke scenarios                        # list the two scenarios and their capabilities
+duke simulate T1110 -o data/events/t1110-demo.json
+duke detect T1110 -i data/events/t1110-demo.json
+duke investigate T1110 -i data/events/t1110-demo.json
+duke respond T1110  -i data/events/t1110-demo.json
+duke validate T1110 -i data/events/t1110-demo.json
+duke report T1110  -i data/events/t1110-demo.json -o reports/t1110-demo.md
+duke learn T1110
+```
+
+A complete, reproducible end-to-end walkthrough of this T1110 flow — with
+exact output and expected exit codes — lives in
+[docs/development/reproducible-demo.md](docs/development/reproducible-demo.md).
+All artefact and report paths under `data/events/` and `reports/` are
+gitignored.
 
 ### Implemented today
 
@@ -174,6 +195,9 @@ duke scenarios
 - [CHANGELOG.md](CHANGELOG.md) — release history
 - [CONTRIBUTING.md](CONTRIBUTING.md) — how to contribute
 - [docs/architecture/overview.md](docs/architecture/overview.md) — component architecture
+- [docs/architecture/components.md](docs/architecture/components.md) — component diagram and status
+- [docs/architecture/lifecycle.md](docs/architecture/lifecycle.md) — lifecycle and data-flow diagram
+- [docs/development/reproducible-demo.md](docs/development/reproducible-demo.md) — reproducible T1110 demonstration
 - [docs/scenarios/scenario-registry.md](docs/scenarios/scenario-registry.md) — the scenario registry and how to add a scenario
 - [docs/scenarios/scenario-authoring.md](docs/scenarios/scenario-authoring.md) — the authoring contract for a new scenario
 - [docs/scenarios/scenario-conformance.md](docs/scenarios/scenario-conformance.md) — scenario conformance checks
@@ -197,6 +221,12 @@ implements destructive malware, credential theft, real data
 exfiltration, unauthorized access, or defense evasion. Every
 simulation states what it does and does not do. See
 [AGENTS.md](AGENTS.md) for the full safety policy.
+
+**Duke is a defensive educational CLI, not a production security
+control.** It teaches security engineering through synthetic scenarios;
+its response "actions" are dry-run proposals that are never executed, and
+its findings and reports are analytic and advisory, not live alerts or
+enforcement.
 
 ## License
 

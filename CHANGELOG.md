@@ -408,6 +408,16 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
   (`scenario-authoring.md`, `scenario-conformance.md`) and updated
   scenario-registry, testing, README, roadmap, and changelog entries.
 
+### Documentation
+
+- **Phase 1 portfolio / release-preparation documentation**: architecture
+  component diagram (`docs/architecture/components.md`) and lifecycle /
+  data-flow diagram (`docs/architecture/lifecycle.md`), a concise README
+  showcase ("Try Duke"), a reproducible end-to-end T1110 demonstration
+  (`docs/development/reproducible-demo.md`), and a `0.2.0` release-readiness
+  checklist (`docs/release/0.2.0-release-readiness.md`). No runtime code or
+  tests changed; the source version remains `0.1.0` and no release action
+  was taken.
 
 ### Changed
 
