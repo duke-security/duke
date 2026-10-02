@@ -102,6 +102,30 @@ normalized key.
 - **No CLI changes** — registering a scenario and rebuilding the registry
   is enough; every command resolves and dispatches through the registry.
 
+## Scenario versioning
+
+Duke's **package version** and each scenario's **metadata/content version**
+are **independent** and must not be conflated.
+
+- The package version is the Duke release version (for example `0.1.0`
+  today, declared in `pyproject.toml` and surfaced by `duke version`).
+- Each scenario carries its own `version` field in its metadata (for
+  example `version: "0.1.0"` in `scenario.yaml`). That field describes the
+  scenario's own metadata/content contract, not the Duke package release.
+
+Consequences:
+
+- A Duke package release does **not** automatically change scenario
+  versions.
+- A scenario version changes only when that scenario's documented
+  metadata/content contract changes — for example, its entities, events,
+  detection behaviour, safety model, or scenario metadata shape.
+- A package release may leave every scenario version untouched.
+
+This slice changes neither the Duke package version (still `0.1.0`) nor
+either scenario's version (`t1078_valid_accounts` and
+`t1110_brute_force` both remain `version: "0.1.0"`).
+
 ## Adding a scenario (summary)
 
 1. Implement the scenario's capability functions in the appropriate

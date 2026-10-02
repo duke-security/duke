@@ -407,6 +407,11 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
 - Scenario authoring and conformance documentation under `docs/scenarios/`
   (`scenario-authoring.md`, `scenario-conformance.md`) and updated
   scenario-registry, testing, README, roadmap, and changelog entries.
+- **Apache License 2.0** licensing and package metadata hardening: a root
+  `LICENSE` file, `license = "Apache-2.0"` + `license-files = ["LICENSE"]`
+  package metadata, an `authors` entry, `keywords`, and accurate `classifiers`
+  (Education / Information Technology / Security); README's License
+  section now states Apache-2.0 and links the license text.
 
 ### Documentation
 
@@ -427,3 +432,10 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
   functions directly; they resolve scenarios and dispatch to capabilities
   through the static built-in `duke.scenarios` registry (T1078 remains in help
   examples and default filenames).
+- Release-metadata hardening: the `build` frontend is now declared in the
+  `dev` extra, `[build-system] requires` is set to `setuptools>=77` (for the
+  PEP 639 license metadata), `.claude/` is explicitly gitignored, and the
+  scenario-version policy is documented under `docs/scenarios/` (scenario
+  metadata/content versions are independent of the Duke package version;
+  this slice changes neither). Source version remains `0.1.0`; no release
+  action was taken.

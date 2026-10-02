@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,6 +8,31 @@ version = "0.1.0"
 description = "A vendor-agnostic cybersecurity education and security-engineering platform."
 readme = "README.md"
 requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Umar Gambari" }]
+keywords = [
+    "cybersecurity",
+    "education",
+    "security-engineering",
+    "MITRE-ATT&CK",
+    "detection-engineering",
+    "python-learning",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Education",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Education",
+    "Topic :: Security",
+]
 dependencies = [
     "networkx>=3.2",
     "pydantic>=2.6",
@@ -18,6 +43,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    "build>=1.0",
     "mypy>=1.8",
     "pre-commit>=3.6",
     "pytest>=8.0",

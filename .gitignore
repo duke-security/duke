@@ -35,6 +35,9 @@ dist/
 .DS_Store
 Thumbs.db
 
+# Claude Code local configuration (never commit)
+.claude/
+
 # Duke-generated runtime data
 data/events/*.json
 reports/
