@@ -64,7 +64,7 @@ def test_version_displays_installed_version() -> None:
     result = runner.invoke(app, ["version"])
 
     assert result.exit_code == 0
-    assert "Duke version 0.1.0" in result.stdout
+    assert "Duke version 0.2.0" in result.stdout
 
 def test_simulate_t1078_writes_json_artifact(tmp_path: Path) -> None:
     output_path = tmp_path / "t1078.json"

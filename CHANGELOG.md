@@ -7,6 +7,8 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-02
+
 ### Added
 
 - A second production scenario, MITRE ATT&CK **T1110 — Brute Force**

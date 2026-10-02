@@ -25,7 +25,7 @@ python -m duke.cli.app version
 Expected output (`exit 0`):
 
 ```
-Duke version 0.1.0
+Duke version 0.2.0
 ```
 
 ## Caveats before you start

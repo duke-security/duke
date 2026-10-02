@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "duke-security"
-version = "0.1.0"
+version = "0.2.0"
 description = "A vendor-agnostic cybersecurity education and security-engineering platform."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -53,6 +53,12 @@ dev = [
 
 [project.scripts]
 duke = "duke.cli.app:app"
+
+[project.urls]
+Homepage = "https://github.com/umargambari/duke-security"
+Repository = "https://github.com/umargambari/duke-security"
+Documentation = "https://github.com/umargambari/duke-security/tree/main/docs"
+Issues = "https://github.com/umargambari/duke-security/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

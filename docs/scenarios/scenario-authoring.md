@@ -107,8 +107,9 @@ normalized key.
 Duke's **package version** and each scenario's **metadata/content version**
 are **independent** and must not be conflated.
 
-- The package version is the Duke release version (for example `0.1.0`
-  today, declared in `pyproject.toml` and surfaced by `duke version`).
+- The package version is the Duke release version (for example `0.2.0`
+  on the `0.2.0` release branch, declared in `pyproject.toml` and surfaced
+  by `duke version`).
 - Each scenario carries its own `version` field in its metadata (for
   example `version: "0.1.0"` in `scenario.yaml`). That field describes the
   scenario's own metadata/content contract, not the Duke package release.
