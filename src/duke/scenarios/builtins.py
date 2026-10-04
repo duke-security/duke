@@ -27,11 +27,16 @@ from duke.scenarios.registry import (
     ScenarioRegistration,
     ScenarioRegistry,
 )
-from duke.simulation import generate_t1078_simulation, generate_t1110_simulation
+from duke.simulation import (
+    generate_t1078_simulation,
+    generate_t1110_simulation,
+    generate_t1566_simulation,
+)
 from duke.validation import validate_t1078, validate_t1110
 
 _T1078_SLUG = "t1078_valid_accounts"
 _T1110_SLUG = "t1110_brute_force"
+_T1566_SLUG = "t1566_phishing"
 
 
 def load_t1078_metadata() -> Scenario:
@@ -42,6 +47,11 @@ def load_t1078_metadata() -> Scenario:
 def load_t1110_metadata() -> Scenario:
     """Load the packaged T1110 scenario metadata from its YAML definition."""
     return load_builtin_scenario(_T1110_SLUG)
+
+
+def load_t1566_metadata() -> Scenario:
+    """Load the packaged T1566 scenario metadata from its YAML definition."""
+    return load_builtin_scenario(_T1566_SLUG)
 
 
 def t1078_registration() -> ScenarioRegistration:
@@ -91,6 +101,30 @@ def t1110_registration() -> ScenarioRegistration:
     )
 
 
+def t1566_registration() -> ScenarioRegistration:
+    """Build the deterministic T1566 registration.
+
+    T1566 is registered as a **simulation-only** slice. The canonical
+    technique ID is ``T1566`` (Phishing), matching the pattern set by T1078
+    and T1110; the specific behaviour model is the sub-technique, surfaced as
+    a friendly alias (``T1566.002``) alongside the slug. Only the simulation
+    capability is provided; detection, investigation, response, validation,
+    reporting, and learning are intentionally not yet implemented and remain
+    ``None`` so unsupported lifecycle commands fail safely through the
+    registry's missing-capability path.
+    """
+    return ScenarioRegistration(
+        technique_id="T1566",
+        slug=_T1566_SLUG,
+        name="Phishing: Spearphishing Link",
+        aliases=("phishing", "T1566.002"),
+        metadata_loader=load_t1566_metadata,
+        capabilities=ScenarioCapabilities(
+            simulation=generate_t1566_simulation,
+        ),
+    )
+
+
 def builtin_registry() -> ScenarioRegistry:
     """Return a fresh registry with all built-in scenarios registered.
 
@@ -101,6 +135,7 @@ def builtin_registry() -> ScenarioRegistry:
     registry = ScenarioRegistry()
     registry.register(t1078_registration())
     registry.register(t1110_registration())
+    registry.register(t1566_registration())
     return registry
 
 
@@ -108,6 +143,8 @@ __all__ = [
     "builtin_registry",
     "load_t1078_metadata",
     "load_t1110_metadata",
+    "load_t1566_metadata",
     "t1078_registration",
     "t1110_registration",
+    "t1566_registration",
 ]

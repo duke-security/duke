@@ -67,10 +67,11 @@ def test_builtin_unknown_scenario_raises() -> None:
         registry.resolve("not-a-registered-key")
 
 
-def test_builtin_registry_contains_both_scenarios() -> None:
+def test_builtin_registry_contains_all_builtin_scenarios() -> None:
     registry = builtin_registry()
     registry.resolve("T1078")
     registry.resolve("T1110")
+    registry.resolve("T1566")
 
 
 def test_display_metadata_agrees_with_yaml_metadata() -> None:
@@ -83,6 +84,10 @@ def test_display_metadata_agrees_with_yaml_metadata() -> None:
     assert "Credential Access" in meta.attack_tactics
 
 
-def test_t1110_is_registered_second_and_deterministic() -> None:
+def test_t1110_is_registered_in_deterministic_order() -> None:
     registry = builtin_registry()
-    assert [r.technique_id for r in registry.scenarios()] == ["T1078", "T1110"]
+    assert [r.technique_id for r in registry.scenarios()] == [
+        "T1078",
+        "T1110",
+        "T1566",
+    ]

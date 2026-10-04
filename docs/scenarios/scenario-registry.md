@@ -119,7 +119,7 @@ All subclass `ScenarioRegistryError`.
 
 `ScenarioRegistry.resolve(key)` folds the key to lowercase and looks it up
 against each registration's technique ID, slug, and aliases. The built-in
-`builtin_registry()` currently registers two scenarios.
+`builtin_registry()` currently registers three scenarios.
 
 T1078 resolves all of these to the same registration:
 
@@ -136,6 +136,18 @@ resolves:
 - `t1110_brute_force` (stable slug)
 - `brute-force` (friendly alias)
 - `T1110.003` (sub-technique alias)
+
+T1566 (Phishing), a **simulation-only** scenario modelling sub-technique
+T1566.002 Spearphishing Link, resolves:
+
+- `T1566` / `t1566` (technique ID, case-insensitive)
+- `t1566_phishing` (stable slug)
+- `phishing` (friendly alias)
+- `T1566.002` (sub-technique alias)
+
+T1566 exposes **simulation only**; its detection, investigation, response,
+validation, reporting, and learning capabilities remain `None` until their
+slices are implemented.
 
 `register()` builds each registration's normalized key set and rejects any
 collision with an already registered scenario, so duplicate canonical IDs,
@@ -196,4 +208,4 @@ To add a new scenario (e.g. `T9999`):
 - [T1078 guided learning path](../learning/T1078-guided-learning.md)
 - [CONTRIBUTING.md](../../CONTRIBUTING.md)
 
-Last reviewed: 2026-09-25
+Last reviewed: 2026-10-04

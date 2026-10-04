@@ -1,0 +1,47 @@
+id: "15660000-0000-4000-8000-000000000001"
+name: "Phishing: Spearphishing Link"
+description: >-
+  A synthetic employee receives a spearphishing email whose message contains a
+  link to an inert, RFC 2606 reserved domain (example.invalid). The employee
+  opens the message and clicks the link; an inert redirect record is produced
+  and correlated DNS-style telemetry is observed, then a defensive web filter
+  blocks the reserved destination. The synthetic telemetry reproduces only
+  observable delivery, open, click, redirect, DNS, and block records. No real
+  email, URL, network request, DNS resolution, or credential capture occurs,
+  and no compromise is asserted.
+
+attack_technique_id: "T1566"
+attack_tactics:
+  - "Initial Access"
+
+learning_objectives:
+  - "Reconstruct the observable telemetry chain of a spearphishing-link attempt (delivery, open, click, redirect record, DNS observation, blocked destination)."
+  - "Distinguish recorded phishing telemetry from real network or credential activity."
+  - "Explain that clicking a link or observing a redirect does not confirm a completed connection or account compromise."
+
+python_concepts:
+  - "Lists and tuples"
+  - "Functions and modules"
+  - "Typed data models"
+  - "Datetime arithmetic"
+  - "Event outcomes (success vs unknown)"
+  - "Deterministic test data"
+
+telemetry_requirements:
+  - "Email delivery"
+  - "Email opening"
+  - "Link click observation"
+  - "Inert redirect record"
+  - "Inconclusive DNS-style observation"
+  - "Defensive web-filter block"
+
+safety_notes:
+  - "Uses only synthetic identities, hosts, and RFC 2606 reserved (example.invalid) domains."
+  - "Does not deliver, open, or click a real email or link."
+  - "Does not make real network requests, resolve real domains, or fetch content."
+  - "Does not include a payload, attachment, macro, or credential-harvesting page, and never collects or stores credentials."
+  - "Click, redirect, and DNS records never imply a completed connection; the block is a policy decision only."
+  - "Does not label the employee as compromised, the message as an attacker, or assert any impact."
+
+version: "0.1.0"
+last_reviewed: "2026-10-03"

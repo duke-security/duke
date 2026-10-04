@@ -61,7 +61,11 @@ def test_every_capability_is_available() -> None:
 
 def test_builtin_listing_is_deterministic() -> None:
     registry = builtin_registry()
-    assert [r.technique_id for r in registry.scenarios()] == ["T1078", "T1110"]
+    assert [r.technique_id for r in registry.scenarios()] == [
+        "T1078",
+        "T1110",
+        "T1566",
+    ]
 
 
 def test_display_metadata_agrees_with_yaml_metadata() -> None:

@@ -44,8 +44,8 @@ Duke version 0.2.0
 python -m duke.cli.app scenarios
 ```
 
-Expected output (`exit 0`): exactly two production scenarios, each with all
-seven capabilities.
+Expected output (`exit 0`): the three production scenarios. T1078 and T1110
+each expose all seven capabilities; T1566 exposes simulation only.
 
 ```
 Registered scenarios
@@ -57,6 +57,10 @@ Registered scenarios
     Slug: t1110_brute_force
     Capabilities: simulation, detection, investigation, response, validation, reporting, learning
     Aliases: brute-force, T1110.003
+- T1566 — Phishing: Spearphishing Link
+    Slug: t1566_phishing
+    Capabilities: simulation
+    Aliases: phishing, T1566.002
 ```
 
 This command **prints** a listing; it writes nothing and never runs a

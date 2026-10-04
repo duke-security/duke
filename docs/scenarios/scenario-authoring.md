@@ -135,8 +135,16 @@ either scenario's version (`t1078_valid_accounts` and
 3. Add a `ScenarioRegistration` in `duke.scenarios.builtins` wiring the
    capabilities (leaving unimplemented ones `None`).
 4. Add the registration to `builtin_registry()`.
-5. Add a conformance **fixture** (expectations) and register the scenario
-   in the conformance pairs so the reusable checks run over it.
+5. Add conformance coverage:
+   - A **full-lifecycle** scenario joins `SCENARIO_PAIRS` (a conformance
+     fixture + expectations) so all reusable checks run over it.
+   - A **partial** (e.g. simulation-only) scenario is **not** added to
+     `SCENARIO_PAIRS`; instead it gets generic **partial-production
+     conformance** in `tests/conformance/test_production.py` (metadata,
+     registration-shape, isolated registry, simulation, artefact, and
+     relationship checks), with each unimplemented capability reported as a
+     passing skip. The simulation-only T1566 scenario follows this partial
+     pattern today.
 
 ## References
 
@@ -146,4 +154,4 @@ either scenario's version (`t1078_valid_accounts` and
   resolution semantics.
 - [CONTRIBUTING.md](../../CONTRIBUTING.md) — the contribution workflow.
 
-Last reviewed: 2026-09-23
+Last reviewed: 2026-10-04

@@ -20,10 +20,14 @@ probe scenario, proving the checks themselves are reusable.
 3. **Behavioural conformance** — determinism of simulation and detection,
    artefact validity (unique entity/event IDs, resolved relationships),
    safe-response guarantees, and validation/reporting/learning determinism.
-4. **Production built-in / CLI conformance** — `builtin_registry()` still
-   contains exactly T1078, CLI resolution agrees, T1078's YAML agreement is
-   asserted here only, and an AST-based guard proves the reusable sources
-   stay independent of the T1078 implementation modules.
+4. **Production built-in / CLI conformance** — `builtin_registry()` contains
+   the three static built-ins (T1078 and T1110 as full-lifecycle members of
+   `SCENARIO_PAIRS`, plus the simulation-only T1566, whose generic
+   conformance runs via partial-production checks because it is not yet a
+   full-lifecycle `SCENARIO_PAIRS` member), CLI resolution agrees, the
+   full-lifecycle scenarios' YAML agreement is asserted here only, and an
+   AST-based guard proves the reusable sources stay independent of the T1078
+   implementation modules.
 
 ## Key files
 
@@ -132,4 +136,4 @@ mypy src tests/conformance
   resolution.
 - [CONTRIBUTING.md](../../CONTRIBUTING.md) — the contribution workflow.
 
-Last reviewed: 2026-09-23
+Last reviewed: 2026-10-04

@@ -35,6 +35,37 @@ Additional ATT&CK techniques and tactics are expected to follow once
 this vertical slice is complete, but are intentionally out of scope
 for the current milestone.
 
+## Current production portfolio
+
+Beyond T1078, Duke now ships **T1110 — Brute Force (Password Spraying)** as
+a full seven-capability lifecycle scenario, and a third production scenario,
+**T1566 — Spearphishing Link** (sub-technique **T1566.002**), as an in-progress
+vertical built in small slices.
+
+### T1566 — Phishing (Spearphishing Link) · In progress
+
+Duke registers this scenario under canonical technique ID **T1566** and
+accepts **T1566.002** as an alias (the same pattern as T1110 / T1110.003).
+The behaviour modelled is **T1566.002 Spearphishing Link**.
+
+**Complete:**
+
+- Safe, deterministic T1566.002 simulation (five entities, six ordered
+  events: delivery, open, click, inert redirect record, inconclusive DNS
+  observation, and a defensive web-filter block)
+- Partial-production generic conformance coverage (T1566 is not yet a
+  full-lifecycle `SCENARIO_PAIRS` member)
+- `duke simulate T1566` and alias resolution (`phishing`, `T1566.002`)
+- T1566.002 simulation, safety, CLI, and conformance tests
+- `docs/labs/T1566/overview.md` lab overview (detection through learning
+  marked as planned)
+
+**Planned (future slices):**
+
+- Detection, investigation, response, validation, reporting, and guided
+  learning for T1566.002
+- Full-lifecycle conformance membership once reporting is complete
+
 ## Status
 
 ### Complete

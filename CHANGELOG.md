@@ -7,6 +7,41 @@ and Duke adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- A third production scenario framework, **T1566 — Phishing**
+  (**T1566.002 Spearphishing Link**), implemented as a **simulation-only**
+  slice (`duke simulate T1566`). Duke registers the scenario under its
+  canonical technique ID (`T1566`) and accepts **T1566.002** as an alias,
+  matching the established T1110 / T1110.003 convention. It reproducibly
+  models the observable Initial Access telemetry of a spearphishing-link
+  attempt with exactly five synthetic entities and six ordered events:
+  `email_receive` (a synthetic message is delivered to a synthetic employee),
+  `email_open` (the employee opens the message), `url_click` (the employee
+  clicks the link — a recorded UI action only), `url_redirect` (an inert
+  redirect record with `destination_reached=false`), `dns_query` (an
+  inconclusive, unresolved DNS-style observation), and `url_blocked` (a
+  defensive web-filter block that is a policy decision only, with
+  `established=false` and `network_effect=none`). The simulation never
+  delivers, opens, or clicks a real email or link, never makes a network
+  request or resolves a domain, never carries a payload, attachment, macro,
+  or credential-harvesting page, never collects or stores credentials, and
+  never asserts compromise, credential theft, impact, or completed network
+  access. It uses only RFC 2606 reserved domains (`example.invalid`) and
+  synthetic identities. T1566 exposes **simulation only**; unsupported
+  lifecycle commands (`detect`, `investigate`, `respond`, `validate`,
+  `report`, `learn`) fail safely with exit code 2 through the registry's
+  missing-capability path. The simulation-only scenario is covered by
+  **partial-production generic conformance** (metadata, registration,
+  isolated registry, simulation, artefact, relationships) and is deliberately
+  **not** a member of the full-lifecycle `SCENARIO_PAIRS`. Includes
+  simulation, safety (no side-effecting generation, no credential material,
+  reserved domains only, string-typed attributes), CLI, and conformance
+  tests, plus a new `docs/labs/T1566/overview.md` lab overview that marks
+  detection through learning as **planned**. Detection, investigation,
+  response, validation, reporting, and guided learning for T1566 are
+  intentionally not yet implemented.
+
 ## [0.2.0] - 2026-10-02
 
 ### Added

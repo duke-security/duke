@@ -50,6 +50,21 @@ def _t1110_registry_with(**capability_overrides):
     return registry
 
 
+def _t1566_registry_with(**capability_overrides):
+    """Return a registry whose T1566 registration has capability overrides."""
+    import dataclasses
+
+    from duke.scenarios.builtins import t1566_registration
+    from duke.scenarios.registry import ScenarioRegistry
+
+    base = t1566_registration()
+    caps = dataclasses.replace(base.capabilities, **capability_overrides)
+    registration = dataclasses.replace(base, capabilities=caps)
+    registry = ScenarioRegistry()
+    registry.register(registration)
+    return registry
+
+
 def test_help_displays_project_description() -> None:
     """The help command should explain Duke's purpose."""
     result = runner.invoke(app, ["--help"])
@@ -174,6 +189,131 @@ def test_simulate_t1110_requires_force_to_overwrite(tmp_path: Path) -> None:
     assert second.exit_code == 1
     assert "Output already exists" in second.stdout
     assert forced.exit_code == 0
+
+
+def test_simulate_t1566_writes_json_artifact(tmp_path: Path) -> None:
+    output_path = tmp_path / "t1566-session-001.json"
+
+    result = runner.invoke(
+        app,
+        ["simulate", "T1566", "--output", str(output_path)],
+    )
+
+    assert result.exit_code == 0
+    assert "Simulation complete" in result.stdout
+    assert "Events generated: 6" in result.stdout
+    assert output_path.exists()
+
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["scenario"]["attack_technique_id"] == "T1566"
+    assert len(payload["entities"]) == 5
+    assert len(payload["events"]) == 6
+
+
+def test_simulate_t1566_resolves_all_aliases(tmp_path: Path) -> None:
+    for key in ("T1566", "t1566", "t1566_phishing", "phishing", "T1566.002"):
+        output_path = tmp_path / f"out-{key.replace('.', '-')}.json"
+        result = runner.invoke(
+            app,
+            ["simulate", key, "--output", str(output_path)],
+        )
+        assert result.exit_code == 0, key
+        assert output_path.exists(), key
+
+
+def test_simulate_t1566_requires_force_to_overwrite(tmp_path: Path) -> None:
+    output_path = tmp_path / "t1566.json"
+
+    first = runner.invoke(
+        app,
+        ["simulate", "T1566", "--output", str(output_path)],
+    )
+    second = runner.invoke(
+        app,
+        ["simulate", "T1566", "--output", str(output_path)],
+    )
+    forced = runner.invoke(
+        app,
+        ["simulate", "T1566", "--output", str(output_path), "--force"],
+    )
+
+    assert first.exit_code == 0
+    assert second.exit_code == 1
+    assert "Output already exists" in second.stdout
+    assert forced.exit_code == 0
+
+
+def test_simulate_t1566_unknown_technique_exits_2(tmp_path: Path) -> None:
+    output_path = tmp_path / "unknown.json"
+    result = runner.invoke(
+        app,
+        ["simulate", "T1567", "--output", str(output_path)],
+    )
+
+    assert result.exit_code == 2
+    assert "Unsupported technique" in result.stdout
+    assert not output_path.exists()
+
+
+def test_detect_t1566_missing_capability_exits_2(tmp_path: Path) -> None:
+    """Lifecycle commands against the simulation-only T1566 fail safely (exit
+    2, 'does not provide capability') without reading or producing an
+    artefact."""
+    input_path = tmp_path / "t1566.json"
+    simulated = runner.invoke(
+        app,
+        ["simulate", "T1566", "--output", str(input_path)],
+    )
+    assert simulated.exit_code == 0
+
+    result = runner.invoke(app, ["detect", "T1566", "--input", str(input_path)])
+
+    assert result.exit_code == 2
+    assert "does not provide capability" in result.stdout
+
+
+def test_investigate_and_respond_t1566_missing_capability_exit_2(
+    tmp_path: Path,
+) -> None:
+    """The same missing-capability safe-fail path applies to every other
+    lifecycle command."""
+    input_path = tmp_path / "t1566.json"
+    simulated = runner.invoke(
+        app,
+        ["simulate", "T1566", "--output", str(input_path)],
+    )
+    assert simulated.exit_code == 0
+
+    for command in ("investigate", "respond", "validate", "report", "learn"):
+        args = (
+            [command, "T1566", "--input", str(input_path)]
+            if command != "learn"
+            else [command, "T1566"]
+        )
+        result = runner.invoke(app, args)
+        assert result.exit_code == 2, command
+        assert "does not provide capability" in result.stdout, command
+
+
+def test_report_t1566_exit_2_without_output(tmp_path: Path, monkeypatch) -> None:
+    """`duke report T1566` exits 2 via the missing-capability path and never
+    writes an output file."""
+    input_path = tmp_path / "t1566.json"
+    simulated = runner.invoke(
+        app,
+        ["simulate", "T1566", "--output", str(input_path)],
+    )
+    assert simulated.exit_code == 0
+    output_path = tmp_path / "report.md"
+
+    result = runner.invoke(
+        app,
+        ["report", "T1566", "--input", str(input_path), "--output", str(output_path)],
+    )
+
+    assert result.exit_code == 2
+    assert "does not provide capability" in result.stdout
+    assert not output_path.exists()
 
 
 def test_detect_t1110_reads_input_artifact(tmp_path: Path) -> None:
@@ -596,6 +736,34 @@ def test_scenarios_lists_t1110_capabilities() -> None:
     assert "validation" in result.stdout
     assert "reporting" in result.stdout
     assert "T1078" in result.stdout
+
+
+def test_scenarios_lists_t1566_simulation_only() -> None:
+    result = runner.invoke(app, ["scenarios"])
+
+    assert result.exit_code == 0
+    # The `scenarios` listing renders each scenario as a block starting with
+    # "- <TECHNIQUE_ID> — <name>". Isolate the T1566 block by anchoring on the
+    # aliases line that ends it.
+    marker = "- T1566"
+    start = result.stdout.index(marker)
+    aliases_line = "    Aliases: phishing, T1566.002"
+    end = result.stdout.index(aliases_line, start) + len(aliases_line)
+    block = result.stdout[start:end]
+
+    assert "Phishing: Spearphishing Link" in block
+    assert "simulation" in block
+    # T1566 exposes simulation only; none of the other six lifecycle
+    # capabilities may appear within its own block.
+    for capability in (
+        "detection",
+        "investigation",
+        "response",
+        "validation",
+        "reporting",
+        "learning",
+    ):
+        assert capability not in block
 
 
 def test_detect_t1078_reads_input_artifact(tmp_path: Path) -> None:

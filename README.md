@@ -24,14 +24,21 @@ Duke is under active early development. The first milestone was a single,
 complete, end-to-end scenario based on MITRE ATT&CK **T1078 — Valid
 Accounts**, used to prove out the platform's architecture. That vertical is
 done, and a second full-lifecycle scenario, **T1110 — Brute Force
-(Password Spraying)**, is complete alongside it. The current production
-portfolio is exactly these two scenarios — see [ROADMAP.md](ROADMAP.md).
+(Password Spraying)**, is complete alongside it. A third production scenario,
+**T1566 — Spearphishing Link** (sub-technique **T1566.002**), is now underway
+as a **simulation-only** slice. The current production portfolio is exactly
+these three scenarios — see [ROADMAP.md](ROADMAP.md).
+
+> Duke registers the phishing scenario under its canonical technique ID
+> **T1566** and accepts **T1566.002** as an alias, matching the T1110 /
+> T1110.003 convention. Throughout the user-facing documentation the behaviour
+> is referred to as **T1566.002 Spearphishing Link**.
 
 ### Try Duke
 
 ```bash
 pip install -e .                      # local, editable install
-duke scenarios                        # list the two scenarios and their capabilities
+duke scenarios                        # list the three scenarios and their capabilities
 duke simulate T1110 -o data/events/t1110-demo.json
 duke detect T1110 -i data/events/t1110-demo.json
 duke investigate T1110 -i data/events/t1110-demo.json
@@ -39,6 +46,7 @@ duke respond T1110  -i data/events/t1110-demo.json
 duke validate T1110 -i data/events/t1110-demo.json
 duke report T1110  -i data/events/t1110-demo.json -o reports/t1110-demo.md
 duke learn T1110
+duke simulate T1566 -o data/events/t1566-demo.json   # simulation-only slice
 ```
 
 A complete, reproducible end-to-end walkthrough of this T1110 flow — with
@@ -119,6 +127,30 @@ gitignored.
   learning path. T1110 now provides **all seven** registered lifecycle
   capabilities (simulation, detection, investigation, response, validation,
   reporting, learning) and joins the full-lifecycle conformance fixture set.
+- A third production scenario, **T1566 — Spearphishing Link** (`duke simulate
+  T1566`), currently a **simulation-only** slice of sub-technique **T1566.002**.
+  It safely models the observable Initial Access telemetry of a
+  spearphishing-link attempt — a synthetic employee receives an untrusted
+  email (`email_receive`), opens it (`email_open`), clicks the enclosed link
+  (`url_click`), an inert redirect record is produced
+  (`url_redirect`, `destination_reached=false`), correlated DNS-style
+  telemetry is observed as inconclusive (`dns_query`, `resolved=false`), and a
+  defensive web filter blocks the reserved destination
+  (`url_blocked`, `established=false`). It uses only RFC 2606 reserved
+  `example.invalid` domains and synthetic identities; it never delivers or
+  opens a real email, clicks a real link, resolves a domain, or makes a
+  network request, carries no payload or credential capture, and never
+  asserts compromise or impact. Duke registers the scenario under canonical
+  technique ID **T1566** and accepts **T1566.002** as an alias. Only the
+  simulation capability is provided; detection, investigation, response,
+  validation, reporting, and learning for T1566 are intentionally **planned**
+  and not yet implemented, so unsupported lifecycle commands fail safely with
+  exit code 2 through the registry's missing-capability path. The
+  simulation-only scenario passes the generic scenario-conformance checks
+  (metadata, registration, registry, simulation, artefact, relationships)
+  via partial-production conformance and round-trips through the existing
+  telemetry loader with no schema change. See
+  [the T1566 lab documentation](docs/labs/T1566/overview.md).
 - Reusable, test-only scenario-conformance infrastructure: the same
   checks validate both the built-in T1078 scenario and an independent
   probe scenario, with an AST guard proving the conformance sources stay
@@ -135,9 +167,12 @@ deterministic detection validation, deterministic incident reporting, a
 T1078 guided learning path, and a static scenario registry are
 implemented. The T1110 scenario now provides the full seven-capability
 lifecycle (simulation, detection, investigation, response, validation,
-reporting, learning) and joins the full-lifecycle conformance fixture set;
-broader future work such as additional scenarios, adapters, a GUI/API, and
-real execution remains planned. The full learning component (additional scenarios and their
+reporting, learning) and joins the full-lifecycle conformance fixture set.
+The T1566 scenario's deterministic simulation (T1566.002 Spearphishing Link)
+is implemented as a simulation-only slice; its detection, investigation,
+response, validation, reporting, and learning remain **planned**. Broader
+future work such as additional scenarios, adapters, a GUI/API, and real
+execution also remains planned. The full learning component (additional scenarios and their
 learning paths, learner-progress tracking, broader improve → retest
 learning workflows, further lesson content), a dynamic/plugin scenario
 registry, additional ATT&CK scenarios, and vendor adapters remain
@@ -147,6 +182,7 @@ See [the T1078 guided learning guide](docs/learning/T1078-guided-learning.md),
 [the T1078 lab documentation](docs/labs/T1078/overview.md),
 [the T1110 lab documentation](docs/labs/T1110/overview.md),
 [the T1110 guided learning guide](docs/learning/T1110-guided-learning.md),
+[the T1566 lab documentation](docs/labs/T1566/overview.md),
 [the architecture overview](docs/architecture/overview.md), and
 [ROADMAP.md](ROADMAP.md) for details.
 

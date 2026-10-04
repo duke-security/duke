@@ -57,14 +57,15 @@ def test_registry_without_duplicates(isolated_registry):
     assert len(registry.scenarios()) == 3
 
 
-def test_production_builtin_registry_holds_only_t1078_and_t1110():
-    """The production built-in registry must never contain the probe; its count
-    is distinct from the conformance fixture registry count above."""
+def test_production_builtin_registry_holds_only_the_three_builtins():
+    """The production built-in registry holds exactly T1078, T1110, and the
+    simulation-only T1566, and must never contain the probe; its count is
+    distinct from the conformance fixture registry count above."""
     from duke.scenarios.builtins import builtin_registry
 
     registry = builtin_registry()
     ids = [registration.technique_id for registration in registry.scenarios()]
-    assert ids == ["T1078", "T1110"]
+    assert ids == ["T1078", "T1110", "T1566"]
     assert "T9999" not in ids
 
 
